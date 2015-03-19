@@ -16,7 +16,8 @@ and dataset generators.
 
 The programs are written in C++ and bash scripts.
 The makefile assumes certaint filename conventions to work properly;
-the details can be found in [`naming_conventions.md`](naming_conventions.md).
+the details can be found in [`naming_conventions.md`](naming_conventions.md)
+and [`submakefiles.md`](submakefiles.md).
 
 For information about the dataset strucutre,
 read [`datasets/format.md`](datasets/format.md).
