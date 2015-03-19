@@ -42,10 +42,10 @@ The number of these directives shall be the number given in the `d` directive.
 
 Following the header there should be an empty line,
 followed by all the entries in the dataset.
-Each entry is comma-separated list of values,
+Each entry is a comma-separated list of values,
 in the order presented by the `f` and `c` directives.
 Each `f` directive correspond to a floating point value readable by scanf,
 and each `c` directive correspond to a string without commas or line breaks.
 Each entry is followed by a newline character.
 
-An example of dataset is the [iris flower dataset](iris_flower.data).
+[An example](iris_flower.data) might help clarify this format.

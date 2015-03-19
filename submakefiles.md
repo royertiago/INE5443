@@ -9,7 +9,7 @@ includes other makefiles (for instance test/makefile.mk).
 Some conventions ease this integration
 while mantaining different build rules for each makefile.
 
-The [file naming conventons](naming_conventions.md) shall be respected.
+The [file naming conventions](naming_conventions.md) shall be respected.
 
 There are two variables,
 MAIN and NOMAIN,

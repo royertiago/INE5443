@@ -1,7 +1,7 @@
 Makefile naming conventions
 ===========================
 
-`file.cpp`: Some file that contains source code of implementations.
+`file.cpp`: Contains source code of implementations.
 If this file has a `main` function,
 ideally it should be the only function of the file.
 There shall not be any `file.h` headers acompanying
