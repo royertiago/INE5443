@@ -1,5 +1,6 @@
-const char help_text[] = 
-"%s [options] --dataset=file\n"
+namespace command_line {
+    const char help_text[] =
+"%s [options] --dataset <file>\n"
 "This program loads a dataset in the format specified by dadasets/format.md\n"
 "and try to classify the incoming entries into one of the categories\n"
 "defined in the dataset.\n"
@@ -7,6 +8,12 @@ const char help_text[] =
 "against the dataset. The guessed category is printed to stdout.\n"
 "\n"
 "Options:\n"
+"\n"
+" --dataset <file>\n"
+"     Selects <file> as the data set against which\n"
+"     the entries are to be classified.\n"
+"     This is the only obrigatory option;\n"
+"     it is listed as an \"option\" because the agrument order do not matter.\n"
 "\n"
 " --manhattan\n"
 " --hamming\n"
@@ -16,12 +23,12 @@ const char help_text[] =
 "     Chooses euclidean distance as proximity metric.\n"
 "     This is the default.\n"
 "\n"
-" --neighbors=N\n"
+" --neighbors <N>\n"
 "     Set the minimum number of neighbhors analysed\n"
 "     with the Nearest Neighbhor algorithm.\n"
 "     Default is 1.\n"
 "\n"
-" --normalize-tolerance=F\n"
+" --normalize-tolerance <F>\n"
 "     Sets the normalization tolerance to F.\n"
 "     (F should be a floating-point number greater than 0.)\n"
 "     Default is 0.1.\n"
@@ -41,35 +48,132 @@ const char help_text[] =
 " --version\n"
 "     Show program version and quit.\n"
 ;
+} // namespace command_line
 
-#include <stdio.h>
+#include <getopt.h>
+#include <cstdio>
+#include <cstdlib>
 #include "pr/nearest_neighbor.h"
 #include "pr/data_entry.h"
 #include "pr/distance.h"
 
-int main() {
-    // read args
+namespace command_line {
+    double tolerance = 0.1;
+    bool euclidean = false;
+    unsigned neighbors = 1;
+    std::FILE * dataset;
 
-    DataSet dataset = DataSet::parse( dataset_file );
+    /* We will use freopen to reset stdin and stdout
+     * in the presence of --input or --output options. */
+    void parse( int argc, char ** argv ) {
+        static option options[] = {
+            {"manhattan", no_argunent, 0, 'm'},
+            {"hamming", no_argument, 0, 'm'},
+            {"euclidean", no_argument, 0, 'e'},
+            {"neighbors", required_argument, 0, 'n'},
+            {"normalize-tolerance", required_argument, 0, 't'},
+            {"input", required_argument, 0, 'i'},
+            {"output", required_argument, 0, 'o'},
+            {"dataset", required_argument, 0, 'd'},
+            {"help", no_argument, 0, 'h'},
+            {"version", no_argument, 0, 'v'},
+            {0, 0, 0, 0},
+        };
+        int opt;
+        int dummy_option_index;
+        while( (opt = getopt_long( argc, argv, "men:t:i:o:d:hv",
+                    options, &dummy_option_index
+                )) != -1 ) {
+            switch( opt ) {
+                case 'm':
+                    euclidean = false;
+                    break;
+                case 'e':
+                    euclidean = true;
+                    break;
+                case 'n':
+                    if( std::sscanf( optarg, "%u", &neighbors ) != 1 ) {
+                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
+                        std::exit(1);
+                    }
+                    if( neighbors == 0 ) {
+                        std::fprintf( stderr, "Too few neighbors\n" );
+                        std::exit(1);
+                    }
+                    break;
+                case 't':
+                    if( std::sscanf( optarg, "%lf", &tolerance ) != 1 ) {
+                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
+                        std::exit(1);
+                    }
+                    if( tolerance < 0 ) {
+                        std::fprintf( stderr, "Invalid negative tolerance\n" );
+                        std::exit(1);
+                    }
+                    break;
+                case 'i':
+                    if( std::freopen(optarg, "r", stdin) == nullptr ) {
+                        std::fprintf( stderr, "Error opening file %s\n", optarg );
+                        std::exit(1);
+                    }
+                    break;
+                case 'o':
+                    if( std::freopen(optarg, "r", stdout) == nullptr ) {
+                        std::fprintf( stderr, "Error opening file %s\n", optarg );
+                        std::exit(1);
+                    }
+                    break;
+                case 'd':
+                    if( (dataset = std::fopen(optarg, "r")) == nullptr ) {
+                        std::fprintf( stderr, "Error opening file %s\n", optarg );
+                        std::exit(1);
+                    }
+                    break;
+                case 'h':
+                    /* We print to stderr to allow for printing
+                     * even after stdout was reopened above. */
+                    std::fprintf( stderr, help_message, argv[0] );
+                    std::exit(0);
+                    break;
+                case 'v':
+                    std::frpintf( stderr, "0.1\n" );
+                    std::exit(0);
+                    break;
+                default:
+                    std::frpintf( stderr, "Unknown parameter %c\n", optopt );
+                    std::exit(1);
+            }
+        }
+        if( dataset == nullptr ) {
+            std::fprintf( stderr, "No dataset chosen.\n" );
+            std::exit(1);
+        }
+    } // void parse(int, char**)
+} // namespace command_line
+
+int main( int argc, char ** argv ) {
+    using namespace command_line;
+    parse( argc, argv );
+
+    DataSet dataset = DataSet::parse( command_line::dataset );
     std::size_t attributes = dataset.attribute_count();
 
     std::unique_ptr<DistanceCalculator> calculator;
-    if( manhattan )
-        calculator = std::make_unique<Manhattan>( attributes, tolerance );
+    if( command_line::euclidean )
+        calculator = std::make_unique<EuclideanDistance>( attributes, tolerance );
     else
-        calculator = std::make_unique<Euclidean>( attributes, tolerance );
+        calculator = std::make_unique<ManhattanDistance>( attributes, tolerance );
 
     NearestNeighbor nn( *distance, dataset );
     DataEntry entry;
 
-    while( (entry = DataEntry.parse(infile, attributes)).attribute_count() == atributes ) {
+    while( (entry = DataEntry.parse(stdin, attributes)).attribute_count() == atributes ) {
         const char * delim = "";
         for( auto str : nn.classify(entry) ) {
-            std::cout << delim << str;
-            delim = ", ";
+            std::fprintf( stdout, "%s%s", str.c_str(), delim );
+            delim = ",";
         }
-        std::cout << '\n';
+        std::fprintf( stdout, "\n" );
     }
-
     return 0;
 }
