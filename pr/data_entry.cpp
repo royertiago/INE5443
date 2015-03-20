@@ -1,3 +1,4 @@
+#include <utility>
 #include "data_entry.h"
 
 DataEntry::DataEntry( std::vector< double > && a, std::vector< std::string >&& c ) :
@@ -26,7 +27,6 @@ static DataEntry DataEntry::parseEntry( std::FILE * file, std::size_t size ) {
         return DataEntry( std::vector<double>(), std::vector<std::string>>() );
 
     std::vector< double > attributes;
-    double current_attribute;
     std::fscanf( file, "%lf", &current_attribute );
     attributes.push_back(current_attribute);
 
@@ -36,4 +36,28 @@ static DataEntry DataEntry::parseEntry( std::FILE * file, std::size_t size ) {
         attributes.push_back(current_attribute);
     }
     return DataEntry( attributes, std::vector<std::string>() );
+}
+
+static DataEntry DataEntry::parseEntry( std::FILE * file, const char * format ) {
+    std::vector< double > attributes;
+    std::vector< std::string > categories;
+    while( *format != '\0' ) {
+        if( *format == 'a' ) {
+            double current_attribute;
+            std::fscanf( file, "%lf", &current_attribute );
+            attributes.push_back(current_attribute);
+        }
+        else if( *format == 'c' ) {
+            std::string name;
+            char c = fgetc( file );
+            while( c != '\n' && c != ',' ) {
+                name += c;
+                c = fgetc(file);
+            }
+            categories.push_back(name);
+        }
+        else
+            throw "Unknown format.";
+    }
+    return DataEntry( std::move(attributes), std::move(categories) );
 }

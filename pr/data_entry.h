@@ -27,6 +27,11 @@ public:
      *
      * The format is assumed to be comma-separated. */
     static DataEntry parseEntry( std::FILE * file, std::size_t size );
+
+    /* Parses an entry according to hte specified format.
+     * If EOF is reached, a DataEntry
+     * with less attributes of categories is returned. */
+    static DataEntry parseEntry( std::FILE * file, const char * format );
 };
 
 #endif // DATA_ENTRY_H
