@@ -13,9 +13,11 @@ struct DistanceCalculator {
 class NormalizingDistanceCalculator : public DistanceCalculator {
 private:
     double tolerance;
-protected:
+    bool normalized;
     std::vector< double > minimum_value;
     std::vector< double > multiplicative_factor;
+protected:
+    double normalize( double value, std::size_t attribute_index );
 public:
     NormalizingDistanceCalculator( double tolerance );
     virtual double operator()( const DataEntry&, const DataEntry& ) const = 0;
@@ -23,19 +25,15 @@ public:
 };
 
 
-class EuclideanDistance : public NormalizingDistanceCalculator {
-    unsigned size;
-public:
-    EuclideanDistance( unsigned size, double normalizing_tolarance );
-    virtual double compute( const double * begin1, const double * begin2 ) override;
+struct EuclideanDistance : public NormalizingDistanceCalculator {
+    EuclideanDistance( double normalizing_tolarance );
+    virtual double compute( const DataEntry&, const DataEntry& ) override;
 };
 
 
 struct ManhattanDistance : public NormalizingDistanceCalculator {
-public:
-    unsigned size;
-    ManhattanDistance( unsigned size, double normalizing_tolerance );
-    virtual double compute( const double * begin1, const double * begin2 ) override;
+    ManhattanDistance( double normalizing_tolerance );
+    virtual double compute( const DataEntry&, const DataEntry& ) override;
 };
 
 #endif // DISTANCE_H
