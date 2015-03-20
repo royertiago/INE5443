@@ -46,6 +46,7 @@ Each entry is a comma-separated list of values,
 in the order presented by the `f` and `c` directives.
 Each `f` directive correspond to a floating point value readable by scanf,
 and each `c` directive correspond to a string without commas or line breaks.
+There shall not have any whitespace surrounding the comma.
 Each entry is followed by a newline character.
 
 [An example](iris_flower.data) might help clarify this format.
