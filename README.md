@@ -19,5 +19,5 @@ The makefile assumes certaint filename conventions to work properly;
 the details can be found in [`naming_conventions.md`](naming_conventions.md)
 and [`submakefiles.md`](submakefiles.md).
 
-For information about the dataset strucutre,
+For information about the dataset structure,
 read [`datasets/format.md`](datasets/format.md).
