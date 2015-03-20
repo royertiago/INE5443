@@ -1,7 +1,7 @@
 #ifndef DATA_ENTRY_H
 #define DATA_ENTRY_H
 
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -10,11 +10,7 @@ class DataEntry {
     std::vector< std::string > categories;
 
 public:
-
     DataEntry( std::vector< double > &&, std::vector< std::string >&& );
-
-    const double * begin() const;
-    const double * end() const;
 
     double attribute( std::size_t index ) const;
     const std::string& category( std::size_t index ) const;
@@ -30,7 +26,7 @@ public:
      * with less than size attributes is returned.
      *
      * The format is assumed to be comma-separated. */
-    static DataEntry parseEntry( FILE * file, std::size_t size );
+    static DataEntry parseEntry( std::FILE * file, std::size_t size );
 };
 
 #endif // DATA_ENTRY_H
