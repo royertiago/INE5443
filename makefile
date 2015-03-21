@@ -46,7 +46,7 @@ PROGRAMS := $(MAIN:.cpp=)
 all: $(PROGRAMS)
 
 $(PROGRAMS): %: %.o
-	$(CXX) $(CXXFLAGS) -o $@ $+
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(OBJ): %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
