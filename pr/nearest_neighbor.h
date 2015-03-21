@@ -4,12 +4,16 @@
 #include <string>
 #include <vector>
 
+class DataSet;
+struct DistanceCalculator;
+class DataEntry;
+
 class DistanceCalculator;
 
 class NearestNeighbor {
     const DataSet & dataset;
     DistanceCalculator& distance;
-    std::size_t _n; // Nearest Neighbor algorithm parameter
+    std::size_t neighbors; // Nearest Neighbor algorithm parameter
 
 public:
     NearestNeighbor(

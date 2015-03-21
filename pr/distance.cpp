@@ -1,19 +1,20 @@
 /* Implementation of distance.h.
  */
 #include <cmath>
+#include <cfloat>
 #include "distance.h"
 #include "pr/data_set.h"
 #include "pr/data_entry.h"
 
-NormalizingDistanceCalculator::NormalizingDistanceCalculador( double tolerance ) :
+NormalizingDistanceCalculator::NormalizingDistanceCalculator( double tolerance ) :
     tolerance( tolerance ),
-    normalized( false ),
+    normalized( false )
 {}
 
 void NormalizingDistanceCalculator::normalize( const DataSet & dataset ) {
     normalized = true;
     minimum_value = std::vector<double>( dataset.attribute_count(), DBL_MAX );
-    auto minimum_value = std::vector<double>( dataset.attribute_count(), DBL_MIN );
+    auto maximum_value = std::vector<double>( dataset.attribute_count(), DBL_MIN );
     for( const DataEntry & entry : dataset )
         for( std::size_t i = 0; i < dataset.attribute_count(); i++ ) {
             minimum_value[i] = std::min(minimum_value[i], entry.attribute(i));
@@ -30,9 +31,9 @@ void NormalizingDistanceCalculator::normalize( const DataSet & dataset ) {
     }
 }
 
-void NormalizingDistanceCalculator::normalize( double value, std::size_t index ) {
+double NormalizingDistanceCalculator::normalize( double value, std::size_t index ) const {
     if( !normalized ) return value;
-    return multiplicative_factor[i] * (value - minimum_value[i]);
+    return multiplicative_factor[index] * (value - minimum_value[index]);
 };
 
 
@@ -40,11 +41,11 @@ EuclideanDistance::EuclideanDistance( double normalizing_tolerance ) :
     NormalizingDistanceCalculator( normalizing_tolerance )
 {}
 
-double EuclideanDistance::compute( const DataEntry& e1, const DataEntry& e2 ) const {
+double EuclideanDistance::operator()( const DataEntry& e1, const DataEntry& e2 ) const {
     double sum = 0;
     for( std::size_t i = 0; i < e1.attribute_count(); i++ ) {
-        double v1 = this->normalize( e1.attribute(i) );
-        double v2 = this->normalize( e2.attribute(i) );
+        double v1 = this->normalize( e1.attribute(i), i );
+        double v2 = this->normalize( e2.attribute(i), i );
         sum = std::fma(v1 - v2, v1 - v2, sum);
     }
     return std::sqrt(sum);
@@ -54,11 +55,11 @@ ManhattanDistance::ManhattanDistance( double normalizing_tolerance ) :
     NormalizingDistanceCalculator( normalizing_tolerance )
 {}
 
-double ManhattanDistance::compute( const double * begin1, const double * begin2 ) {
+double ManhattanDistance::operator()( const DataEntry& e1, const DataEntry& e2 ) const {
     double sum = 0;
     for( std::size_t i = 0; i < e1.attribute_count(); i++ ) {
-        double v1 = this->normalize( e1.attribute(i) );
-        double v2 = this->normalize( e2.attribute(i) );
+        double v1 = this->normalize( e1.attribute(i), i );
+        double v2 = this->normalize( e2.attribute(i), i );
         sum += std::fabs(v1 - v2);
     }
     return std::sqrt(sum);

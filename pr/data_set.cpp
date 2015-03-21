@@ -10,7 +10,7 @@ DataSet::DataSet(
     category_names(category_names)
 {}
 
-DataSed DataSet::parse( std::FILE * source ) {
+DataSet DataSet::parse( std::FILE * source ) {
     std::size_t field_count = 0;
     char c;
 
@@ -49,9 +49,10 @@ DataSed DataSet::parse( std::FILE * source ) {
     std::vector< DataEntry > entries;
     DataEntry entry;
 
-    while( entry = DataEntry::parse( source, format.c_str() ) ) {
+    while( true ) {
+        entry = DataEntry::parse( source, format.c_str() );
         if( entry.attribute_count() < attribute_names.size() ||
-            entry.category_cout() < category_names.size() )
+            entry.category_count() < category_names.size() )
             break;
         entries.push_back( entry );
     }
@@ -72,7 +73,7 @@ const DataEntry * DataSet::end() const {
 }
 
 std::size_t DataSet::size() const {
-    return entres.size();
+    return entries.size();
 }
 
 std::size_t DataSet::attribute_count() const {
@@ -80,13 +81,13 @@ std::size_t DataSet::attribute_count() const {
 }
 
 std::size_t DataSet::category_count() const {
-    return category_name.count();
+    return category_names.size();
 }
 
-std::string DataSet::attribute_name( std::size_t index ) {
+std::string DataSet::attribute_name( std::size_t index ) const {
     return attribute_names[index];
 }
 
-std::string DataSet::category_name( std::size_t index ) {
+std::string DataSet::category_name( std::size_t index ) const {
     return category_names[index];
 }

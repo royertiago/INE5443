@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <map>
 #include "nearest_neighbor.h"
 #include "pr/data_entry.h"
 #include "pr/data_set.h"
@@ -10,12 +12,12 @@ NearestNeighbor::NearestNeighbor(
 ) :
     dataset( dataset ),
     distance( distance ),
-    n( neighbors )
+    neighbors( neighbors )
 {
     distance.normalize(dataset);
 }
 
-std::vector< std::string > classify( const DataEntry & target ) {
+std::vector< std::string > NearestNeighbor::classify( const DataEntry & target ) {
     std::vector< std::pair<double, const DataEntry *> > nearest;
     for( const DataEntry & entry : dataset )
         nearest.emplace_back( distance( entry, target ), &entry );
@@ -32,16 +34,16 @@ std::vector< std::string > classify( const DataEntry & target ) {
      * We begin by processing the first `this->neighbors`
      * mandatory votes. */
 
-    auto it = nighbors.begin();
+    auto it = nearest.begin();
     for( unsigned i = 0; i < neighbors; ++i, ++it ) {
-        if( it == neighbors.end() )
+        if( it == nearest.end() )
             throw "Too few entries in dataset to categorize target entry.";
-        for( unsigned j = 0; j < it->category_count(); j++ )
-            count[j][it->category(j)]++;
+        for( unsigned j = 0; j < dataset.category_count(); j++ )
+            votes[j][it->second->category(j)]++;
     }
 
     std::vector< std::string > categories( dataset.category_count() );
-    std::vector< std::string > max_votes( dataset.category_count() );
+    std::vector< unsigned > max_votes( dataset.category_count() );
     /* categories[i] is the category with the highest number of votes
      * for the ith category type,
      * or "" in the event of a draw.
@@ -117,12 +119,12 @@ std::vector< std::string > classify( const DataEntry & target ) {
         bool already_incremented = false;
         auto category_of = [&](unsigned index) {
             if( !already_incremented ) {
-                if( it == neighbors.end() )
+                if( it == nearest.end() )
                     throw "Too few entries in dataset to resolve the tie.";
                 ++it;
                 already_incremented = true;
             }
-            return it->category(index);
+            return it->second->category(index);
         };
         for( unsigned i = 0; i < neighbors; ++i ) {
             if( categories[i] == "" ) {

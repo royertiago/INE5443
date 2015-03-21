@@ -10,6 +10,8 @@ class DataEntry {
     std::vector< std::string > categories;
 
 public:
+    DataEntry() = default;
+
     DataEntry( std::vector< double > &&, std::vector< std::string >&& );
 
     double attribute( std::size_t index ) const;
@@ -26,12 +28,12 @@ public:
      * with less than size attributes is returned.
      *
      * The format is assumed to be comma-separated. */
-    static DataEntry parseEntry( std::FILE * file, std::size_t size );
+    static DataEntry parse( std::FILE * file, std::size_t size );
 
     /* Parses an entry according to hte specified format.
      * If EOF is reached, a DataEntry
      * with less attributes of categories is returned. */
-    static DataEntry parseEntry( std::FILE * file, const char * format );
+    static DataEntry parse( std::FILE * file, const char * format );
 };
 
 #endif // DATA_ENTRY_H

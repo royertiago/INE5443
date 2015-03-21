@@ -1,5 +1,5 @@
 namespace command_line {
-    const char help_text[] =
+    const char help_message[] =
 "%s [options] --dataset <file>\n"
 "This program loads a dataset in the format specified by dadasets/format.md\n"
 "and try to classify the incoming entries into one of the categories\n"
@@ -53,9 +53,11 @@ namespace command_line {
 #include <getopt.h>
 #include <cstdio>
 #include <cstdlib>
-#include "pr/nearest_neighbor.h"
+#include <memory>
 #include "pr/data_entry.h"
+#include "pr/data_set.h"
 #include "pr/distance.h"
+#include "pr/nearest_neighbor.h"
 
 namespace command_line {
     double tolerance = 0.1;
@@ -67,7 +69,7 @@ namespace command_line {
      * in the presence of --input or --output options. */
     void parse( int argc, char ** argv ) {
         static option options[] = {
-            {"manhattan", no_argunent, 0, 'm'},
+            {"manhattan", no_argument, 0, 'm'},
             {"hamming", no_argument, 0, 'm'},
             {"euclidean", no_argument, 0, 'e'},
             {"neighbors", required_argument, 0, 'n'},
@@ -136,11 +138,11 @@ namespace command_line {
                     std::exit(0);
                     break;
                 case 'v':
-                    std::frpintf( stderr, "0.1\n" );
+                    std::fprintf( stderr, "0.1\n" );
                     std::exit(0);
                     break;
                 default:
-                    std::frpintf( stderr, "Unknown parameter %c\n", optopt );
+                    std::fprintf( stderr, "Unknown parameter %c\n", optopt );
                     std::exit(1);
             }
         }
@@ -152,22 +154,25 @@ namespace command_line {
 } // namespace command_line
 
 int main( int argc, char ** argv ) {
-    using namespace command_line;
-    parse( argc, argv );
+    command_line::parse( argc, argv );
 
     DataSet dataset = DataSet::parse( command_line::dataset );
-    std::size_t attributes = dataset.attribute_count();
 
     std::unique_ptr<DistanceCalculator> calculator;
     if( command_line::euclidean )
-        calculator = std::make_unique<EuclideanDistance>( attributes, tolerance );
+        calculator = std::make_unique<EuclideanDistance>( command_line::tolerance );
     else
-        calculator = std::make_unique<ManhattanDistance>( attributes, tolerance );
+        calculator = std::make_unique<ManhattanDistance>( command_line::tolerance );
 
-    NearestNeighbor nn( *distance, dataset );
+    NearestNeighbor nn( dataset, *calculator, command_line::neighbors );
+
     DataEntry entry;
+    std::size_t attribute_count = dataset.attribute_count();
+    while( true ) {
+        entry = DataEntry::parse(stdin, attribute_count );
+        if( entry.attribute_count() != attribute_count )
+            break;
 
-    while( (entry = DataEntry.parse(stdin, attributes)).attribute_count() == atributes ) {
         const char * delim = "";
         for( auto str : nn.classify(entry) ) {
             std::fprintf( stdout, "%s%s", str.c_str(), delim );
