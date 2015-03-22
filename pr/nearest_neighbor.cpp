@@ -52,7 +52,7 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
      * If there are draws, we will get more votes
      * from the nearest neighbors after the first `this->neighbors`. */
 
-    for( unsigned i = 0; i < neighbors; ++i ) {
+    for( unsigned i = 0; i < dataset.category_count(); ++i ) {
         for( auto pair: votes[i] ) {
             if( pair.second > max_votes[i] ) {
                 categories[i] = pair.first;
@@ -113,28 +113,21 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
     bool draws = true;
     while( draws ) {
         draws = false;
-        /* The following two variables encapsulate
-         * the exception throwing
-         * whenever there is no more neighbors to consider. */
-        bool already_incremented = false;
-        auto category_of = [&](unsigned index) {
-            if( !already_incremented ) {
+        for( unsigned i = 0; i < dataset.category_count(); ++i ) {
+            if( categories[i] == "" ) {
+                // We need a new vote, but we might not have more voters.
                 if( it == nearest.end() )
                     throw "Too few entries in dataset to resolve the tie.";
-                ++it;
-                already_incremented = true;
-            }
-            return it->second->category(index);
-        };
-        for( unsigned i = 0; i < neighbors; ++i ) {
-            if( categories[i] == "" ) {
-                votes[i][category_of(i)]++;
-                if( votes[i][category_of(i)] > max_votes[i] )
-                    categories[i] = category_of(i);
+                std::string next_vote = it->second->category(i);
+
+                votes[i][next_vote]++;
+                if( votes[i][next_vote] > max_votes[i] )
+                    categories[i] = next_vote;
                 else
                     draws = true;
             }
         }
+        ++it;
     }
 
     return categories;
