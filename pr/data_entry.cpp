@@ -71,18 +71,18 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
 }
 
 // Public operators implementation
-bool operator==( const DataEntry & rhs, const DataEntry & lhs ) {
-    if( rhs.attribute_count() != lhs.attribute_count() )
+bool operator==( const DataEntry & lhs, const DataEntry & rhs ) {
+    if( lhs.attribute_count() != rhs.attribute_count() )
         return false;
 
-    for( std::size_t i = 0; i < rhs.attribute_count(); i++ )
-        if( std::fabs(rhs.attribute(i) - lhs.attribute(i))
+    for( std::size_t i = 0; i < lhs.attribute_count(); i++ )
+        if( std::fabs(lhs.attribute(i) - rhs.attribute(i))
                 > std::numeric_limits<double>::epsilon() )
             return false;
 
-    return rhs.categories == lhs.categories;
+    return lhs.categories == rhs.categories;
 }
 
-bool operator!=( const DataEntry & rhs, const DataEntry & lhs ) {
-    return !(rhs == lhs);
+bool operator!=( const DataEntry & lhs, const DataEntry & rhs ) {
+    return !(lhs == rhs);
 }
