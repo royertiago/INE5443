@@ -101,3 +101,37 @@ TEST_CASE( "DataEntry equality/inequality operators", "[DataEntry][operators]" )
         CHECK_FALSE( e5 != e6 );
     }
 }
+
+TEST_CASE( "DataEntry std::initializer_list constructor",
+           "[DataEntry][initializer_list]" )
+{
+    SECTION( "Default constructor" ) {
+        DataEntry data;
+        DataEntry il( {}, {} );
+        CHECK( data == il );
+    }
+
+    SECTION( "DataEntry with no categories" ) {
+        DataEntry data( std::vector<double>{0.1, 2.5, -3.5, 4},
+                        std::vector<std::string>()
+                      );
+        DataEntry il( {0.1, 2.5, -3.5, 4}, {} );
+        CHECK( data == il );
+    }
+
+    SECTION( "DataEntry with no attributes" ) {
+        DataEntry data( std::vector<double>(),
+                        std::vector<std::string>{"A", "B", "XYZ"}
+                      );
+        DataEntry il( {}, {"A", "B", "XYZ"} );
+        CHECK( data == il );
+    }
+
+    SECTION( "DataEntry with both categories and attributes" ) {
+        DataEntry data( std::vector<double>{-1, 3.9},
+                        std::vector<std::string>{"A", "D"}
+                      );
+        DataEntry il( {-1, 3.9}, {"A", "D"} );
+        CHECK( data == il );
+    }
+}
