@@ -46,16 +46,33 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
         }
         else if( *format == 'c' ) {
             std::string name;
-            char c = fgetc( file );
+            char c = std::fgetc( file );
             while( c != '\n' && c != ',' ) {
                 name += c;
-                c = fgetc(file);
+                c = std::fgetc(file);
             }
+            if( c == ',' )
+                std::ungetc(',', file);
             categories.push_back(name);
         }
         else
             throw "Unknown format.";
+
+        ++format;
+        if( *format != '\0' ) {
+            char c = std::fgetc( file );
+            if( c != ',' ) {
+                printf( "-> got char %c\n", c );
+                throw "Input format is missing a comma.";
+            }
+        }
     }
+
+    /* Discard a trailing newline */
+    char c = std::fgetc( file );
+    if( c != '\n' )
+        std::ungetc( c, file );
+
     return DataEntry( std::move(attributes), std::move(categories) );
 }
 
