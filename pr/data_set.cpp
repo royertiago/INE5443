@@ -33,14 +33,16 @@ DataSet DataSet::parse( std::FILE * source ) {
     std::string format;
 
     while( field_count-- ) {
-        std::fscanf( source, "%c ", &c );
-        format += c;
+        char type;
+        std::fscanf( source, "%c", &type );
+        format += type;
+        std::fgetc(source); // Discard only first whitespace
         std::string name;
         while( (c = std::fgetc(source)) != '\n' )
             name += c;
-        if( c == 'a' )
+        if( type == 'a' )
             attribute_names.push_back(name);
-        else if( c == 'c' )
+        else if( type == 'c' )
             category_names.push_back(name);
         else
             throw "Unknown field type.";
@@ -48,6 +50,9 @@ DataSet DataSet::parse( std::FILE * source ) {
 
     std::vector< DataEntry > entries;
     DataEntry entry;
+
+    c = std::fgetc(source);
+    std::ungetc(c, source);
 
     while( true ) {
         entry = DataEntry::parse( source, format.c_str() );
