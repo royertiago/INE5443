@@ -7,15 +7,15 @@
 #include "pr/data_entry.h"
 
 class DataSet {
-    std::vector< DataEntry > entries;
     std::vector< std::string > attribute_names;
     std::vector< std::string > category_names;
+    std::vector< DataEntry > entries;
 
 public:
     DataSet(
-        std::vector< DataEntry >&& entries,
         std::vector< std::string >&& attribute_names,
-        std::vector< std::string >&& category_names
+        std::vector< std::string >&& category_names,
+        std::vector< DataEntry >&& entries
     );
 
     static DataSet parse( std::FILE * source );

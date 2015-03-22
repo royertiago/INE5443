@@ -1,13 +1,13 @@
 #include "pr/data_set.h"
 
 DataSet::DataSet(
-    std::vector< DataEntry >&& entries,
     std::vector< std::string >&& attribute_names,
-    std::vector< std::string >&& category_names
+    std::vector< std::string >&& category_names,
+    std::vector< DataEntry >&& entries
 ) :
-    entries(entries),
     attribute_names(attribute_names),
-    category_names(category_names)
+    category_names(category_names),
+    entries(entries)
 {}
 
 DataSet DataSet::parse( std::FILE * source ) {
@@ -58,9 +58,9 @@ DataSet DataSet::parse( std::FILE * source ) {
     }
 
     return DataSet(
-        std::move(entries),
         std::move(attribute_names),
-        std::move(category_names)
+        std::move(category_names),
+        std::move(entries)
     );
 }
 
