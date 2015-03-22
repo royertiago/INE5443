@@ -47,3 +47,57 @@ TEST_CASE( "Trivial DataEntry member test", "[DataEntry][trivial]" ) {
         CHECK( data.category(1) == "D" );
     }
 }
+
+TEST_CASE( "DataEntry equality/inequality operators", "[DataEntry][operators]" ) {
+    DataEntry e1( std::vector<double>{-1, 1},
+                  std::vector<std::string>{"A"}
+                );
+    DataEntry e2( std::vector<double>{-1, 1},
+                  std::vector<std::string>{"A"}
+                );
+    DataEntry e3( std::vector<double>{-1, 1, 1},
+                  std::vector<std::string>{"A"}
+                );
+    DataEntry e4( std::vector<double>{-1, 1},
+                  std::vector<std::string>{"B"}
+                );
+    DataEntry e5( std::vector<double>{-1, 1.00000001},
+                  std::vector<std::string>{"B"}
+                );
+    DataEntry e6( std::vector<double>{-1, 1.00000001},
+                  std::vector<std::string>{"B"}
+                );
+
+    SECTION( "Tests against e1" ) {
+        CHECK( e1 == e2 );
+        CHECK_FALSE( e1 != e2 );
+        CHECK_FALSE( e1 == e3 );
+        CHECK( e1 != e3 );
+        CHECK_FALSE( e1 == e4 );
+        CHECK( e1 != e4 );
+        CHECK_FALSE( e1 == e5 );
+        CHECK( e1 != e5 );
+        CHECK_FALSE( e1 == e6 );
+        CHECK( e1 != e6 );
+    }
+
+    SECTION( "Tests against e2 (for transitivity)" ) {
+        CHECK_FALSE( e2 == e3 );
+        CHECK( e2 != e3 );
+        CHECK_FALSE( e2 == e4 );
+        CHECK( e2 != e4 );
+        CHECK_FALSE( e2 == e5 );
+        CHECK( e2 != e5 );
+        CHECK_FALSE( e2 == e6 );
+        CHECK( e2 != e6 );
+    }
+
+    SECTION( "Floating point checks" ) {
+        CHECK_FALSE( e4 == e5 );
+        CHECK( e4 != e5 );
+        CHECK_FALSE( e4 == e6 );
+        CHECK( e4 != e6 );
+        CHECK( e5 == e6 );
+        CHECK_FALSE( e5 != e6 );
+    }
+}
