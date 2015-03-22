@@ -8,6 +8,12 @@ DataEntry::DataEntry( std::vector< double > && a, std::vector< std::string >&& c
     categories( c )
 {}
 
+DataEntry::DataEntry( std::initializer_list< double > attributes,
+                      std::initializer_list< const char * > categories ) :
+    attributes( attributes.begin(), attributes.end() ),
+    categories( categories.begin(), categories.end() )
+{}
+
 double DataEntry::attribute( std::size_t index ) const {
     return attributes[index];
 }

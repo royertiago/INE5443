@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include <initializer_list>
 
 class DataEntry {
     std::vector< double > attributes;
@@ -13,6 +14,7 @@ public:
     DataEntry() = default;
 
     DataEntry( std::vector< double > &&, std::vector< std::string >&& );
+    DataEntry( std::initializer_list<double>, std::initializer_list<const char*> );
 
     double attribute( std::size_t index ) const;
     const std::string& category( std::size_t index ) const;
