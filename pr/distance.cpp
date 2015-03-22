@@ -62,5 +62,5 @@ double ManhattanDistance::operator()( const DataEntry& e1, const DataEntry& e2 )
         double v2 = this->normalize( e2.attribute(i), i );
         sum += std::fabs(v1 - v2);
     }
-    return std::sqrt(sum);
+    return std::fabs(sum);
 };
