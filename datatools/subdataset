@@ -1,0 +1,98 @@
+#!/bin/bash
+set -e
+
+show_help() {
+    cat << HELP_TEXT
+$0 [options]
+Produces a dadaset whose entries are subsets of the given dataset.
+The dataset is read in stdin; output is written is stdout.
+Options:
+
+--input <file>
+--dataset <file>
+    Scans 'file' instead of stdin.
+
+--output <file>
+    Writes the result to 'file' instead of stdout.
+
+--ratio <F>
+    Choose the floating-point F as the ratio between
+    the original dataset and the generated dadaset.
+    Must be between 0 and 1.
+    Default: 0.8.
+
+--help
+    Display this help and exit.
+
+--version
+    Display program version and quit.
+HELP_TEXT
+}
+
+dataset_ratio=0.8
+
+# Parse command line
+while (($# != 0)); do
+    case "$1" in
+    (--input | --dataset)
+        exec < "$2"
+        shift
+        ;;
+    (--output)
+        exec > "$2"
+        shift
+        ;;
+    (--ratio)
+        dataset_ratio="$2"
+        if (( $(bc <<< "$dataset_ratio < 0 || $dataset_ratio > 1") )); then
+            echo Invalid ratio $dataset_ratio. >&2
+            exit 1
+        fi
+        shift
+        ;;
+    (--help)
+        show_help >&1
+        # We need to redirect to stderr
+        # because we might already had redirected output to some file.
+        exit 0
+        ;;
+    (--version)
+        echo 0.1
+        exit 0
+        ;;
+    esac
+    shift
+done
+
+IFS=""
+
+while read line; do
+    if [[ "$line" == '#'* ]]; then
+        continue
+    fi
+    if [[ -z "$line" ]]; then
+        echo
+        # We need an empty line between header and data.
+        break
+    fi
+    echo "$line"
+done
+
+shuffled_data=$(mktemp --tmpdir)
+
+# I'm writing this to a file because I will read it twice
+# --- once with 'wc', to get the line count,
+# and once with top, to get the $dataset_ratio first lines.
+shuf > "$shuffled_data"
+
+line_count=$(wc -l "$shuffled_data" | sed 's/\([^ ]*\).*/\1/')
+# Stupid wc outputs filename after line count.
+
+lines=$( bc <<< "$line_count * $dataset_ratio + 0.5" | sed 's/\..*//' )
+# bc leaves a dot if either of the operands are a decimal number.
+# We strip it to not confuse head.
+
+head -n $lines "$shuffled_data"
+
+rm "$shuffled_data"
+exit 0
