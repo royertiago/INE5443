@@ -32,19 +32,7 @@ std::size_t DataEntry::category_count() const {
 }
 
 DataEntry DataEntry::parse( std::FILE * file, std::size_t size ) {
-    if( size == 0 )
-        return DataEntry( std::vector<double>(), std::vector< std::string >() );
-
-    std::vector< double > attributes;
-    double current_attribute;
-    std::fscanf( file, "%lf", &current_attribute );
-    attributes.push_back(current_attribute);
-
-    while( --size ) {
-        std::fscanf( file, " ,%lf", &current_attribute );
-        attributes.push_back(current_attribute);
-    }
-    return DataEntry( std::move(attributes), std::vector<std::string>() );
+    return std::move( DataEntry::parse(file, std::string( size, 'a' ).c_str()) );
 }
 
 DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
