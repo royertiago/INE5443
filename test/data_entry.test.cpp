@@ -163,3 +163,40 @@ TEST_CASE( "DataEntry ostream operator", "[DataEntry][operators][ostream]" ) {
     CHECK( os.str() == "({0.5,-1},{A,B})" );
     os.str("");
 }
+
+TEST_CASE( "DataEntry parsing from file", "[DataEntry][parse]" ) {
+    char str_file[] =
+        "0.5,3.141592\n"
+        "-0.98,1e-2,DifferentWordPosition\n"
+        "-0.98,DifferentWordPosition,1e-2\n"
+        "DifferentWordPosition,-0.98,1e-2\n"
+        "Comma,separated,words\n"
+        " white space ,before comma , after comma\n"
+        ;
+
+    std::FILE * file = fmemopen(str_file, sizeof(str_file)-1, "r");
+
+    DataEntry e1 = DataEntry::parse(file, "aa");
+    REQUIRE( e1 == DataEntry({0.5, 3.141592}, {}) );
+
+    DataEntry e2 = DataEntry::parse(file, "aac");
+    REQUIRE( e2 == DataEntry({-0.98, 1e-2}, {"DifferentWordPosition"}) );
+
+    DataEntry e3 = DataEntry::parse(file, "aca");
+    REQUIRE( e3 == DataEntry({-0.98, 1e-2}, {"DifferentWordPosition"}) );
+
+    printf( "here\n" );
+    DataEntry e4 = DataEntry::parse(file, "caa");
+    printf( "there\n" );
+    REQUIRE( e4 == DataEntry({-0.98, 1e-2}, {"DifferentWordPosition"}) );
+
+    CHECK( e2 == e3 );
+    CHECK( e3 == e4 );
+    CHECK( e3 == e4 );
+
+    DataEntry e5 = DataEntry::parse(file, "ccc");
+    REQUIRE( e5 == DataEntry({}, {"Comma", "separated", "words"}) );
+
+    DataEntry e6 = DataEntry::parse(file, "ccc");
+    REQUIRE( e6 == DataEntry({}, {" white space ", "before comma ", " after comma"}) );
+}
