@@ -199,4 +199,8 @@ TEST_CASE( "DataEntry parsing from file", "[DataEntry][parse]" ) {
 
     DataEntry e6 = DataEntry::parse(file, "ccc");
     REQUIRE( e6 == DataEntry({}, {" white space ", "before comma ", " after comma"}) );
+
+    // End of file scan
+    DataEntry eof = DataEntry::parse(file, "a");
+    REQUIRE( eof == DataEntry({},{}) );
 }

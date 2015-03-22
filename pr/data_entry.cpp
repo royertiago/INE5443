@@ -38,18 +38,23 @@ DataEntry DataEntry::parse( std::FILE * file, std::size_t size ) {
 DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
     std::vector< double > attributes;
     std::vector< std::string > categories;
+    int c;
+
     while( *format != '\0' ) {
         if( *format == 'a' ) {
             double current_attribute;
-            std::fscanf( file, "%lf", &current_attribute );
+            if( std::fscanf( file, "%lf", &current_attribute ) == EOF )
+                goto end_of_file;
             attributes.push_back(current_attribute);
         }
         else if( *format == 'c' ) {
             std::string name;
-            char c = std::fgetc( file );
+            c = std::fgetc( file );
+            if( c == EOF ) goto end_of_file;
             while( c != '\n' && c != ',' ) {
                 name += c;
                 c = std::fgetc(file);
+                if( c == EOF ) goto end_of_file;
             }
             if( c == ',' )
                 std::ungetc(',', file);
@@ -60,7 +65,8 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
 
         ++format;
         if( *format != '\0' ) {
-            char c = std::fgetc( file );
+            c = std::fgetc( file );
+            if( c == EOF ) goto end_of_file;
             if( c != ',' ) {
                 printf( "-> got char %c\n", c );
                 throw "Input format is missing a comma.";
@@ -69,10 +75,11 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
     }
 
     /* Discard a trailing newline */
-    char c = std::fgetc( file );
+    c = std::fgetc( file );
     if( c != '\n' )
         std::ungetc( c, file );
 
+end_of_file:
     return DataEntry( std::move(attributes), std::move(categories) );
 }
 
