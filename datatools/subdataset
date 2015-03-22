@@ -5,6 +5,7 @@ show_help() {
     cat << HELP_TEXT
 $0 [options]
 Produces a dadaset whose entries are subsets of the given dataset.
+The entries are chosen randomly.
 The dataset is read in stdin; output is written is stdout.
 Options:
 
@@ -14,6 +15,11 @@ Options:
 
 --output <file>
     Writes the result to 'file' instead of stdout.
+
+--remaining <file>
+    Writes the entries that did not get selected to 'file'.
+    Note that it only writes the entries,
+    the dataset header is not duplicated.
 
 --ratio <F>
     Choose the floating-point F as the ratio between
@@ -30,6 +36,7 @@ HELP_TEXT
 }
 
 dataset_ratio=0.8
+remaining_entries=/dev/null
 
 # Parse command line
 while (($# != 0)); do
@@ -40,6 +47,10 @@ while (($# != 0)); do
         ;;
     (--output)
         exec > "$2"
+        shift
+        ;;
+    (--remaining)
+        remaining_entries="$2"
         shift
         ;;
     (--ratio)
@@ -93,6 +104,7 @@ lines=$( bc <<< "$line_count * $dataset_ratio + 0.5" | sed 's/\..*//' )
 # We strip it to not confuse head.
 
 head -n $lines "$shuffled_data"
+head -n $((line_count - lines)) "$shuffled_data" > "$remaining_entries"
 
 rm "$shuffled_data"
 exit 0
