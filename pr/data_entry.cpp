@@ -67,10 +67,8 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
         if( *format != '\0' ) {
             c = std::fgetc( file );
             if( c == EOF ) goto end_of_file;
-            if( c != ',' ) {
-                printf( "-> got char %c\n", c );
+            if( c != ',' )
                 throw "Input format is missing a comma.";
-            }
         }
     }
 

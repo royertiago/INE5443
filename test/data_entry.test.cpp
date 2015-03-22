@@ -185,9 +185,7 @@ TEST_CASE( "DataEntry parsing from file", "[DataEntry][parse]" ) {
     DataEntry e3 = DataEntry::parse(file, "aca");
     REQUIRE( e3 == DataEntry({-0.98, 1e-2}, {"DifferentWordPosition"}) );
 
-    printf( "here\n" );
     DataEntry e4 = DataEntry::parse(file, "caa");
-    printf( "there\n" );
     REQUIRE( e4 == DataEntry({-0.98, 1e-2}, {"DifferentWordPosition"}) );
 
     CHECK( e2 == e3 );
