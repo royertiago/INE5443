@@ -1,6 +1,7 @@
-#include <utility>
 #include <cmath>
 #include <limits>
+#include <ostream>
+#include <utility>
 #include "data_entry.h"
 
 DataEntry::DataEntry( std::vector< double > && a, std::vector< std::string >&& c ) :
@@ -85,4 +86,22 @@ bool operator==( const DataEntry & lhs, const DataEntry & rhs ) {
 
 bool operator!=( const DataEntry & lhs, const DataEntry & rhs ) {
     return !(lhs == rhs);
+}
+
+std::ostream & operator<<( std::ostream & os, const DataEntry & rhs ) {
+    const char * separator = "";
+
+    os << "({";
+    for( const auto & a: rhs.attributes ) {
+        os << separator << a;
+        separator = ",";
+    }
+    os << "},{";
+    separator = "";
+    for( const auto & c: rhs.categories ) {
+        os << separator << c;
+        separator = ",";
+    }
+    os << "})";
+    return os;
 }

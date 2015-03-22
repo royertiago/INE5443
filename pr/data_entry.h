@@ -2,6 +2,7 @@
 #define DATA_ENTRY_H
 
 #include <cstdio>
+#include <iosfwd>
 #include <string>
 #include <vector>
 #include <initializer_list>
@@ -42,6 +43,11 @@ public:
      * std::numeric_limits<double>::epsilon(). */
     friend bool operator==( const DataEntry &, const DataEntry & );
     friend bool operator!=( const DataEntry &, const DataEntry & );
+
+    /* Prints a DataEntry.
+     * Format example:
+     * ({1.5,0.8},{"CategoryA"}) */
+    friend std::ostream& operator<<( std::ostream& os, const DataEntry& );
 };
 
 #endif // DATA_ENTRY_H
