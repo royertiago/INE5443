@@ -1,6 +1,7 @@
 /* Unit test for pr/data_entry.h. */
 #include "pr/data_entry.h"
 #include <catch.hpp>
+#include <sstream>
 
 TEST_CASE( "Trivial DataEntry member test", "[DataEntry][trivial]" ) {
 
@@ -134,4 +135,31 @@ TEST_CASE( "DataEntry std::initializer_list constructor",
         DataEntry il( {-1, 3.9}, {"A", "D"} );
         CHECK( data == il );
     }
+}
+
+TEST_CASE( "DataEntry ostream operator", "[DataEntry][operators][ostream]" ) {
+    std::ostringstream os;
+    os << DataEntry({},{});
+    CHECK( os.str() == "({},{})" );
+    os.str("");
+
+    os << DataEntry({0.5},{});
+    CHECK( os.str() == "({0.5},{})" );
+    os.str("");
+
+    os << DataEntry({0.5,-1},{});
+    CHECK( os.str() == "({0.5,-1},{})" );
+    os.str("");
+
+    os << DataEntry({0.5},{"A"});
+    CHECK( os.str() == "({0.5},{A})" );
+    os.str("");
+
+    os << DataEntry({0.5},{"A", "B"});
+    CHECK( os.str() == "({0.5},{A,B})" );
+    os.str("");
+
+    os << DataEntry({0.5,-1},{"A", "B"});
+    CHECK( os.str() == "({0.5,-1},{A,B})" );
+    os.str("");
 }
