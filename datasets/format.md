@@ -42,6 +42,8 @@ The number of these directives shall be the number given in the `d` directive.
 
 Following the header there should be an empty line,
 followed by all the entries in the dataset.
+The empty line between the header and the data
+shall be the only empty line in the whole file.
 Each entry is a comma-separated list of values,
 in the order presented by the `f` and `c` directives.
 Each `f` directive correspond to a floating point value readable by scanf,
