@@ -1,4 +1,6 @@
 #include <utility>
+#include <cmath>
+#include <limits>
 #include "data_entry.h"
 
 DataEntry::DataEntry( std::vector< double > && a, std::vector< std::string >&& c ) :
@@ -60,4 +62,21 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
             throw "Unknown format.";
     }
     return DataEntry( std::move(attributes), std::move(categories) );
+}
+
+// Public operators implementation
+bool operator==( const DataEntry & rhs, const DataEntry & lhs ) {
+    if( rhs.attribute_count() != lhs.attribute_count() )
+        return false;
+
+    for( std::size_t i = 0; i < rhs.attribute_count(); i++ )
+        if( std::fabs(rhs.attribute(i) - lhs.attribute(i))
+                > std::numeric_limits<double>::epsilon() )
+            return false;
+
+    return rhs.categories == lhs.categories;
+}
+
+bool operator!=( const DataEntry & rhs, const DataEntry & lhs ) {
+    return !(rhs == lhs);
 }
