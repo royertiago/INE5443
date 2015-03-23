@@ -27,6 +27,11 @@ Options:
     Must be between 0 and 1.
     Default: 0.8.
 
+--canonic
+    Canonicalize the output (sorting attributes before categories)
+    and remove the category information from the data produced
+    with the --remaining option.
+
 --help
     Display this help and exit.
 
@@ -37,6 +42,7 @@ HELP_TEXT
 
 dataset_ratio=0.8
 remaining_entries=/dev/null
+canonic=""
 
 # Parse command line
 while (($# != 0)); do
@@ -67,6 +73,9 @@ while (($# != 0)); do
         # because we might already had redirected output to some file.
         exit 0
         ;;
+    (--canonic)
+        canonic="true"
+        ;;
     (--version)
         echo 0.1
         exit 0
@@ -79,11 +88,22 @@ while (($# != 0)); do
     shift
 done
 
+temporary_data=$(mktemp --tmpdir)
+datatools/canonicalize > "$temporary_data"
+exec < "$temporary_data"
+
 IFS=""
+format_string=""
 
 while read line; do
     if [[ "$line" == '#'* ]]; then
         continue
+    fi
+    if [[ "$line" == 'a'* ]]; then
+        format_string+=a
+    fi
+    if [[ "$line" == 'c'* ]]; then
+        format_string+=c
     fi
     if [[ -z "$line" ]]; then
         echo
@@ -108,7 +128,9 @@ lines=$( bc <<< "$line_count * $dataset_ratio + 0.5" | sed 's/\..*//' )
 # We strip it to not confuse head.
 
 head -n $lines "$shuffled_data"
-head -n $((line_count - lines)) "$shuffled_data" > "$remaining_entries"
+head -n $((line_count - lines)) "$shuffled_data" | \
+    datatools/strip_entry_category $format_string > "$remaining_entries"
 
 rm "$shuffled_data"
+rm "$temporary_data"
 exit 0
