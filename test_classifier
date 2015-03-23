@@ -1,0 +1,125 @@
+#!/bin/bash
+set -e
+
+show_help() {
+    cat << HELP_TEXT
+$0 [options]
+Generates a test file from a dataset (using datatools/subdataset)
+and runs it using the classifier.
+
+To generate the test, the dataset is splited into a training file
+(a subdataset with some of the entries of the original dataset)
+and a list of DataEntries to be categorized
+(made from the entries of the original dataset that were left behind).
+The entries are chosen randomly.
+
+The dataset is read in stdin; output is written to files
+'training_dataset', 'input_data', and 'output'.
+(The first two are the input to the classifier; the latter
+is classifier's output. These intermediade fires are kept
+because we have no way of getting the seed of the RNG.)
+
+Options:
+--dataset <file>
+    Scans 'file' instead of stdin.
+
+--training-dataset <file>
+    Writes to 'file' instead of 'training_dataset'.
+
+--input-data <file>
+    Writes to 'file' instead of 'input_data'.
+
+--output
+    Writes to 'file' instead of 'output'.
+
+--ratio <F>
+    Choose the floating-point F as the ratio between
+    the original dataset and the generated dadaset.
+    Must be between 0 and 1.
+    Default: 0.8.
+
+--help
+    Display this help and exit.
+
+--version
+    Display program version and quit.
+
+Classifier options:
+These options are passed directly to the classifier.
+Run .classify --help for more information.
+--manhattan
+--hamming
+--euclidean
+--neighbors <N>
+--normalize-tolerance <F>
+HELP_TEXT
+}
+
+dataset=/dev/stdin
+training_dataset=training_dataset
+input_data=input_data
+output=output
+dataset_ratio=0.8
+distance_type=""
+neighbors=""
+normalization=""
+
+while (($# != 0)); do
+    case "$1" in
+    (--dataset)
+        dataset="$2"
+        shift
+        ;;
+    (--training-dataset)
+        training_dataset="$2"
+        shift
+        ;;
+    (--input-data)
+        input_data="$2"
+        shift
+        ;;
+    (--output)
+        output="$2"
+        shift
+        ;;
+    (--ratio)
+        dataset_ratio="$2"
+        shift
+        ;;
+    (--help)
+        show_help "$@"
+        exit 0
+        ;;
+    (--version)
+        echo 0.1
+        exit 0
+        ;;
+    (--manhattan | --hamming | --euclidean)
+        distance_type="$1"
+        ;;
+    (--neighbors)
+        neighbors="$2"
+        ;;
+    (--normalize-tolerance)
+        normalization="$2"
+    (*)
+        echo Unrecognized option "$1" >&2
+        exit 1
+        ;;
+    esac
+    shift
+done
+
+datatools/subdataset --ratio "$dataset_ratio" --output "$training_dataset" \
+    --remaining "$input_data" --canonic < "$dataset"
+
+tmp=$(mktemp --tmpdir)
+
+./classify --dataset "$training_dataset" --input "$input_data" --output "$tmp" \
+    $distance_type $neighbors $normalization
+
+cat "$training_dataset" > "$output"
+
+paste -d , "$input_data" "$tmp" >> "$output"
+
+rm "$tmp"
