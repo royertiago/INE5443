@@ -5,30 +5,38 @@
 #include "data_entry.h"
 
 DataEntry::DataEntry( std::vector< double > && a, std::vector< std::string >&& c ) :
-    attributes( a ),
-    categories( c )
+    _attributes( a ),
+    _categories( c )
 {}
 
 DataEntry::DataEntry( std::initializer_list< double > attributes,
                       std::initializer_list< const char * > categories ) :
-    attributes( attributes.begin(), attributes.end() ),
-    categories( categories.begin(), categories.end() )
+    _attributes( attributes.begin(), attributes.end() ),
+    _categories( categories.begin(), categories.end() )
 {}
 
 double DataEntry::attribute( std::size_t index ) const {
-    return attributes[index];
+    return _attributes[index];
 }
 
 const std::string& DataEntry::category( std::size_t index ) const {
-    return categories[index];
+    return _categories[index];
 }
 
 std::size_t DataEntry::attribute_count() const {
-    return attributes.size();
+    return _attributes.size();
 }
 
 std::size_t DataEntry::category_count() const {
-    return categories.size();
+    return _categories.size();
+}
+
+const std::vector< double > & DataEntry::attributes() const {
+    return _attributes;
+}
+
+const std::vector< std::string > & DataEntry::categories() const {
+    return _categories;
 }
 
 DataEntry DataEntry::parse( std::FILE * file, std::size_t size ) {
@@ -82,19 +90,19 @@ end_of_file:
 }
 
 void DataEntry::write( std::FILE * file, const char * format ) const {
-    auto attribute_it = attributes.begin();
-    auto category_it = categories.begin();
+    auto attribute_it = _attributes.begin();
+    auto category_it = _categories.begin();
     const char * separator = "";
     while( *format != '\0' ) {
         if( *format == 'a' ) {
-            if( attribute_it == attributes.end() )
+            if( attribute_it == _attributes.end() )
                 throw "Too much 'a' specifiers.";
             std::fprintf( file, "%s%lf", separator, *attribute_it );
             separator = ",";
             ++attribute_it;
         }
         else if( *format == 'c' ) {
-            if( category_it == categories.end() )
+            if( category_it == _categories.end() )
                 throw "Too much 'c' specifiers.";
             std::fprintf( file, "%s%s", separator, category_it->c_str() );
             separator = ",";
@@ -104,12 +112,12 @@ void DataEntry::write( std::FILE * file, const char * format ) const {
             throw "Unknown specifier.";
         ++format;
     }
-    while( attribute_it != attributes.end() ) {
+    while( attribute_it != _attributes.end() ) {
         std::fprintf( file, "%s%lf", separator, *attribute_it );
         separator = ",";
         ++attribute_it;
     }
-    while( category_it != categories.end() ) {
+    while( category_it != _categories.end() ) {
         std::fprintf( file, "%s%s", separator, category_it->c_str() );
         separator = ",";
         ++category_it;
@@ -127,7 +135,7 @@ bool operator==( const DataEntry & lhs, const DataEntry & rhs ) {
                 > std::numeric_limits<double>::epsilon() )
             return false;
 
-    return lhs.categories == rhs.categories;
+    return lhs._categories == rhs._categories;
 }
 
 bool operator!=( const DataEntry & lhs, const DataEntry & rhs ) {
@@ -138,13 +146,13 @@ std::ostream & operator<<( std::ostream & os, const DataEntry & rhs ) {
     const char * separator = "";
 
     os << "({";
-    for( const auto & a: rhs.attributes ) {
+    for( const auto & a: rhs._attributes ) {
         os << separator << a;
         separator = ",";
     }
     os << "},{";
     separator = "";
-    for( const auto & c: rhs.categories ) {
+    for( const auto & c: rhs._categories ) {
         os << separator << c;
         separator = ",";
     }

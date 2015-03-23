@@ -18,8 +18,8 @@
  * is kept in the object.
  */
 class DataEntry {
-    std::vector< double > attributes;
-    std::vector< std::string > categories;
+    std::vector< double > _attributes;
+    std::vector< std::string > _categories;
 public:
 
     /* Constructs a new DataEntry from the specified vectors.
@@ -52,6 +52,11 @@ public:
      * of this DataEntry, respectively. */
     std::size_t attribute_count() const;
     std::size_t category_count() const;
+
+    /* Return the attributes or categories of this DataEntry.
+     * Note you cannot change them. */
+    const std::vector< double > & attributes() const;
+    const std::vector< std::string > & categories() const;
 
     /* Parses an entry according to the specified format.
      *
