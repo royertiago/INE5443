@@ -173,12 +173,7 @@ int main( int argc, char ** argv ) {
         if( entry.attribute_count() != attribute_count )
             break;
 
-        const char * delim = "";
-        for( auto str : nn.classify(entry) ) {
-            std::fprintf( stdout, "%s%s", str.c_str(), delim );
-            delim = ",";
-        }
-        std::fprintf( stdout, "\n" );
+        DataEntry({},nn.classify(entry)).write( stdout );
     }
     return 0;
 }
