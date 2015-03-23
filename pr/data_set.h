@@ -20,6 +20,12 @@ public:
 
     static DataSet parse( std::FILE * source );
 
+    /* Writes this dataset to the file.
+     * 'format' is the order that attributes and categories
+     * should appear in the file;
+     * it have the same organization as DataEntry::write. */
+    void write( std::FILE * file, const char * format = "" ) const;
+
     const DataEntry * begin() const;
     const DataEntry * end() const;
     std::size_t size() const;

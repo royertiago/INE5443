@@ -69,6 +69,42 @@ DataSet DataSet::parse( std::FILE * source ) {
     );
 }
 
+void DataSet::write( std::FILE * file, const char * format ) const {
+    std::fprintf( file, "n %zd\n", attribute_names.size() + category_names.size() );
+    const char * original_format = format;
+
+    auto attribute_it = attribute_names.begin();
+    auto category_it = category_names.begin();
+    while( *format != '\0' ) {
+        if( *format == 'a' ) {
+            if( attribute_it == attribute_names.end() )
+                throw "Too much 'a' specifiers.";
+            std::fprintf( file, "a %s\n", attribute_it->c_str() );
+            ++attribute_it;
+        }
+        else if( *format == 'c' ) {
+            if( category_it == category_names.end() )
+                throw "Too much 'c' specifiers.";
+            std::fprintf( file, "c %s\n", category_it->c_str() );
+            ++category_it;
+        }
+        else
+            throw "Unknown specifier.";
+        ++format;
+    }
+    while( attribute_it != attribute_names.end() ) {
+        std::fprintf( file, "a %s\n", attribute_it->c_str() );
+        ++attribute_it;
+    }
+    while( category_it != category_names.end() ) {
+        std::fprintf( file, "c %s\n", category_it->c_str() );
+        ++category_it;
+    }
+    std::fprintf( file, "\n" );
+    for( const auto & entry : entries )
+        entry.write( file, original_format );
+}
+
 const DataEntry * DataSet::begin() const {
     return &*entries.begin();
 }
