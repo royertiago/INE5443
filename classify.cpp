@@ -120,7 +120,7 @@ namespace command_line {
                     }
                     break;
                 case 'o':
-                    if( std::freopen(optarg, "r", stdout) == nullptr ) {
+                    if( std::freopen(optarg, "w", stdout) == nullptr ) {
                         std::fprintf( stderr, "Error opening file %s\n", optarg );
                         std::exit(1);
                     }
