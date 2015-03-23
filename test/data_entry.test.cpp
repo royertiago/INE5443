@@ -164,7 +164,7 @@ TEST_CASE( "DataEntry ostream operator", "[DataEntry][operators][ostream]" ) {
     os.str("");
 }
 
-TEST_CASE( "DataEntry parsing from file", "[DataEntry][parse]" ) {
+TEST_CASE( "DataEntry file input/output", "[DataEntry][parse]" ) {
     char str_file[] =
         "0.5,3.141592\n"
         "-0.98,1e-2,DifferentWordPosition\n"
@@ -201,4 +201,28 @@ TEST_CASE( "DataEntry parsing from file", "[DataEntry][parse]" ) {
     // End of file scan
     DataEntry eof = DataEntry::parse(file, "a");
     REQUIRE( eof == DataEntry({},{}) );
+
+    std::fclose( file );
+
+    char output_file[2*sizeof(str_file)];
+
+    file = fmemopen(output_file, 2*sizeof(str_file)-1, "w");
+    e1.write( file, "aa" );
+    e2.write( file );
+    e3.write( file, "aca" );
+    e4.write( file, "ca" );
+    e5.write( file, "ccc" );
+    e6.write( file );
+
+    std::fclose( file );
+
+    REQUIRE( output_file == std::string(
+        "0.500000,3.141592\n"
+        "-0.980000,0.010000,DifferentWordPosition\n"
+        "-0.980000,DifferentWordPosition,0.010000\n"
+        "DifferentWordPosition,-0.980000,0.010000\n"
+        "Comma,separated,words\n"
+        " white space ,before comma , after comma\n"
+        )
+    );
 }

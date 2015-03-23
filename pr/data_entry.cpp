@@ -81,6 +81,42 @@ end_of_file:
     return DataEntry( std::move(attributes), std::move(categories) );
 }
 
+void DataEntry::write( std::FILE * file, const char * format ) const {
+    auto attribute_it = attributes.begin();
+    auto category_it = categories.begin();
+    const char * separator = "";
+    while( *format != '\0' ) {
+        if( *format == 'a' ) {
+            if( attribute_it == attributes.end() )
+                throw "Too much 'a' specifiers.";
+            std::fprintf( file, "%s%lf", separator, *attribute_it );
+            separator = ",";
+            ++attribute_it;
+        }
+        else if( *format == 'c' ) {
+            if( category_it == categories.end() )
+                throw "Too much 'c' specifiers.";
+            std::fprintf( file, "%s%s", separator, category_it->c_str() );
+            separator = ",";
+            ++category_it;
+        }
+        else
+            throw "Unknown specifier.";
+        ++format;
+    }
+    while( attribute_it != attributes.end() ) {
+        std::fprintf( file, "%s%lf", separator, *attribute_it );
+        separator = ",";
+        ++attribute_it;
+    }
+    while( category_it != categories.end() ) {
+        std::fprintf( file, "%s%s", separator, category_it->c_str() );
+        separator = ",";
+        ++category_it;
+    }
+    std::fprintf( file, "\n" );
+}
+
 // Public operators implementation
 bool operator==( const DataEntry & lhs, const DataEntry & rhs ) {
     if( lhs.attribute_count() != rhs.attribute_count() )

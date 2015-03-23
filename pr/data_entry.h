@@ -67,6 +67,15 @@ public:
      * will be discarded. */
     static DataEntry parse( std::FILE * file, const char * format );
 
+    /* Writes itself to 'file' and append a newline.
+     *
+     * 'format' uses the same code as in function 'parse'.
+     * If the variable 'format' is too short
+     * (for instance, the empty string)
+     * then all remaining attributes and then all remaining categories
+     * will be written to 'file'. */
+    void write( std::FILE * file, const char * format = "" ) const;
+
     /* Parses an entry with 'size' attributes
      * and no category.
      *
