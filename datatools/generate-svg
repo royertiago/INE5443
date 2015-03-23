@@ -1,0 +1,200 @@
+#!/bin/bash
+
+set -e
+
+show_help() {
+    cat << HELP_TEXT
+$0 [options]
+Generate a SVG from the dataset read in stdin.
+Output is printed on stdout.
+The entry format is assumed to be <number>,<number>,<category>;
+that is, this program only support 2D category visualization.
+
+Options:
+
+--dataset <file>
+--input <file>
+    Read the dataset from 'file' instead of stdin.
+
+--output <file>
+    Write the output to 'file' instead of stdout.
+
+--colors <associative-array initializer>
+    Supply an association between categories and colors.
+    The expression should be proper for initializing
+    bash's associative arrays.
+
+--color-list <comma-separated color list>
+    Use the given colors for the categories for which no color was assigned
+    using the option '--colors'.
+    Default value: "red,green,blue,yellow,magenta,cyan,black"
+
+--more-colors <comma-separated color list>
+    Appends the current color list with the given colors.
+    The format is the same as with the option "--color-list".
+    No checking is done to test wether there are repeated colors.
+
+--help
+    Display this help and exit.
+
+--version
+    Display program version and quit.
+HELP_TEXT
+}
+
+# Local convention: any function shall put its return value
+# into the global RETVAL variable.
+
+color_list="red,green,blue,yellow,magenta,cyan,black"
+declare -A colors
+
+# Parse command line
+while (($# != 0)); do
+    case "$1" in
+    (--input | --dataset)
+        exec < "$2"
+        shift
+        ;;
+    (--output)
+        exec > "$2"
+        shift
+        ;;
+    (--colors)
+        colors=($2)
+        shift
+        ;;
+    (--color-list)
+        color_list="$2"
+        shift
+        ;;
+    (--more-colors)
+        color_list+=,"$2"
+        shift
+        ;;
+    (--help)
+        show_help "$@" >&2
+        # We need to redirect to stderr
+        # because we might already had redirected output to some file.
+        exit 0
+        ;;
+    (--version)
+        echo 0.1
+        exit 0
+        ;;
+    (*)
+        echo Unrecognized option "$1" >&2
+        exit 1
+        ;;
+    esac
+    shift
+done
+
+
+# next_color
+# Returns the next color in the color list.
+# This command modifies the color list.
+next_color() {
+    if [[ "$color_list" == "" ]]; then
+        echo Color list exausted. >&2
+        echo Please, provide more colors with \'--more-colors\' option. >&2
+        exit 2
+    fi
+
+    RETVAL="${color_list/,*/}"
+
+    if [[ "$color_list" == *,* ]]; then
+        color_list=${color_list#*,}
+    else
+        color_list=""
+    fi
+}
+
+# color_of <category>
+# Returns the color of the given category.
+# If specified category have no colors, get one from next_color.
+# This command might modify the color list.
+color_of() {
+    if [[ ! "${colors["$1"]:+is_set}" ]]; then
+        next_color
+        colors["$1"]=$RETVAL
+    fi
+    RETVAL=${colors["$1"]}
+}
+
+# split_field <line>
+# Generate the variables RETVAL_X, RETVAL_Y, RETVAL_C
+# based on given line.
+split_field() {
+    local line="$1"
+    RETVAL_X=${line%%,*}
+    line="${1#*,}"
+    RETVAL_Y=${line%%,*}
+    RETVAL_C="${line#*,}"
+}
+
+# Parse header
+# These lines will produce the variables x_label, y_label and c_label.
+
+while read line; do
+    if [[ "$line" == '#'* ]]; then
+        continue
+    fi
+
+    if [[ "$line" == 'a '* ]]; then
+        if [[ ${x_label:+isset} ]]; then
+            if [[ ${y_label:+isset} ]]; then
+                echo Only two dimensions are allowed in the dataset. >&2
+                exit 3
+            fi
+            y_label=${line#'c '}
+        else
+            x_label=${line#'c '}
+        fi
+    fi
+
+    if [[ "$line" == 'c '* ]]; then
+        if [[ ${c_label:+isset} ]]; then
+            echo Only a single characteristic is allowed. >&2
+            exit 3
+        fi
+        c_label=${line#'a '}
+    fi
+
+    if [[ -z "$line" ]]; then
+        break
+    fi
+done
+
+temp_file=$(mktemp --tmpdir)
+
+> "$temp_file"
+echo '<svg xmlns="http://www.w3.org/2000/svg">' >> "$temp_file"
+echo '<g transform="TRANSFORM">' >> "$temp_file"
+
+max_x=0
+max_y=0
+
+while read line; do
+    split_field "$line"
+    color_of "$RETVAL_C"
+    echo "<circle "\
+         "r=\"RADIUS\" "\
+         "cx=\"$RETVAL_X\" "\
+         "cy=\"-$RETVAL_Y\" "\
+         "fill=\"$RETVAL\" />" >> "$temp_file"
+    max_x=$(bc <<< "if( $RETVAL_X > $max_x ) $RETVAL_X else $max_x")
+    max_y=$(bc <<< "if( $RETVAL_Y > $max_y ) $RETVAL_Y else $max_y")
+done
+
+echo '</g>' >> "$temp_file"
+echo '</svg>' >> "$temp_file"
+
+max=$(bc <<< "if( $max_x > $max_y ) $max_x else $max_y")
+# Some arbitrarily chosen values
+scale=$(bc -l <<< "500 / $max")
+radius=$(bc -l <<< "5 / $scale")
+transform="scale($scale),translate(0,$(bc <<< "$max_y+$radius"))"
+
+sed "s/TRANSFORM/$transform/g;s/RADIUS/$radius/g" "$temp_file"
+
+rm -f "$temp_file"
