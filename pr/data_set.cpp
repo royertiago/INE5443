@@ -12,15 +12,16 @@ DataSet::DataSet(
 
 DataSet DataSet::parse( std::FILE * source ) {
     std::size_t field_count = 0;
-    char c;
+    int c;
 
-    while( std::fscanf( source, "%c", &c ) != EOF ) {
+    while( (c = std::fgetc(source)) != EOF ) {
         if( c == '#' ) {
-            std::fscanf( source, "%*[^\n]\n" );
+            while( c != '\n' )
+                c = std::fgetc(source);
             continue;
         }
         if( c == 'n' ) {
-            std::fscanf( source, " %zd \n", &field_count );
+            std::fscanf( source, " %zd ", &field_count );
             break;
         }
         throw "Unknown directive.";
