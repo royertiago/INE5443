@@ -128,7 +128,7 @@ lines=$( bc <<< "$line_count * $dataset_ratio + 0.5" | sed 's/\..*//' )
 # We strip it to not confuse head.
 
 head -n $lines "$shuffled_data"
-head -n $((line_count - lines)) "$shuffled_data" | \
+tail -n $((line_count - lines)) "$shuffled_data" | \
     datatools/strip_entry_category $format_string > "$remaining_entries"
 
 rm "$shuffled_data"
