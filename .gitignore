@@ -6,3 +6,4 @@ test/test
 classify
 datatools/canonicalize
 datatools/strip_entry_category
+datatools/generate_spiral
