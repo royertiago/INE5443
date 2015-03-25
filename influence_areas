@@ -101,10 +101,12 @@ cat - > "$dataset"
 datatools/generate_entry_grid --dimensions "$grid_x","$grid_y" \
     --expand "$expand" < "$dataset" > "$grid"
 
-./classify --dataset spiral.data < "$grid" > "$answers"
+./classify --dataset "$dataset" < "$grid" > "$answers" \
+    $distance_type $neighbors $normalization
 
 cat "$dataset" <(paste -d , "$grid" "$answers") > "$output"
 
-datatools/generate_svg < "$output"
+datatools/generate_svg --width "$width" --height "$height" \
+    --radius "$density" < "$output"
 
 rm -f "$dataset" "$grid" "$answers" "$output"
