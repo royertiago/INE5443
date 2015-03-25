@@ -77,6 +77,45 @@ TEST_CASE( "DataSet parsing from file", "[DataSet][parse]" ) {
     CHECK( it == dataset.end() );
 }
 
+TEST_CASE( "DataSet parsing - corner cases", "[DataSet][parse]" ) {
+    DataSet dataset;
+    std::FILE * file;
+
+    char consecutive_commentaries[] = "#\n#\n#\nn 1\na X\n\n2\n";
+    file = fmemopen(consecutive_commentaries, sizeof(consecutive_commentaries)-1, "r");
+
+    REQUIRE_NOTHROW( dataset = DataSet::parse(file) );
+    CHECK( dataset.size() == 1 );
+    CHECK( dataset.attribute_count() == 1 );
+    CHECK( dataset.category_count() == 0 );
+    CHECK( dataset.attribute_name(0) == "X" );
+    CHECK( *dataset.begin() == DataEntry({2},{}) );
+
+    std::fclose(file);
+
+    char no_entries[] = "n 1\na X\n\n";
+    file = fmemopen(no_entries, sizeof(no_entries)-1, "r");
+
+    REQUIRE_NOTHROW( dataset = DataSet::parse(file) );
+    CHECK( dataset.size() == 0 );
+    CHECK( dataset.attribute_count() == 1 );
+    CHECK( dataset.category_count() == 0 );
+    CHECK( dataset.attribute_name(0) == "X" );
+
+    std::fclose(file);
+
+    char both_cases[] = "#\n#\n#\nn 1\na X\n\n";
+    file = fmemopen(both_cases, sizeof(both_cases)-1, "r");
+
+    REQUIRE_NOTHROW( dataset = DataSet::parse(file) );
+    CHECK( dataset.size() == 0 );
+    CHECK( dataset.attribute_count() == 1 );
+    CHECK( dataset.category_count() == 0 );
+    CHECK( dataset.attribute_name(0) == "X" );
+
+    std::fclose(file);
+}
+
 TEST_CASE( "DataSet writing to file", "[DataSet][write]" ) {
     std::FILE * file = fmemopen(str_file, sizeof(str_file)-1, "r");
     DataSet dataset = DataSet::parse( file );

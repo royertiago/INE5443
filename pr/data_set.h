@@ -17,6 +17,7 @@ public:
         std::vector< std::string >&& category_names,
         std::vector< DataEntry >&& entries
     );
+    DataSet() = default;
 
     static DataSet parse( std::FILE * source );
 
