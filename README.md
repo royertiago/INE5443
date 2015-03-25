@@ -26,8 +26,6 @@ read [`datasets/format.md`](datasets/format.md).
 Known bugs
 ==========
 
-### Makeifle
-
 There is a bug in the makefile, in the module of tests.
 There is a single hardcoded link between the test executable
 and the object files that contain the auto-registering tests;
@@ -45,7 +43,3 @@ will appear to make as up to date,
 so the program test/test will not be recreated.
 
 Workaround: execute `rm test/test` when deleting a test case.
-
-### datatools/generate-svg
-This tool is unable to handle properly negative numbers
-or data sets too distant from the origin (`(0, 0)`).
