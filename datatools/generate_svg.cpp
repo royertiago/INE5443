@@ -1,6 +1,6 @@
 namespace command_line {
     const char help_message[] =
-"$0 [options]\n"
+"%s [options]\n"
 "Generate a SVG from the dataset read in stdin.\n"
 "Output is printed on stdout.\n"
 "The entry format is assumed to be <number>,<number>,<category>;\n"

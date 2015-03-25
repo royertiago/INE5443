@@ -1,6 +1,6 @@
 namespace command_line {
     const char help_message[] =
-"$0 [options]\n"
+"%s [options]\n"
 "Generate a list of entry points that can be used to visuzlize\n"
 "the influence areas of each entry.\n"
 "The generated points are organized in a grid.\n"
@@ -22,7 +22,7 @@ namespace command_line {
 "--expand <F>\n"
 "    How much we should expand the grid, related to\n"
 "    the extremum points of the datsaet.\n"
-"    Default: 0.1. (= 10%)\n"
+"    Default: 0.1. (= 10%%)\n"
 "\n"
 "--help\n"
 "    Display this help and exit.\n"
