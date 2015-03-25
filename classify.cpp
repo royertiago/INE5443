@@ -36,12 +36,6 @@ namespace command_line {
 "    When measuring distances, the datasets should be normalized\n"
 "    to avoid having differences in scale influencing the measurements.\n"
 "\n"
-"--input <file>\n"
-"    Reads data from file instead of stdin.\n"
-"\n"
-"--output <file>\n"
-"    Writes data to file instead of stdout.\n"
-"\n"
 "--help\n"
 "    Display this help and quit.\n"
 "\n"
@@ -74,8 +68,6 @@ namespace command_line {
             {"euclidean", no_argument, 0, 'e'},
             {"neighbors", required_argument, 0, 'n'},
             {"normalize-tolerance", required_argument, 0, 't'},
-            {"input", required_argument, 0, 'i'},
-            {"output", required_argument, 0, 'o'},
             {"dataset", required_argument, 0, 'd'},
             {"help", no_argument, 0, 'h'},
             {"version", no_argument, 0, 'v'},
@@ -83,7 +75,7 @@ namespace command_line {
         };
         int opt;
         int dummy_option_index;
-        while( (opt = getopt_long( argc, argv, "men:t:i:o:d:hv",
+        while( (opt = getopt_long( argc, argv, "men:t:d:hv",
                     options, &dummy_option_index
                 )) != -1 ) {
             switch( opt ) {
@@ -113,18 +105,6 @@ namespace command_line {
                         std::exit(1);
                     }
                     break;
-                case 'i':
-                    if( std::freopen(optarg, "r", stdin) == nullptr ) {
-                        std::fprintf( stderr, "Error opening file %s\n", optarg );
-                        std::exit(1);
-                    }
-                    break;
-                case 'o':
-                    if( std::freopen(optarg, "w", stdout) == nullptr ) {
-                        std::fprintf( stderr, "Error opening file %s\n", optarg );
-                        std::exit(1);
-                    }
-                    break;
                 case 'd':
                     if( (dataset = std::fopen(optarg, "r")) == nullptr ) {
                         std::fprintf( stderr, "Error opening file %s\n", optarg );
@@ -132,9 +112,7 @@ namespace command_line {
                     }
                     break;
                 case 'h':
-                    /* We print to stderr to allow for printing
-                     * even after stdout was reopened above. */
-                    std::fprintf( stderr, help_message, argv[0] );
+                    std::printf( help_message, argv[0] );
                     std::exit(0);
                     break;
                 case 'v':

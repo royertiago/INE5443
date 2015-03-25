@@ -110,12 +110,12 @@ while (($# != 0)); do
     shift
 done
 
-datatools/subdataset --ratio "$dataset_ratio" --output "$training_dataset" \
+datatools/subdataset --ratio "$dataset_ratio" > "$training_dataset" \
     --remaining "$input_data" --canonic < "$dataset"
 
 tmp=$(mktemp --tmpdir)
 
-./classify --dataset "$training_dataset" --input "$input_data" --output "$tmp" \
+./classify --dataset "$training_dataset" < "$input_data" > "$tmp" \
     $distance_type $neighbors $normalization
 
 cat "$training_dataset" > "$output"

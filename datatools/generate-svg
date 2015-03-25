@@ -12,13 +12,6 @@ that is, this program only support 2D category visualization.
 
 Options:
 
---dataset <file>
---input <file>
-    Read the dataset from 'file' instead of stdin.
-
---output <file>
-    Write the output to 'file' instead of stdout.
-
 --colors <associative-array initializer>
     Supply an association between categories and colors.
     The expression should be proper for initializing
@@ -51,14 +44,6 @@ declare -A colors
 # Parse command line
 while (($# != 0)); do
     case "$1" in
-    (--input | --dataset)
-        exec < "$2"
-        shift
-        ;;
-    (--output)
-        exec > "$2"
-        shift
-        ;;
     (--colors)
         colors=($2)
         shift
@@ -72,11 +57,7 @@ while (($# != 0)); do
         shift
         ;;
     (--help)
-        show_help "$@" >&2
-        # We need to redirect to stderr
-        # because we might already had redirected output to some file.
-        exit 0
-        ;;
+        show_help "$@"
     (--version)
         echo 0.1
         exit 0

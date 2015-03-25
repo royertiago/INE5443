@@ -9,13 +9,6 @@ The entries are chosen randomly.
 The dataset is read in stdin; output is written is stdout.
 Options:
 
---input <file>
---dataset <file>
-    Scans 'file' instead of stdin.
-
---output <file>
-    Writes the result to 'file' instead of stdout.
-
 --remaining <file>
     Writes the entries that did not get selected to 'file'.
     Note that it only writes the entries,
@@ -47,14 +40,6 @@ canonic=""
 # Parse command line
 while (($# != 0)); do
     case "$1" in
-    (--input | --dataset)
-        exec < "$2"
-        shift
-        ;;
-    (--output)
-        exec > "$2"
-        shift
-        ;;
     (--remaining)
         remaining_entries="$2"
         shift
@@ -68,9 +53,7 @@ while (($# != 0)); do
         shift
         ;;
     (--help)
-        show_help "$@" >&2
-        # We need to redirect to stderr
-        # because we might already had redirected output to some file.
+        show_help "$@"
         exit 0
         ;;
     (--canonic)
