@@ -38,9 +38,6 @@ namespace command_line {
 "\n"
 "--help\n"
 "    Display this help and quit.\n"
-"\n"
-"--version\n"
-"    Show program version and quit.\n"
 ;
 } // namespace command_line
 
@@ -70,12 +67,11 @@ namespace command_line {
             {"normalize-tolerance", required_argument, 0, 't'},
             {"dataset", required_argument, 0, 'd'},
             {"help", no_argument, 0, 'h'},
-            {"version", no_argument, 0, 'v'},
             {0, 0, 0, 0},
         };
         int opt;
         int dummy_option_index;
-        while( (opt = getopt_long( argc, argv, "men:t:d:hv",
+        while( (opt = getopt_long( argc, argv, "men:t:d:h",
                     options, &dummy_option_index
                 )) != -1 ) {
             switch( opt ) {
@@ -113,10 +109,6 @@ namespace command_line {
                     break;
                 case 'h':
                     std::printf( help_message, argv[0] );
-                    std::exit(0);
-                    break;
-                case 'v':
-                    std::fprintf( stderr, "0.1\n" );
                     std::exit(0);
                     break;
                 default:
