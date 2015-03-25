@@ -128,6 +128,8 @@ int main( int argc, char ** argv ) {
 
     DataSet dataset = DataSet::parse( command_line::dataset );
 
+    std::fclose(command_line::dataset);
+
     std::unique_ptr<DistanceCalculator> calculator;
     if( command_line::euclidean )
         calculator = std::make_unique<EuclideanDistance>( command_line::tolerance );
