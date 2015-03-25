@@ -192,7 +192,7 @@ int main( int argc, char ** argv ) {
 
     for( unsigned i = 0; i < command_line::entries; i++ )
     for( unsigned j = 0; j < command_line::spirals; j++ ) {
-        char name[2] = {(char) 'A' + j};
+        char name[2] = {(char) ('A' + j)};
         double angle = j * (2 * 3.14159265358979)/command_line::spirals +
              + command_line::angular_start + i * command_line::angular_step;
         double radius = command_line::radial_start + radial_noise() +
