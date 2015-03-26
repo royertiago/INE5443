@@ -14,6 +14,9 @@ for pattern recognition.
 It contains programs like classifiers
 and dataset generators.
 
+See the [user manual](user_manual.md)
+for an overview of these tools.
+
 The programs are written in C++ and bash scripts.
 The makefile assumes certaint filename conventions to work properly;
 the details can be found in [`naming_conventions.md`](naming_conventions.md)
