@@ -8,7 +8,7 @@ ILIBS := -isystem Catch/single_include
 #
 # However, some strictness must be followed in the code;
 # see "naming_conventions.md" for more information.
-CXXFLAGS := -std=c++1y -g $(ILIBS) -I./
+CXXFLAGS := -std=c++1y -g $(ILIBS) -iquote./
 
 # Directories whose makefiles need to be included
 INCLUDE := test
