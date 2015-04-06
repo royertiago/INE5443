@@ -94,4 +94,8 @@ std::vector<std::string> Classifier::classify( const DataEntry & data ) {
     return nn->classify( data );
 }
 
+std::size_t Classifier::dataset_attribute_count() const {
+    return dataset->attribute_count();
+}
+
 Classifier::~Classifier() {}
