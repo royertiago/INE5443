@@ -1,6 +1,8 @@
 Makefile structure
 ==================
 
+**NOTE**: This text is outdated since commit `d855b2d`.
+
 In the light of
 [Recursive Make Considered Harmful](http://aegis.sourceforge.net/auug97.pdf),
 the makefiles of this project are not recursive.
