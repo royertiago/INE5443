@@ -1,7 +1,7 @@
 # LIBS is the list of libraries used by this repository.
 # ILIBS are the include flags for GCC.
 LIBS := Catch
-ILIBS := -isystem Catch/single_include
+ILIBS := -isystem Catch/single_include $$(pkg-config --cflags opencv)
 
 # This makefile handles multiple programs in the same directory
 # that include several files.
@@ -46,7 +46,7 @@ PROGRAMS := $(MAIN:.cpp=)
 all: $(PROGRAMS)
 
 $(PROGRAMS): %: %.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ $$(pkg-config --libs opencv)
 
 $(OBJ): %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
