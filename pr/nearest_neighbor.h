@@ -21,6 +21,7 @@ public:
         DistanceCalculator& distance,
         std::size_t neighbors
     );
+    NearestNeighbor() = default;
 
     std::vector< std::string > classify( const DataEntry & );
 };
