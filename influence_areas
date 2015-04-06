@@ -13,15 +13,6 @@ Options:
     Choose the dimensions of the image.
     Default value: 500 (for both).
 
---density <N>
-    A single pixel categorization can be used to fill more than
-    a single pixel in the output. This value controls the
-    "radius of influence" of each pixel.
-    The smaller is this value, the greater is the quality
-    of the output, and the greater is the run time.
-    Default: 3.
-    Note there is no point in chosing a value smaller than 1.
-
 --expand <F>
     Percentage of the dataset extension that should be used as border.
     Default value: 0.05.
@@ -42,7 +33,6 @@ HELP_TEXT
 
 width=500
 height=500
-density=3
 expand=0.05
 distance_type=""
 neighbors=""
@@ -56,10 +46,6 @@ while (($# != 0)); do
         ;;
     (--height)
         height="$2"
-        shift
-        ;;
-    (--density)
-        density="$2"
         shift
         ;;
     (--help)
@@ -89,8 +75,6 @@ while (($# != 0)); do
     shift
 done
 
-grid_x=$(bc <<< "$width / $density")
-grid_y=$(bc <<< "$height / $density")
 dataset=$(mktemp --tmpdir)
 grid=$(mktemp --tmpdir)
 answers=$(mktemp --tmpdir)
@@ -98,7 +82,7 @@ output=$(mktemp --tmpdir)
 
 cat - > "$dataset"
 
-datatools/generate_entry_grid --dimensions "$grid_x","$grid_y" \
+datatools/generate_entry_grid --dimensions "$width","$height" \
     --expand "$expand" < "$dataset" > "$grid"
 
 ./classify --dataset "$dataset" < "$grid" > "$answers" \
@@ -106,7 +90,6 @@ datatools/generate_entry_grid --dimensions "$grid_x","$grid_y" \
 
 cat "$dataset" <(paste -d , "$grid" "$answers") > "$output"
 
-datatools/generate_svg --width "$width" --height "$height" \
-    --radius "$density" < "$output"
+datatools/generate_svg --width "$width" --height "$height" --radius 1 < "$output"
 
 rm -f "$dataset" "$grid" "$answers" "$output"
