@@ -2,16 +2,12 @@ TESTDIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 TEST := $(TESTDIR)test
 TESTSRC := $(shell find $(TESTDIR) -name "*.cpp")
-TESTOBJ := $(TESTSRC:.cpp=.o)
 
+PROG += $(TEST)
+SRC += $(TESTSRC)
 DEP += $(TESTSRC:.cpp=.dep.mk)
 
-$(TESTOBJ): %.o : %.cpp
-	$(compile_obj)
-
-# Admittedly complex dependency management.
-$(TEST): $(TEST).o $(TESTOBJ) $(NOMAIN:.cpp=.o)
-	$(link_main)
+$(TEST): $(TESTSRC:.cpp=.o)
 
 all : $(TEST)
 
