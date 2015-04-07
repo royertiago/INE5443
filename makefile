@@ -10,6 +10,10 @@ define link_main
 $(CXX) -o $@ $^ $(ALL_CXXFLAGS) $(ALL_LDFLAGS)
 endef
 
+define generate_dependency
+$(CXX) $*.cpp -MM -MP -MF $*.dep.mk -MT '$*.o $*.dep.mk' $(ALL_CXXFLAGS)
+endef
+
 
 # This makefile handles multiple programs in the same directory
 # that include several files.
@@ -81,7 +85,7 @@ $(MAINOBJ) $(NOMAINOBJ): %.o : %.cpp
 	$(compile_obj)
 
 $(DEP): %.dep.mk: %.cpp
-	$(CXX) $*.cpp -MM -MP -MF $*.dep.mk -MT '$*.o $*.dep.mk' $(ALL_CXXFLAGS)
+	$(generate_dependency)
 
 .PHONY: mostlyclean clean
 mostlyclean:
