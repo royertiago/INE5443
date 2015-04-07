@@ -1,3 +1,6 @@
+# This clears all the implicit rules.
+.SUFFIXES:
+
 # Utility defines
 define compile_obj
 $(CXX) $(CXXFLAGS) -c $< -o $@
