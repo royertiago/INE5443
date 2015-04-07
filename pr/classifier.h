@@ -17,7 +17,7 @@ struct DistanceCalculator;
 class NearestNeighbor;
 
 class Classifier {
-    std::unique_ptr<DataSet> dataset;
+    std::unique_ptr<DataSet> _dataset;
     std::unique_ptr<DistanceCalculator> calculator;
     std::unique_ptr<NearestNeighbor> nn;
 
@@ -66,7 +66,7 @@ public:
     Classifier( int argc, char ** argv );
     ~Classifier();
 
-    std::size_t dataset_attribute_count() const;
+    const DataSet & dataset() const;
 
     std::vector< std::string > classify( const DataEntry & );
 };

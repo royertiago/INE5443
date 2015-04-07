@@ -78,7 +78,7 @@ Classifier::Classifier( int argc, char ** argv ) {
 
     // Command line options parsed, now we will initialize the variables.
 
-    dataset = std::make_unique<DataSet>(DataSet::parse( dataset_file ));
+    _dataset = std::make_unique<DataSet>(DataSet::parse( dataset_file ));
 
     std::fclose(dataset_file);
 
@@ -87,15 +87,15 @@ Classifier::Classifier( int argc, char ** argv ) {
     else
         calculator = std::make_unique<ManhattanDistance>( tolerance );
 
-    nn = std::make_unique<NearestNeighbor>( *dataset, *calculator, neighbors );
+    nn = std::make_unique<NearestNeighbor>( *_dataset, *calculator, neighbors );
 }
 
 std::vector<std::string> Classifier::classify( const DataEntry & data ) {
     return nn->classify( data );
 }
 
-std::size_t Classifier::dataset_attribute_count() const {
-    return dataset->attribute_count();
+const DataSet & Classifier::dataset() const {
+    return *_dataset;
 }
 
 /* The destructor must be here because the default destructor,
