@@ -3,11 +3,11 @@
 
 # Utility defines
 define compile_obj
-$(CXX) $(CXXFLAGS) -c $< -o $@
+$(CXX) -c $< -o $@ $(ALL_CXXFLAGS)
 endef
 
 define link_main
-$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+$(CXX) -o $@ $^ $(ALL_CXXFLAGS) $(ALL_LDFLAGS)
 endef
 
 
@@ -16,9 +16,10 @@ endef
 #
 # However, some strictness must be followed in the code;
 # see "naming_conventions.md" for more information.
-CXXFLAGS += -std=c++1y -g -iquote./ \
-			-isystem Catch/single_include $$(pkg-config opencv --cflags) -iquote./
-LDFLAGS += $$(pkg-config opencv --libs)
+CXXFLAGS := -g
+ALL_CXXFLAGS := $(CXXFLAGS) -std=c++1y -iquote./ \
+	-isystem Catch/single_include $$(pkg-config opencv --cflags) -iquote./
+ALL_LDFLAGS += $$(pkg-config opencv --libs) $(LDFLAGS)
 
 # Directories whose makefiles need to be included
 INCLUDE := $(wildcard */makefile.mk)
@@ -80,7 +81,7 @@ $(MAINOBJ) $(NOMAINOBJ): %.o : %.cpp
 	$(compile_obj)
 
 $(DEP): %.dep.mk: %.cpp
-	$(CXX) $(CXXFLAGS) $*.cpp -MM -MP -MF $*.dep.mk -MT '$*.o $*.dep.mk'
+	$(CXX) $*.cpp -MM -MP -MF $*.dep.mk -MT '$*.o $*.dep.mk' $(ALL_CXXFLAGS)
 
 .PHONY: mostlyclean clean
 mostlyclean:
