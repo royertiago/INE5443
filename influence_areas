@@ -41,7 +41,7 @@ normalization=""
 while (($# != 0)); do
     case "$1" in
     (--width)
-        witdth="$2"
+        width="$2"
         shift
         ;;
     (--height)
