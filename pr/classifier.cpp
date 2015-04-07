@@ -71,16 +71,15 @@ Classifier::Classifier( int argc, char ** argv ) {
                 std::exit(1);
         }
     }
-    if( dataset_file == nullptr ) {
-        std::fprintf( stderr, "No dataset chosen.\n" );
-        std::exit(1);
-    }
-
     // Command line options parsed, now we will initialize the variables.
 
-    _dataset = std::make_unique<DataSet>(DataSet::parse( dataset_file ));
-
-    std::fclose(dataset_file);
+    if( dataset_file == nullptr ) {
+        _dataset = std::make_unique<DataSet>(DataSet::parse( stdin ));
+    }
+    else {
+        _dataset = std::make_unique<DataSet>(DataSet::parse( dataset_file ));
+        std::fclose(dataset_file);
+    }
 
     if( euclidean )
         calculator = std::make_unique<EuclideanDistance>( tolerance );
