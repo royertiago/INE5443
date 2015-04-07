@@ -98,4 +98,8 @@ std::size_t Classifier::dataset_attribute_count() const {
     return dataset->attribute_count();
 }
 
+/* The destructor must be here because the default destructor,
+ * for std::unique_ptr, requires the full class specification.
+ * This would defeat the purpose of the forward-declarations
+ * in the beginning of the header file. */
 Classifier::~Classifier() {}
