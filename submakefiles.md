@@ -1,8 +1,6 @@
 Makefile structure
 ==================
 
-**NOTE**: This text is outdated since commit `d855b2d`.
-
 In the light of
 [Recursive Make Considered Harmful](http://aegis.sourceforge.net/auug97.pdf),
 the makefiles of this project are not recursive.
@@ -12,21 +10,6 @@ Some conventions ease this integration
 while mantaining different build rules for each makefile.
 
 The [file naming conventions](naming_conventions.md) shall be respected.
-
-There are two variables,
-MAIN and NOMAIN,
-that can be used to chose what files will receive the default treatment
-from the top makefile.
-These variables can be amended (but not overwritten) by included makefiles.
-
-MAIN contains every .cpp file that can be compiled to an executable;
-that is, the files that contains the `main` function.
-(Almost; see test/makefile.mk).
-
-NOMAIN contains every .cpp file that implements some .h file.
-Note that MAIN and NOMAIN shall be mutually excludent.
-
-The top makefile will manage the automatic dependency generation.
 
 The targets `clean` and `mostlyclean` can be extended
 by providing extra dependencies.
@@ -39,3 +22,30 @@ To avoid name clashes, any extra target or variable
 must be prefixed by the name of the makefile's directory.
 For instance, test/makefile defines the variable TESTSRC
 and the target test-clean.
+
+The top makefile will, by default,
+create build rules for all object files and programs in the directory.
+The presence of a submakefile supresses this rule generation.
+The submakefile may use the top makefile's hooks
+to have that functionality back
+and to interact with the rest of the repository.
+
+There are four variables,
+in the main makefile,
+that may be appended to to request such services.
+
+-   `prog` lists all the programs of this repository.
+    This variable will hold a list of targets.
+    The object files in these targets' dependencies
+    will be linked together to form the specified program.
+
+-   `src` lists all the `.cpp` files that should be built
+    into corresponding `.o` files.
+
+-   `dep` lists all the `.dep.mk` files that will be automatically generated
+    from the corresponding source files.
+
+-   `obj` lists all the object files that provide symbol definitions
+    that might be useful for other targets.
+    (If the submakefile builds some shared object file,
+    this variable is, in fact, mandatory.)

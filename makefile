@@ -53,6 +53,8 @@ obj := $(obj:.cpp=.o)
 # prog, src and dep automatically.
 # So, submakefiles may append files to these variables
 # to request the specified service.
+#
+# See submakefiles.md.
 include $(submakefiles)
 
 
