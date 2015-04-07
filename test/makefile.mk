@@ -3,9 +3,9 @@ TESTDIR := $(dir $(lastword $(MAKEFILE_LIST)))
 TEST := $(TESTDIR)test
 TESTSRC := $(shell find $(TESTDIR) -name "*.cpp")
 
-PROG += $(TEST)
-SRC += $(TESTSRC)
-DEP += $(TESTSRC:.cpp=.dep.mk)
+prog += $(TEST)
+src += $(TESTSRC)
+dep += $(TESTSRC:.cpp=.dep.mk)
 
 $(TEST): $(TESTSRC:.cpp=.o)
 
