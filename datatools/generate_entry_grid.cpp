@@ -30,14 +30,12 @@ namespace command_line {
 } // namespace command_line
 
 #include <getopt.h>
-#include <algorithm>
 #include <cstdio>
 #include <cstring>
-#include <cfloat>
-#include <map>
 #include <vector>
 #include "pr/data_entry.h"
 #include "pr/data_set.h"
+#include "pr/grid_generator.h"
 
 namespace command_line {
     std::vector<unsigned> dimensions;
@@ -97,56 +95,21 @@ namespace command_line {
 } // namespace command_line
 
 int main( int argc, char ** argv ) {
-    using command_line::dimensions;
-
     command_line::parse( argc, argv );
     DataSet dataset = DataSet::parse( stdin );
-    if( dimensions.size() == 0 )
-        dimensions = std::vector<unsigned>(
+    if( command_line::dimensions.size() == 0 )
+        command_line::dimensions = std::vector<unsigned>(
             dataset.attribute_count(),
             100
         );
-    if( dimensions.size() != dataset.attribute_count() ) {
-        std::fprintf( stderr, "Size of dimension vector"
-                " do not match attribute count in dataset.\n" );
-        std::exit(2);
-    }
 
-    std::vector<double> min( dimensions.size(), DBL_MAX );
-    std::vector<double> max( dimensions.size(), -DBL_MAX );
-    for( const DataEntry & entry : dataset ) {
-        for( unsigned i = 0; i < entry.attribute_count(); i++ ) {
-            min[i] = std::min(min[i], entry.attribute(i));
-            max[i] = std::max(max[i], entry.attribute(i));
-        }
-    }
+    GridGenerator grid;
+    grid.expand( command_line::expand );
+    grid.density( command_line::dimensions );
+    grid.calibrate( dataset );
 
-    std::vector<double> step( dimensions.size() );
-    for( unsigned i = 0; i < dataset.attribute_count(); i++ )
-        step[i] = (max[i] - min[i]) * (1+2*command_line::expand) /
-            dimensions[i];
+    for( auto entry : grid )
+        entry.write( stdout );
 
-    std::vector<double> shift( dimensions.size() );
-    for( unsigned i = 0; i < dataset.attribute_count(); i++ )
-        shift[i] = (max[i] - min[i]) * command_line::expand;
-
-    std::vector<unsigned> i( dimensions.size() );
-    while( true ) {
-        const char * separator = "";
-        for( int j = 0; j < i.size(); j++ ) {
-            std::printf( "%s%lf", separator, i[j] * step[j] + min[j] - shift[j] );
-            separator = ",";
-        }
-        std::printf( "\n" );
-        for( int j = i.size() - 1; ; j-- ) {
-            if( j < 0 ) goto exit_loop;
-            i[j]++;
-            if( i[j] > dimensions[j] )
-                i[j] = 0;
-            else
-                break;
-        }
-    }
-exit_loop:
     return 0;
 }
