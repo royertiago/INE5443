@@ -3,6 +3,7 @@
 *.svg
 .*.swp
 classify
+influence_areas
 datatools/canonicalize
 datatools/generate_entry_grid
 datatools/generate_spiral
