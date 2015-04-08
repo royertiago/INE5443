@@ -189,7 +189,7 @@ int main( int argc, char ** argv ) {
             DataEntry data = grid( {(unsigned)i, (unsigned)j} );
             std::string category = *classifier.classify(data).begin();
             const unsigned * c = color(category);
-            img.at<cv::Vec3b>(height - j - 1, i) = cv::Vec3b(c[0], c[1], c[2]);
+            img.at<cv::Vec3b>(height - j - 1, i) = cv::Vec3b(c[2], c[1], c[0]);
         }
 
     if( !cv::imwrite( output, img ) ) {
