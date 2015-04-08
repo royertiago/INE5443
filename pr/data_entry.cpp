@@ -89,6 +89,20 @@ end_of_file:
     return DataEntry( std::move(attributes), std::move(categories) );
 }
 
+DataEntry DataEntry::csv_parse( std::FILE * file ) {
+    std::vector< double > attributes;
+    int c = ',';
+    while( c == ',' ) {
+        double next;
+        std::fscanf( file, "%lf", &next );
+        attributes.push_back( next );
+        c = std::fgetc( file );
+    }
+    if( c != '\n' )
+        throw "Unterminated CSV format.";
+    return DataEntry( std::move(attributes), {} );
+}
+
 void DataEntry::write( std::FILE * file, const char * format ) const {
     auto attribute_it = _attributes.begin();
     auto category_it = _categories.begin();

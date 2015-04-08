@@ -72,6 +72,13 @@ public:
      * will be discarded. */
     static DataEntry parse( std::FILE * file, const char * format );
 
+    /* Parses an entry, deducing its format.
+     * Currently, this method can only scan attribute-only entries.
+     *
+     * The entry is assumed to be newline-terminated.
+     */
+    static DataEntry csv_parse( std::FILE * file );
+
     /* Writes itself to 'file' and append a newline.
      *
      * 'format' uses the same code as in function 'parse'.
