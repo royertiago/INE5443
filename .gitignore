@@ -9,4 +9,5 @@ datatools/generate_entry_grid
 datatools/generate_spiral
 datatools/generate_svg
 datatools/strip_entry_category
+mahalanobis/pixel_chooser
 test/test
