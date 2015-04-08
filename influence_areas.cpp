@@ -183,13 +183,13 @@ int main( int argc, char ** argv ) {
             return pair.first->second;
         };
 
-    cv::Mat img( width, height, CV_8UC3, cv::Scalar(255, 255, 255) );
+    cv::Mat img( height, width, CV_8UC3, cv::Scalar(255, 255, 255) );
     for( int i = 0; i < width; i++ )
         for( int j = 0; j < height; j++ ) {
             DataEntry data = grid( {(unsigned)i, (unsigned)j} );
             std::string category = *classifier.classify(data).begin();
             const unsigned * c = color(category);
-            img.at<cv::Vec3b>(i, j) = cv::Vec3b(c[0], c[1], c[2]);
+            img.at<cv::Vec3b>(height - j - 1, i) = cv::Vec3b(c[0], c[1], c[2]);
         }
 
     if( !cv::imwrite( output, img ) ) {
