@@ -22,15 +22,16 @@ const std::vector<unsigned>& GridGenerator::density() const {
 }
 
 void GridGenerator::calibrate( const DataSet & dataset ) {
-    if( _density.size() != dataset.attribute_count() ) {
+    std::size_t size = dataset.attribute_count();
+
+    if( _density.size() == 0 )
+        _density = std::vector<unsigned>( size, default_density );
+
+    if( _density.size() != size ) {
         std::fprintf( stderr, "Size of dimension vector"
                 " do not match attribute count in dataset.\n" );
         std::exit(2);
     }
-
-    std::size_t size = dataset.attribute_count();
-
-    _density = std::vector<unsigned>( size, default_density );
 
     std::vector<double> min( size, DBL_MAX );
     std::vector<double> max( size, DBL_MIN );
