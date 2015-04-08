@@ -70,22 +70,6 @@ DataSet DataSet::parse( std::FILE * source ) {
     );
 }
 
-DataSet DataSet::csv_parse( std::FILE * file ) {
-    std::vector< DataEntry > entries;
-    entries.push_back( DataEntry::csv_parse( file ) );
-    std::size_t attribute_count = entries[0].attribute_count();
-
-    char c;
-    while( (c = std::fgetc(file)) != EOF ) {
-        std::ungetc( c, file );
-        DataEntry entry = DataEntry::csv_parse( file );
-        if( entry.attribute_count() != attribute_count )
-            throw "Inconsistent attribute sizes.";
-        entries.push_back( entry );
-    }
-    return DataSet( std::vector<std::string>(attribute_count), {}, std::move(entries) );
-}
-
 void DataSet::write( std::FILE * file, const char * format ) const {
     std::fprintf( file, "n %zd\n", attribute_names.size() + category_names.size() );
     const char * original_format = format;

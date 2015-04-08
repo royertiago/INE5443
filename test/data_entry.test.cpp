@@ -226,27 +226,3 @@ TEST_CASE( "DataEntry file input/output", "[DataEntry][parse]" ) {
         )
     );
 }
-
-TEST_CASE( "DataEntry csv input", "[DataEntry][parse][csv]" ) {
-    char str_file[] =
-        "0,2\n"
-        "5,9,9\n"
-        "8,-1.5\n"
-        "-1\n"
-        ;
-    std::FILE * file = fmemopen(str_file, sizeof(str_file)-1, "r");
-
-    DataEntry e1 = DataEntry::csv_parse( file );
-    REQUIRE( e1 == DataEntry({0, 2},{}) );
-
-    DataEntry e2 = DataEntry::csv_parse( file );
-    REQUIRE( e2 == DataEntry({5, 9, 9},{}) );
-
-    DataEntry e3 = DataEntry::csv_parse( file );
-    REQUIRE( e3 == DataEntry({8, -1.5},{}) );
-
-    DataEntry e4 = DataEntry::csv_parse( file );
-    REQUIRE( e4 == DataEntry({-1},{}) );
-
-    std::fclose( file );
-}
