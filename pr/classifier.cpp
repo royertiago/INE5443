@@ -26,6 +26,9 @@ Classifier::Classifier( int argc, char ** argv ) {
     };
     int opt;
     int dummy_option_index;
+
+    // Reset optind to not conflict with external getopt invocations.
+    optind = 1;
     while( (opt = getopt_long( argc, argv, "men:t:d:h",
                 options, &dummy_option_index
             )) != -1 ) {
