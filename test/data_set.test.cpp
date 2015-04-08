@@ -182,3 +182,38 @@ TEST_CASE( "DataSet writing to file", "[DataSet][write]" ) {
         )
     );
 }
+
+TEST_CASE( "DataSet csv input", "[DataSet][parse][csv]" ) {
+    char str_file[] =
+        "0,2\n"
+        "5,9\n"
+        "8,-1.5\n"
+        "-1,0.25\n"
+        ;
+    std::FILE * file = fmemopen(str_file, sizeof(str_file)-1, "r");
+
+    DataSet dataset = DataSet::csv_parse( file );
+
+    REQUIRE( dataset.size() == 4 );
+    REQUIRE( dataset.attribute_count() == 2 );
+    CHECK( dataset.category_count() == 0 );
+
+    auto it = dataset.begin();
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({0, 2},{}) );
+
+    ++it;
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({5,9},{}) );
+
+    ++it;
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({8,-1.5},{}) );
+
+    ++it;
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({-1,0.25},{}) );
+
+    ++it;
+    CHECK( it == dataset.end() );
+}

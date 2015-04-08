@@ -20,6 +20,7 @@ public:
     DataSet() = default;
 
     static DataSet parse( std::FILE * source );
+    static DataSet csv_parse( std::FILE * source );
 
     /* Writes this dataset to the file.
      * 'format' is the order that attributes and categories
