@@ -18,4 +18,12 @@ DataEntry entryFromVec( const cv::Vec3b & vec ) {
     {} );
 }
 
+cv::Mat_<double> matFromEntry( const DataEntry & entry ) {
+    std::size_t size = entry.attribute_count();
+    cv::Mat_<double> r( 1, size );
+    for( unsigned i = 0; i < size; i++ )
+        r(0, i) = entry.attribute(i);
+    return r;
+}
+
 } // namespace util

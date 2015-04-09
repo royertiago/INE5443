@@ -14,5 +14,9 @@ namespace util {
      */
     DataEntry entryFromVec( const cv::Vec3b & vec );
 
+    /* Returns a matrix with one column and several rows
+     * with the attributes of the entry. */
+    cv::Mat_<double> matFromEntry( const DataEntry & );
+
 }
 #endif // UTIL_CV_H

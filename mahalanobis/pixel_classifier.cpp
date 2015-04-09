@@ -128,6 +128,7 @@ int main( int argc, char ** argv ) {
         distance_ptr = std::make_unique<MahalanobisDistance>();
     DistanceCalculator & distance = *distance_ptr;
     distance.calibrate(dataset);
+
     DataEntry mean = dataset.mean();
 
     auto it = img.begin<cv::Vec3b>(), end = img.end<cv::Vec3b>();
