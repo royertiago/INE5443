@@ -11,7 +11,7 @@ NormalizingDistanceCalculator::NormalizingDistanceCalculator( double tolerance )
     normalized( false )
 {}
 
-void NormalizingDistanceCalculator::normalize( const DataSet & dataset ) {
+void NormalizingDistanceCalculator::calibrate( const DataSet & dataset ) {
     normalized = true;
     minimum_value = std::vector<double>( dataset.attribute_count(), DBL_MAX );
     auto maximum_value = std::vector<double>( dataset.attribute_count(), DBL_MIN );

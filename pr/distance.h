@@ -7,8 +7,17 @@ class DataSet;
 class DataEntry;
 
 struct DistanceCalculator {
-    virtual double operator()( const DataEntry&, const DataEntry& ) const = 0;
-    virtual void normalize( const DataSet& ) = 0;
+    /* Compute the distance between the origin two DataEntries.
+     */
+    virtual double operator()( const DataEntry& o, const DataEntry& t ) const = 0;
+
+    /* Calibrate the DistanceCalculator to the given dataset.
+     *
+     * For instance, this method could compute the extremum of the points
+     * and normalize the distance;
+     * or it can compute the covariance matrix for the Mahalanobis distance.
+     */
+    virtual void calibrate( const DataSet& ) = 0;
 };
 
 
@@ -23,7 +32,7 @@ protected:
 public:
     NormalizingDistanceCalculator( double tolerance );
     virtual double operator()( const DataEntry&, const DataEntry& ) const = 0;
-    virtual void normalize( const DataSet& ) override;
+    virtual void calibrate( const DataSet& ) override;
 };
 
 

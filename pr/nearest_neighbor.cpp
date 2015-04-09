@@ -14,7 +14,7 @@ NearestNeighbor::NearestNeighbor(
     distance( distance ),
     neighbors( neighbors )
 {
-    distance.normalize(dataset);
+    distance.calibrate(dataset);
 }
 
 std::vector< std::string > NearestNeighbor::classify( const DataEntry & target ) {
