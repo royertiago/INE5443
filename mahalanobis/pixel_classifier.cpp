@@ -28,6 +28,7 @@ namespace command_line {
 #include "util/csv.h"
 #include "pr/classifier.h"
 #include "pr/grid_generator.h"
+#include "pr/mahalanobis.h"
 
 namespace command_line {
     const char * output = nullptr;
@@ -72,37 +73,44 @@ namespace command_line {
     } // void parse(int, char**)
 } // namespace command_line
 
+DataEntry entryFromVec( const cv::Vec3b & vec ) {
+    /* As the paragraph 8.5.4/7 of the C++11 standard,
+     * conversions from integer types to floating point types are "narrowing",
+     * so the compiler is obligate to issue an error
+     * when such conversion is used within braces - such as initializer lists.
+     *
+     * Here, we silence this error.
+     */
+    return DataEntry({
+        static_cast<double>( vec.val[0] ),
+        static_cast<double>( vec.val[1] ),
+        static_cast<double>( vec.val[2] ),
+    },
+    {} );
+}
+
 int main( int argc, char ** argv ) {
     command_line::parse( argc, argv );
 
     auto data = util::parse_csv( stdin );
     cv::Mat img = cv::imread( command_line::image );
 
-    cv::Mat_<double> samples( data.size(), 3 );
-    for( unsigned i = 0; i < data.size(); i++ ) {
+    DataSet dataset( 3, 0 );
+    for( unsigned i = 0; i < data.size(); ++i )
         /* opencv's dimension access order is row/column.
          * The output of pixel_chooser is the opposite.
          */
-        cv::Vec3b pixel = img.at<cv::Vec3b>(data[i][1], data[i][0]);
-        samples( i, 0 ) = pixel.val[0];
-        samples( i, 1 ) = pixel.val[1];
-        samples( i, 2 ) = pixel.val[2];
-    }
+        dataset.push_back( entryFromVec(img.at<cv::Vec3b>(data[i][1], data[i][0])) );
 
-    cv::Mat covariance;
-    cv::Mat mean;
-    cv::Mat inverse_covariance;
-    cv::calcCovarMatrix( samples, covariance, mean, CV_COVAR_NORMAL | CV_COVAR_ROWS );
-    cv::invert( covariance, inverse_covariance );
+    MahalanobisDistance distance;
+    distance.calibrate(dataset);
+    DataEntry mean = dataset.mean();
 
     auto it = img.begin<cv::Vec3b>(), end = img.end<cv::Vec3b>();
     for( ; it != end; ++it ) {
-        cv::Mat_<double> entry( 1, 3 );
-        entry( 0, 0 ) = (*it).val[0];
-        entry( 0, 1 ) = (*it).val[1];
-        entry( 0, 2 ) = (*it).val[2];
+        DataEntry entry = entryFromVec( *it );
 
-        double dist = cv::Mahalanobis( entry, mean, inverse_covariance );
+        double dist = distance( mean, entry );
         double sim; // similarity
         if( dist > 1 )
             sim = 0;
