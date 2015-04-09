@@ -2,19 +2,24 @@
 #include "pr/data_set.h"
 
 void MahalanobisDistance::calibrate( const DataSet & dataset ) {
-    cv::Mat covariance;
-    cv::Mat mean; // discarded
-    cv::Mat_<double> data( dataset.size(), 3 );
+    std::size_t dim = dataset.attribute_count();
+    std::vector<double> mean(dim);
+    for( const auto & entry : dataset )
+        for( unsigned i = 0; i < dim; i++ )
+            mean[i] += entry.attribute(i);
 
-    unsigned i = 0;
-    auto it = dataset.begin();
-    for( ; i < dataset.size(); ++i, ++it ) {
-        data( i, 0 ) = it->attribute(0);
-        data( i, 1 ) = it->attribute(1);
-        data( i, 2 ) = it->attribute(2);
-    }
+    for( unsigned i = 0; i < dim; i++ )
+        mean[i] /= dataset.size() - 1;
 
-    cv::calcCovarMatrix( data, covariance, mean, cv::COVAR_NORMAL | cv::COVAR_ROWS );
+    // mean[i] is the average of the attribute(i).
+    cv::Mat_<double> covariance(dim, dim);
+    for( const auto & entry : dataset )
+        for( unsigned i = 0; i < dim; i++ )
+            for( unsigned j = 0; j < dim; j++ )
+                covariance(i, j) +=
+                    (entry.attribute(i) - mean[i]) *
+                    (entry.attribute(j) - mean[j]);
+
     cv::invert( covariance, inverse_covariance );
 }
 
