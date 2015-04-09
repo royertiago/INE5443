@@ -38,6 +38,10 @@ public:
      */
     void push_back( DataEntry&& );
 
+    /* The average entry of this dataset.
+     */
+    DataEntry mean() const;
+
     const DataEntry * begin() const;
     const DataEntry * end() const;
     std::size_t size() const;

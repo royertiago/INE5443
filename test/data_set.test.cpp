@@ -19,6 +19,8 @@ TEST_CASE( "Trivial DataSet member test", "[DataSet][trivial]" ) {
     CHECK( dataset.attribute_name(1) == "Y pos" );
     CHECK( dataset.category_name(0) == "Color" );
 
+    CHECK( dataset.mean() == DataEntry({7.0/3, 5.0/3},{}) );
+
     auto it = dataset.begin();
     REQUIRE( it != dataset.end() );
     CHECK( *it == DataEntry({1, 1},{"Blue"}) );
@@ -44,9 +46,11 @@ TEST_CASE( "DataSet appending", "[DataSet][push_back][trivial]" ) {
     dataset.push_back( DataEntry({2,4},{"A"}) );
     REQUIRE( dataset.size() == 1 );
     CHECK( *dataset.begin() == DataEntry({2,4},{"A"}) );
+    CHECK( dataset.mean() == DataEntry({2,4},{}) );
 
     dataset.push_back( DataEntry({9,0},{"B"}) );
     CHECK( dataset.size() == 2 );
+    CHECK( dataset.mean() == DataEntry({5.5,2},{}) );
 
     auto it = dataset.begin();
     REQUIRE( it != dataset.end() );
@@ -85,6 +89,7 @@ TEST_CASE( "DataSet parsing from file", "[DataSet][parse]" ) {
     CHECK( dataset.attribute_name(0) == "X pos" );
     CHECK( dataset.attribute_name(1) == "Y pos" );
     CHECK( dataset.category_name(0) == "Color" );
+    CHECK( dataset.mean() == DataEntry({7.0/3, 5.0/3},{}) );
 
     auto it = dataset.begin();
     REQUIRE( it != dataset.end() );
@@ -115,6 +120,7 @@ TEST_CASE( "DataSet parsing - corner cases", "[DataSet][parse]" ) {
     CHECK( dataset.category_count() == 0 );
     CHECK( dataset.attribute_name(0) == "X" );
     CHECK( *dataset.begin() == DataEntry({2},{}) );
+    CHECK( dataset.mean() == DataEntry({2},{}) );
 
     std::fclose(file);
 

@@ -121,6 +121,18 @@ void DataSet::push_back( DataEntry && entry ) {
         throw "Wrong number of attributes or categories.";
 }
 
+DataEntry DataSet::mean() const {
+    std::vector<double> sum( attribute_count() );
+    for( const DataEntry & entry: *this )
+        for( int i = 0; i < attribute_count(); i++ )
+            sum[i] += entry.attribute(i);
+
+    for( int i = 0; i < attribute_count(); i++ )
+        sum[i] /= size();
+
+    return DataEntry( std::move(sum), std::vector<std::string>() );
+}
+
 const DataEntry * DataSet::begin() const {
     return &*entries.begin();
 }
