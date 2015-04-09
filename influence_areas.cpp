@@ -50,8 +50,6 @@ namespace command_line {
     /* Arguments that will be passed to the classifier. */
     std::vector< char * > args;
 
-    /* We will use freopen to reset stdin and stdout
-     * in the presence of --input or --output options. */
     void parse( int argc, char ** argv ) {
         static option options[] = {
             {"output", required_argument, 0, 'o'},

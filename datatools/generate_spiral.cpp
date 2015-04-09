@@ -69,8 +69,6 @@ namespace command_line {
     std::uint_fast32_t seed =
         std::chrono::system_clock::now().time_since_epoch().count();
 
-    /* We will use freopen to reset stdin and stdout
-     * in the presence of --input or --output options. */
     void parse( int argc, char ** argv ) {
         static option options[] = {
             {"spirals", required_argument, 0, 'c'},
