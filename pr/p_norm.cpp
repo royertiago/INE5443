@@ -1,8 +1,8 @@
-/* Implementation of distance.h.
+/* Implementation of p_norm.h.
  */
 #include <cmath>
 #include <cfloat>
-#include "distance.h"
+#include "p_norm.h"
 #include "pr/data_set.h"
 #include "pr/data_entry.h"
 

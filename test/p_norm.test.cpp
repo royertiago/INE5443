@@ -1,8 +1,8 @@
-#include "pr/distance.h"
+#include "pr/p_norm.h"
 #include <catch.hpp>
 #include "pr/data_entry.h"
 
-TEST_CASE( "Distance Calculator without normalization", "[distance]" ) {
+TEST_CASE( "P-norms Distance Calculator without normalization", "[distance]" ) {
     DataEntry x({0, 1, 5}, {});
     DataEntry y({1, -1, 3}, {});
     DataEntry z({0, 0, 0}, {});

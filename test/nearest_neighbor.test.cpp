@@ -3,7 +3,7 @@
 
 #include "pr/data_set.h"
 #include "pr/data_entry.h"
-#include "pr/distance.h"
+#include "pr/p_norm.h"
 
 DataSet xy_data(
     std::vector<std::string>{"X pos", "Y pos"},
