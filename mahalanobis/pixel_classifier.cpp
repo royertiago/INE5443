@@ -14,6 +14,17 @@ namespace command_line {
 "    Write the generated image to <file>.\n"
 "    No writing is done by default.\n"
 "\n"
+"--mahalanobis\n"
+"    Uses the Mahalanobis distance as similarity metric.\n"
+"    This is the default.\n"
+"\n"
+"--manhattan\n"
+"--hamming\n"
+"    Chooses Hamming/Manhattan distance as similarity metric.\n"
+"\n"
+"--euclidean\n"
+"    Chooses euclidean distance as similarity metric.\n"
+"\n"
 "--help\n"
 "    Display this help and exit.\n"
 ;
@@ -29,14 +40,22 @@ namespace command_line {
 #include "pr/classifier.h"
 #include "pr/grid_generator.h"
 #include "pr/mahalanobis.h"
+#include "pr/p_norm.h"
 
 namespace command_line {
     const char * output = nullptr;
     const char * image = nullptr;
 
+    bool hamming = false;
+    bool euclidean = false;
+
     void parse( int argc, char ** argv ) {
         static option options[] = {
             {"output", required_argument, 0, 'o'},
+            {"mahalanobis", no_argument, 0, 'm'},
+            {"manhattan", no_argument, 0, 'n'},
+            {"hamming", no_argument, 0, 'n'},
+            {"euclidean", no_argument, 0, 'e'},
             {"help", no_argument, 0, 'h'},
             {0, 0, 0, 0},
         };
@@ -48,6 +67,17 @@ namespace command_line {
             switch( opt ) {
                 case 'o':
                     output = optarg;
+                    break;
+                case 'm':
+                    hamming = euclidean = false;
+                    break;
+                case 'n':
+                    hamming = true;
+                    euclidean = false;
+                    break;
+                case 'e':
+                    hamming = false;
+                    euclidean = true;
                     break;
                 case 'h':
                     std::printf( help_message, argv[0] );
@@ -102,7 +132,14 @@ int main( int argc, char ** argv ) {
          */
         dataset.push_back( entryFromVec(img.at<cv::Vec3b>(data[i][1], data[i][0])) );
 
-    MahalanobisDistance distance;
+    std::unique_ptr< DistanceCalculator > distance_ptr;
+    if( command_line::euclidean )
+        distance_ptr = std::make_unique<EuclideanDistance>(0);
+    else if( command_line::hamming )
+        distance_ptr = std::make_unique<ManhattanDistance>(0);
+    else
+        distance_ptr = std::make_unique<MahalanobisDistance>();
+    DistanceCalculator & distance = *distance_ptr;
     distance.calibrate(dataset);
     DataEntry mean = dataset.mean();
 
