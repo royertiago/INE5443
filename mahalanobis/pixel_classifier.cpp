@@ -101,8 +101,15 @@ int main( int argc, char ** argv ) {
         entry( 0, 0 ) = (*it).val[0];
         entry( 0, 1 ) = (*it).val[1];
         entry( 0, 2 ) = (*it).val[2];
+
         double dist = cv::Mahalanobis( entry, mean, inverse_covariance );
-        *it = cv::Vec3b(255 * dist, 255 * dist, 255 * dist);
+        double sim; // similarity
+        if( dist > 1 )
+            sim = 0;
+        else
+            sim = 1 - dist;
+
+        *it = cv::Vec3b(255 * sim, 255 * sim, 255 * sim);
     }
 
     if( command_line::output != nullptr ) {
