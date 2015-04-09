@@ -101,6 +101,12 @@ int main( int argc, char ** argv ) {
         double dist = cv::Mahalanobis( entry, mean, inverse_covariance );
         *it = cv::Vec3b(255 * dist, 255 * dist, 255 * dist);
     }
+
+    if( command_line::output != nullptr ) {
+        if( !cv::imwrite( command_line::output, img ) )
+            std::fprintf( stderr, "Error writing image to %s\n", command_line::output );
+    }
+
     cv::namedWindow( "Mahalanobis", CV_WINDOW_AUTOSIZE );
     cv::imshow( "Mahalanobis", img );
     cv::waitKey();
