@@ -80,7 +80,10 @@ int main( int argc, char ** argv ) {
 
     cv::Mat_<double> samples( data.size(), 3 );
     for( unsigned i = 0; i < data.size(); i++ ) {
-        cv::Vec3b pixel = img.at<cv::Vec3b>(data[i][0], data[i][1]);
+        /* opencv's dimension access order is row/column.
+         * The output of pixel_chooser is the opposite.
+         */
+        cv::Vec3b pixel = img.at<cv::Vec3b>(data[i][1], data[i][0]);
         samples( i, 0 ) = pixel.val[0];
         samples( i, 1 ) = pixel.val[1];
         samples( i, 2 ) = pixel.val[2];

@@ -14,7 +14,7 @@ int main( int argc, char ** argv ) {
             "Usage: %s <image>\n"
             "Displays the image on the screen and lets the user select pixels,\n"
             "using the mouse.\n"
-            "The list of selected pixels is written, in CSV format, to stdout.\n"
+            "The list of selected pixels is written, in column,row format, to stdout.\n"
             "Duplicated pixels are NOT written twice to stdout.\n"
             ,
             argv[0]
