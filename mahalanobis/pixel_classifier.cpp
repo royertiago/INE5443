@@ -41,6 +41,7 @@ namespace command_line {
 #include "pr/grid_generator.h"
 #include "pr/mahalanobis.h"
 #include "pr/p_norm.h"
+#include "util/cv.h"
 
 namespace command_line {
     const char * output = nullptr;
@@ -103,22 +104,6 @@ namespace command_line {
     } // void parse(int, char**)
 } // namespace command_line
 
-DataEntry entryFromVec( const cv::Vec3b & vec ) {
-    /* As the paragraph 8.5.4/7 of the C++11 standard,
-     * conversions from integer types to floating point types are "narrowing",
-     * so the compiler is obligate to issue an error
-     * when such conversion is used within braces - such as initializer lists.
-     *
-     * Here, we silence this error.
-     */
-    return DataEntry({
-        static_cast<double>( vec.val[0] ),
-        static_cast<double>( vec.val[1] ),
-        static_cast<double>( vec.val[2] ),
-    },
-    {} );
-}
-
 int main( int argc, char ** argv ) {
     command_line::parse( argc, argv );
 
@@ -130,7 +115,9 @@ int main( int argc, char ** argv ) {
         /* opencv's dimension access order is row/column.
          * The output of pixel_chooser is the opposite.
          */
-        dataset.push_back( entryFromVec(img.at<cv::Vec3b>(data[i][1], data[i][0])) );
+        dataset.push_back( util::entryFromVec(
+            img.at<cv::Vec3b>(data[i][1], data[i][0])
+        ));
 
     std::unique_ptr< DistanceCalculator > distance_ptr;
     if( command_line::euclidean )
@@ -145,7 +132,7 @@ int main( int argc, char ** argv ) {
 
     auto it = img.begin<cv::Vec3b>(), end = img.end<cv::Vec3b>();
     for( ; it != end; ++it ) {
-        DataEntry entry = entryFromVec( *it );
+        DataEntry entry = util::entryFromVec( *it );
 
         double dist = distance( mean, entry );
         double sim; // similarity
