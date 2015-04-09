@@ -10,4 +10,5 @@ datatools/generate_spiral
 datatools/generate_svg
 datatools/strip_entry_category
 mahalanobis/pixel_chooser
+mahalanobis/pixel_classifier
 test/test
