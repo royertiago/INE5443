@@ -19,6 +19,11 @@ public:
     );
     DataSet() = default;
 
+    /* Initializes an empty dataset with the given number
+     * of attributes and categories, all of which with name "".
+     */
+    DataSet( std::size_t attribute_count, std::size_t category_count );
+
     static DataSet parse( std::FILE * source );
 
     /* Writes this dataset to the file.
@@ -26,6 +31,12 @@ public:
      * should appear in the file;
      * it have the same organization as DataEntry::write. */
     void write( std::FILE * file, const char * format = "" ) const;
+
+    /* Appends the entry in the dataset.
+     *
+     * The given entry must have the correct number of attributes and categories.
+     */
+    void push_back( DataEntry&& );
 
     const DataEntry * begin() const;
     const DataEntry * end() const;

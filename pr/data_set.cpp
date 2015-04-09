@@ -10,6 +10,12 @@ DataSet::DataSet(
     entries(entries)
 {}
 
+DataSet::DataSet( std::size_t attribute_count, std::size_t category_count ) :
+    attribute_names(attribute_count),
+    category_names(category_count),
+    entries()
+{}
+
 DataSet DataSet::parse( std::FILE * source ) {
     std::size_t field_count = 0;
     int c;
@@ -104,6 +110,15 @@ void DataSet::write( std::FILE * file, const char * format ) const {
     std::fprintf( file, "\n" );
     for( const auto & entry : entries )
         entry.write( file, original_format );
+}
+
+void DataSet::push_back( DataEntry && entry ) {
+    if( entry.attribute_count() == attribute_count() &&
+        entry.category_count() == category_count()
+    )
+        entries.push_back( std::move(entry) );
+    else
+        throw "Wrong number of attributes or categories.";
 }
 
 const DataEntry * DataSet::begin() const {

@@ -35,6 +35,31 @@ TEST_CASE( "Trivial DataSet member test", "[DataSet][trivial]" ) {
     CHECK( it == dataset.end() );
 }
 
+TEST_CASE( "DataSet appending", "[DataSet][push_back][trivial]" ) {
+    DataSet dataset( 2, 1 );
+    CHECK( dataset.size() == 0 );
+    CHECK( dataset.attribute_count() == 2 );
+    CHECK( dataset.category_count() == 1 );
+
+    dataset.push_back( DataEntry({2,4},{"A"}) );
+    REQUIRE( dataset.size() == 1 );
+    CHECK( *dataset.begin() == DataEntry({2,4},{"A"}) );
+
+    dataset.push_back( DataEntry({9,0},{"B"}) );
+    CHECK( dataset.size() == 2 );
+
+    auto it = dataset.begin();
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({2,4},{"A"}) );
+
+    ++it;
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({9,0},{"B"}) );
+
+    ++it;
+    CHECK( it == dataset.end() );
+}
+
 char str_file[] =
     "# Commentary that should be ignored.\n"
     "# Another commentary.\n"
