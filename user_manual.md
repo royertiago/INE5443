@@ -22,6 +22,12 @@ so the full functionality can be obtained this way.
 Most tools read things from `stdin` and write to `stdout`;
 this should be controlled with pipes and I/O redirection.
 
+The first section of this manual is about dataset utilities.
+The part about Mahalanobis distance can be found in the "Image Patterns" section.
+
+
+Dataset Utilities
+=================
 
 ### Short demonstration
 
@@ -177,3 +183,68 @@ Several aspects of the algorithm can be tweaked,
 like the number of spirals, the noise intensity
 and the number of points.
 For more information, run `datatools/generate_spiral --help`.
+
+
+Image Patterns
+==============
+
+### Short demonstration
+
+Run
+
+    ./image_pattern some_image.png
+
+Chose some pixels on the image, and press any key.
+The program will classify the other pixels in the screen
+for proximity with the chosen pixels using the Mahalanobis distance.
+The second image contains the classificationn result.
+Pixels closer to white were classified as close to the chosen pixels;
+darker pixels were classified as distant to the chosen pixels.
+
+Pixel Choosing
+--------------
+
+    mahalanobis/pixel_chooser some_image.png
+
+This program opens a window with `some_image.png` as background,
+and lets the user select some pixels in the screen, using the mouse.
+Each selected pixel is written to stdout,
+in the format "column,row" --- in CSV format.
+
+A black circle is painted around each selected pixel,
+to provide some form of viusal feedback.
+
+The `pixel_chooser` cares to not write the same coordinate to stdout twice,
+even if the user clicked in the same pixel twice.
+
+The program supports all image format supported by OpenCV.
+It has no interesting command-line options.
+
+Pixel Classifying
+-----------------
+
+    manalanobis/pixel_classifier some_image.png
+
+This program reads a comma separated list of values from stdin,
+corresponding to pixel coordinates of the image (generated with `pixel_chooser`),
+and classify each pixel of the image against the input set.
+
+How much close some pixel was classified is represented using gray scale.
+The darker the pixel in the screen, the farther the original pixel was considered.
+
+Command line options:
+
+    --ouput <file>
+Writes the generated image, with the classified pixels, to the chosen file.
+
+    --mahalanobis
+    --euclidean
+    --manhattan
+    --hamming
+Chose the metric. Mahalanobis is the default.
+
+You can run the program several times
+to see the result of classifying with different norms.
+
+The progam `image_pattern` merely concatenate the two programs.
+Run `image_pattern --help` for more information.
