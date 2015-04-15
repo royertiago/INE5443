@@ -4,7 +4,7 @@
 #include "classifier.h"
 #include "pr/data_set.h"
 #include "pr/nearest_neighbor.h"
-#include "pr/distance.h"
+#include "pr/p_norm.h"
 
 constexpr char Classifier::help_message[];
 
