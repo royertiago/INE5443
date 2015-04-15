@@ -181,7 +181,7 @@ Run
 Chose some pixels on the image, and press any key.
 The program will classify the other pixels in the screen
 for proximity with the chosen pixels using the Mahalanobis distance.
-The second image contains the classificationn result.
+The second image contains the classification result.
 Pixels closer to white were classified as close to the chosen pixels;
 darker pixels were classified as distant to the chosen pixels.
 
