@@ -1,0 +1,88 @@
+#!/bin/bash
+
+show_help() {
+    cat << HELP_TEXT
+$0 [options] <image_name>
+Find patterns in an image based on a user-chosen set of pixels
+of that same image.
+
+First, this program opens a window with the given image
+and wait for the user to select some of its pixels.
+(Click on the selected pixels; press any key to exit.)
+Then, these pixels are used to identify similar patterns in the image.
+The program shows another window, with a grayscale image.
+The whiter the pixel on this image, the closer that pixel was classified
+against the set of pixels the user had chosen.
+
+Options:
+--keep
+    Keeps the list of pixels chosen by the used to identify the pattern.
+    The program prints the name of the file with the stored pixels.
+
+--use <pixel_set>
+    Skip the pixel selection phase and use the given file instead.
+    The set is assumed to be in the same format as produced by --keep:
+    One pixel per line, in the format x,y,
+    relative to the top-left corner of the image.
+
+--mahalanobis
+--euclidean
+--manhattan
+--hamming
+    Chose the classification metric.
+    Default: mahalanobis
+
+--help
+    Display this help and quit.
+HELP_TEXT
+}
+
+distance=--mahalanobis
+delete_set=true
+print_set=false
+pixel_set=
+image=
+
+while (($# != 0)); do
+    case "$1" in
+        (--keep)
+            print_set=true
+            delete_set=false
+            ;;
+        (--use)
+            pixel_set="$2"
+            delete_set=false
+            shift
+            ;;
+        (--mahalanobis | --euclidean | --manhattan | --hamming)
+            distance="$1"
+            ;;
+        (--help)
+            show_help "$@"
+            exit 0
+            ;;
+        (*)
+            if [ "$image" ]; then
+                echo Error: two images chosen: \""$image"\" and \""$1"\" >&2
+                exit 1
+            fi
+            image="$1"
+            ;;
+    esac
+    shift
+done
+
+if [ -z "$pixel_set" ]; then
+    pixel_set=$(mktemp --tmpdir)
+    mahalanobis/pixel_chooser "$image" > "$pixel_set"
+fi
+
+if $print_set; then
+    echo Pixel set: "$pixel_set"
+fi
+
+mahalanobis/pixel_classifier "$distance" "$image" < "$pixel_set"
+
+if $delete_set; then
+    rm "$pixel_set"
+fi
