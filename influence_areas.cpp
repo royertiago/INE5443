@@ -40,6 +40,7 @@ namespace command_line {
 #include <opencv2/highgui/highgui.hpp>
 #include "pr/classifier.h"
 #include "pr/grid_generator.h"
+#include "util/cv.h"
 
 namespace command_line {
     const char * output = "output.png";
@@ -154,40 +155,12 @@ int main( int argc, char ** argv ) {
     grid.density( std::vector<unsigned>{(unsigned) width, (unsigned) height} );
     grid.calibrate( classifier.dataset() );
 
-    auto color = [
-        color_map = std::map<std::string, const unsigned *>(),
-        index = 0
-        ]
-        ( std::string category ) mutable
-        -> const unsigned *
-        {
-            static const unsigned red[] = {255, 0, 0};
-            static const unsigned green[] = {0, 255, 0};
-            static const unsigned blue[] = {0, 0, 255};
-            static const unsigned yellow[] = {255, 0, 255};
-            static const unsigned magenta[] = {255, 255, 0};
-            static const unsigned cyan[] = {0, 255, 255};
-            static const unsigned black[] = {0, 0, 0};
-            static const unsigned * colors[] =
-            {red, green, blue, yellow, magenta, cyan, black};
-            static constexpr unsigned limit = sizeof(colors)/sizeof(colors[0]);
-
-            auto pair = color_map.insert( std::make_pair(category, colors[index]) );
-            if( pair.second ) {
-                if( index == limit )
-                    throw "Too much different categories.";
-                ++index;
-            }
-            return pair.first->second;
-        };
-
     cv::Mat img( height, width, CV_8UC3, cv::Scalar(255, 255, 255) );
     for( int i = 0; i < width; i++ )
         for( int j = 0; j < height; j++ ) {
             DataEntry data = grid( {(unsigned)i, (unsigned)j} );
             std::string category = *classifier.classify(data).begin();
-            const unsigned * c = color(category);
-            img.at<cv::Vec3b>(height - j - 1, i) = cv::Vec3b(c[2], c[1], c[0]);
+            img.at<cv::Vec3b>(height - j - 1, i) = util::category_color(category);
         }
 
     if( !cv::imwrite( output, img ) ) {

@@ -18,5 +18,13 @@ namespace util {
      * with the attributes of the entry. */
     cv::Mat_<double> matFromEntry( const DataEntry & );
 
-}
+    /* Returns a Vec3b with a color according to the category.
+     *
+     * Each category will be assigned a different color.
+     * The assignment is done on demand, and there is only seven avaliable colors.
+     */
+    cv::Vec3b category_color( std::string category );
+
+} // namespace util
+
 #endif // UTIL_CV_H

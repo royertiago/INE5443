@@ -26,4 +26,31 @@ cv::Mat_<double> matFromEntry( const DataEntry & entry ) {
     return r;
 }
 
+cv::Vec3b category_color( std::string category ) {
+    static std::map<std::string, const unsigned *> color_map;
+    static int index = 0;
+
+    static const unsigned red[] = {255, 0, 0};
+    static const unsigned green[] = {0, 255, 0};
+    static const unsigned blue[] = {0, 0, 255};
+    static const unsigned yellow[] = {255, 0, 255};
+    static const unsigned magenta[] = {255, 255, 0};
+    static const unsigned cyan[] = {0, 255, 255};
+    static const unsigned black[] = {0, 0, 0};
+    static const unsigned * colors[] =
+    {red, green, blue, yellow, magenta, cyan, black};
+    static constexpr unsigned limit = sizeof(colors)/sizeof(colors[0]);
+
+    auto pair = color_map.insert( std::make_pair(category, colors[index]) );
+    if( pair.second ) {
+        if( index == limit )
+            throw "Too much different categories.";
+        ++index;
+    }
+
+    const unsigned * c = pair.first->second;
+    return cv::Vec3b( c[2], c[1], c[0] );
+};
+
+
 } // namespace util
