@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <cfloat>
 #include "cv.h"
 
 namespace util {
@@ -52,5 +54,41 @@ cv::Vec3b category_color( std::string category ) {
     return cv::Vec3b( c[2], c[1], c[0] );
 };
 
+void show_dataset(
+    cv::Mat & output,
+    const DataSet & input,
+    int radius,
+    double border
+) {
+    if( input.attribute_count() != 2 )
+        throw std::out_of_range(
+            "The input dataset must have exactly two attributes."
+        );
+    if( input.category_count() != 1 )
+        throw std::out_of_range(
+            "The input dataset must have exactly one category type."
+        );
+
+    output = cv::Scalar( 255, 255, 255 );
+
+    double max_x = -DBL_MAX, max_y = -DBL_MAX;
+    double min_x = DBL_MAX, min_y = DBL_MAX;
+    for( const DataEntry & e : input ) {
+        max_x = std::max( max_x, e.attribute(0) );
+        min_x = std::min( max_x, e.attribute(0) );
+        max_y = std::max( max_y, e.attribute(1) );
+        min_y = std::min( max_y, e.attribute(1) );
+    }
+
+    double scale_x = output.cols / (max_x - min_x);
+    double scale_y = output.rows / (max_y - min_y);
+
+    for( const DataEntry & e : input ) {
+        int x = (e.attribute(0) - min_x) * scale_x;
+        int y = (e.attribute(1) - min_y) * scale_y;
+        auto color = category_color( e.category(0) );
+        cv::circle( output, cv::Point(x, y), 0, cv::Scalar(color), radius);
+    }
+}
 
 } // namespace util

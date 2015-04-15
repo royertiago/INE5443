@@ -7,6 +7,7 @@
 
 #include <opencv2/core/core.hpp>
 #include "pr/data_entry.h"
+#include "pr/data_set.h"
 
 namespace util {
 
@@ -25,6 +26,20 @@ namespace util {
      */
     cv::Vec3b category_color( std::string category );
 
+    /* "Prints" the dataset in the cv::Mat.
+     * Each point of the dataset become a circle in the image, with the chosen radius.
+     * The background is white.
+     *
+     * The border is a fraction of the actual dataset.
+     *
+     * This function uses util::category_color to decide the color of each point.
+     */
+    void show_dataset(
+        cv::Mat & output,
+        const DataSet & intput,
+        int radius = 6,
+        double border = 0.1
+    );
 } // namespace util
 
 #endif // UTIL_CV_H
