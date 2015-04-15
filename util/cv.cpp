@@ -75,9 +75,9 @@ void show_dataset(
     double min_x = DBL_MAX, min_y = DBL_MAX;
     for( const DataEntry & e : input ) {
         max_x = std::max( max_x, e.attribute(0) );
-        min_x = std::min( max_x, e.attribute(0) );
+        min_x = std::min( min_x, e.attribute(0) );
         max_y = std::max( max_y, e.attribute(1) );
-        min_y = std::min( max_y, e.attribute(1) );
+        min_y = std::min( min_y, e.attribute(1) );
     }
 
     double scale_x = output.cols / (max_x - min_x);
