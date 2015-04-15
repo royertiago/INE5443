@@ -5,7 +5,6 @@
 classify
 influence_areas
 datatools/canonicalize
-datatools/generate_entry_grid
 datatools/generate_spiral
 datatools/generate_svg
 datatools/strip_entry_category
