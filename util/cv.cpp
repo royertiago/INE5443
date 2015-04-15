@@ -82,10 +82,14 @@ void show_dataset(
 
     double scale_x = output.cols / (max_x - min_x);
     double scale_y = output.rows / (max_y - min_y);
+    double shift_x = output.cols * border;
+    double shift_y = output.rows * border;
+    scale_x /= (1 + 2*border);
+    scale_y /= (1 + 2*border);
 
     for( const DataEntry & e : input ) {
-        int x = (e.attribute(0) - min_x) * scale_x;
-        int y = (e.attribute(1) - min_y) * scale_y;
+        int x = (e.attribute(0) - min_x) * scale_x + shift_x;
+        int y = (e.attribute(1) - min_y) * scale_y + shift_y;
         auto color = category_color( e.category(0) );
         cv::circle( output, cv::Point(x, y), 0, cv::Scalar(color), radius);
     }
