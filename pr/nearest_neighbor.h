@@ -23,7 +23,7 @@ public:
     );
     NearestNeighbor() = default;
 
-    std::vector< std::string > classify( const DataEntry & );
+    std::vector< std::string > classify( const DataEntry & ) const;
 };
 
 #endif // NEAREST_NEIGHBOR_H

@@ -17,7 +17,7 @@ NearestNeighbor::NearestNeighbor(
     distance.calibrate(dataset);
 }
 
-std::vector< std::string > NearestNeighbor::classify( const DataEntry & target ) {
+std::vector< std::string > NearestNeighbor::classify( const DataEntry & target ) const {
     std::vector< std::pair<double, const DataEntry *> > nearest;
     for( const DataEntry & entry : dataset )
         nearest.emplace_back( distance( entry, target ), &entry );
