@@ -1,8 +1,9 @@
 namespace command_line {
     const char help_message[] =
 "%s [options]\n"
-"Generates a svg file with the influence areas of the given dataset.\n"
-"Input is read on stdin, output is written in stdout.\n"
+"Generates an image that contains the influence areas\n"
+"of each category sy the dataset.\n"
+"Input is read on stdin.\n"
 "\n"
 "Options:\n"
 "--output <file>\n"
