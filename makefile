@@ -22,7 +22,7 @@ endef
 # see "naming_conventions.md" for more information.
 CXXFLAGS := -g
 ALL_CXXFLAGS := $(CXXFLAGS) -std=c++1y -iquote./ \
-	-isystem Catch/single_include $$(pkg-config opencv --cflags) -iquote./
+	-isystem Catch/single_include $$(pkg-config opencv --cflags)
 ALL_LDFLAGS += $$(pkg-config opencv --libs) $(LDFLAGS)
 
 # Directories whose makefiles need to be included
