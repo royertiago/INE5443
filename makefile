@@ -20,7 +20,7 @@ endef
 #
 # However, some strictness must be followed in the code;
 # see "naming_conventions.md" for more information.
-CXXFLAGS := -g
+CXXFLAGS ?= -g
 ALL_CXXFLAGS := $(CXXFLAGS) -std=c++1y -iquote./ \
 	-isystem Catch/single_include $$(pkg-config opencv --cflags)
 ALL_LDFLAGS += $$(pkg-config opencv --libs) $(LDFLAGS)
