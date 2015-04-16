@@ -40,7 +40,6 @@ namespace command_line {
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "pr/classifier.h"
-#include "pr/grid_generator.h"
 #include "util/cv.h"
 
 namespace command_line {
@@ -151,18 +150,8 @@ int main( int argc, char ** argv ) {
         std::exit( 2 );
     }
 
-    GridGenerator grid;
-    grid.expand( expand );
-    grid.density( std::vector<unsigned>{(unsigned) width, (unsigned) height} );
-    grid.calibrate( classifier.dataset() );
-
     cv::Mat img( height, width, CV_8UC3, cv::Scalar(255, 255, 255) );
-    for( int i = 0; i < width; i++ )
-        for( int j = 0; j < height; j++ ) {
-            DataEntry data = grid( {(unsigned)i, (unsigned)j} );
-            std::string category = *classifier.classify(data).begin();
-            img.at<cv::Vec3b>(height - j - 1, i) = util::category_color(category);
-        }
+    util::influence_areas( img, classifier, expand );
 
     if( !cv::imwrite( output, img ) ) {
         std::fprintf( stderr, "Error writing image to %s\n", output );

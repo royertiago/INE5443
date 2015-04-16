@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <cfloat>
 #include "cv.h"
+#include "pr/grid_generator.h"
 
 namespace util {
 
@@ -93,6 +94,29 @@ void show_dataset(
         auto color = category_color( e.category(0) );
         cv::circle( output, cv::Point(x, y), 0, cv::Scalar(color), radius);
     }
+}
+
+void influence_areas( cv::Mat & img, const Classifier & input, double border ) {
+    if( input.dataset().attribute_count() != 2 )
+        throw std::out_of_range(
+            "The input dataset must have exactly two attributes."
+        );
+    if( input.dataset().category_count() != 1 )
+        throw std::out_of_range(
+            "The input dataset must have exactly one category type."
+        );
+
+    GridGenerator grid;
+    grid.expand( border );
+    grid.density( std::vector<unsigned>{(unsigned) img.cols, (unsigned) img.rows} );
+    grid.calibrate( input.dataset() );
+
+    for( int i = 0; i < img.rows; i++ )
+        for( int j = 0; j < img.cols; j++ ) {
+            DataEntry data = grid( {(unsigned)i, (unsigned)j} );
+            std::string category = *input.classify(data).begin();
+            img.at<cv::Vec3b>(img.rows - j - 1, i) = util::category_color(category);
+        }
 }
 
 } // namespace util

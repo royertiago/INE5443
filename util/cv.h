@@ -8,6 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include "pr/data_entry.h"
 #include "pr/data_set.h"
+#include "pr/classifier.h"
 
 namespace util {
 
@@ -40,6 +41,15 @@ namespace util {
         int radius = 6,
         double border = 0.1
     );
+
+    /* Writes the influence areas of the given dataset to the cv::Mat.
+     * The dataset must be encapsulated in a Classifier,
+     * equiped with the metric that will be used to compute the influence areas.
+     *
+     * border is the percentage of the data set extremum points
+     * that will be used to create a border.
+     */
+     void influence_areas( cv::Mat & output, const Classifier & input, double border );
 } // namespace util
 
 #endif // UTIL_CV_H
