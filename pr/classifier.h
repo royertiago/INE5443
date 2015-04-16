@@ -68,7 +68,7 @@ public:
 
     const DataSet & dataset() const;
 
-    std::vector< std::string > classify( const DataEntry & );
+    std::vector< std::string > classify( const DataEntry & ) const;
 };
 
 #endif // CLASSIFIER_H

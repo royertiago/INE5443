@@ -92,7 +92,7 @@ Classifier::Classifier( int argc, char ** argv ) {
     nn = std::make_unique<NearestNeighbor>( *_dataset, *calculator, neighbors );
 }
 
-std::vector<std::string> Classifier::classify( const DataEntry & data ) {
+std::vector< std::string > Classifier::classify( const DataEntry & data ) const {
     return nn->classify( data );
 }
 
