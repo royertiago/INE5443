@@ -12,12 +12,27 @@ NearestNeighbor::NearestNeighbor(
 ) :
     _dataset( std::move(dataset) ),
     _distance( std::move(distance) ),
-    neighbors( neighbors )
+    neighbors( neighbors ),
+    dirty(false)
 {
     _distance->calibrate(*_dataset);
 }
 
+const DataSet& NearestNeighbor::dataset() const {
+    return *_dataset;
+}
+
+DataSet & NearestNeighbor::edit_dataset() {
+    dirty = true;
+    return *_dataset;
+}
+
 std::vector< std::string > NearestNeighbor::classify( const DataEntry & target ) const {
+    if( dirty ) {
+        _distance->calibrate(*_dataset);
+        dirty = false;
+    }
+
     std::vector< std::pair<double, const DataEntry *> > nearest;
     for( const DataEntry & entry : *_dataset )
         nearest.emplace_back( (*_distance)( entry, target ), &entry );
