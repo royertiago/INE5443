@@ -8,14 +8,17 @@
 NearestNeighbor::NearestNeighbor(
     std::unique_ptr<DataSet> && dataset,
     std::unique_ptr<DistanceCalculator> && distance,
-    std::size_t neighbors
+    std::size_t neighbors,
+    bool normelize
 ) :
     _dataset( std::move(dataset) ),
     _distance( std::move(distance) ),
     neighbors( neighbors ),
+    normalize( normalize ),
     dirty(false)
 {
-    _distance->calibrate(*_dataset);
+    if( normalize )
+        _distance->calibrate(*_dataset);
 }
 
 const DataSet& NearestNeighbor::dataset() const {
@@ -28,7 +31,7 @@ DataSet & NearestNeighbor::edit_dataset() {
 }
 
 std::vector< std::string > NearestNeighbor::classify( const DataEntry & target ) const {
-    if( dirty ) {
+    if( normalize && dirty ) {
         _distance->calibrate(*_dataset);
         dirty = false;
     }

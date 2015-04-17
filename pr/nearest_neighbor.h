@@ -13,13 +13,15 @@ class NearestNeighbor {
     std::unique_ptr<DataSet> _dataset;
     mutable std::unique_ptr<DistanceCalculator> _distance;
     std::size_t neighbors; // Nearest Neighbor algorithm parameter
+    bool normalize;
     mutable bool dirty;
 
 public:
     NearestNeighbor(
         std::unique_ptr<DataSet> && dataset,
         std::unique_ptr<DistanceCalculator> && distance,
-        std::size_t neighbors
+        std::size_t neighbors,
+        bool normalize = true
     );
     NearestNeighbor() = default;
     ~NearestNeighbor();

@@ -9,6 +9,7 @@
 std::unique_ptr<NearestNeighbor> generate_classifier( int argc, char ** argv ) {
     double tolerance = 0.1;
     bool euclidean = false;
+    bool normalize = true;
     unsigned neighbors = 1;
     std::FILE * dataset_file = nullptr;
 
@@ -17,6 +18,8 @@ std::unique_ptr<NearestNeighbor> generate_classifier( int argc, char ** argv ) {
         {"hamming", no_argument, 0, 'm'},
         {"euclidean", no_argument, 0, 'e'},
         {"neighbors", required_argument, 0, 'n'},
+        {"normalize", no_argument, 0, 's'},
+        {"no-normalize", no_argument, 0, 'r'},
         {"normalize-tolerance", required_argument, 0, 't'},
         {"dataset", required_argument, 0, 'd'},
         {"help", no_argument, 0, 'h'},
@@ -27,7 +30,7 @@ std::unique_ptr<NearestNeighbor> generate_classifier( int argc, char ** argv ) {
 
     // Reset optind to not conflict with external getopt invocations.
     optind = 1;
-    while( (opt = getopt_long( argc, argv, "men:t:d:h",
+    while( (opt = getopt_long( argc, argv, "men:srt:d:h",
                 options, &dummy_option_index
             )) != -1 ) {
         switch( opt ) {
@@ -46,6 +49,12 @@ std::unique_ptr<NearestNeighbor> generate_classifier( int argc, char ** argv ) {
                     std::fprintf( stderr, "Too few neighbors\n" );
                     std::exit(1);
                 }
+                break;
+            case 's':
+                normalize = true;
+                break;
+            case 'r':
+                normalize = false;
                 break;
             case 't':
                 if( std::sscanf( optarg, "%lf", &tolerance ) != 1 ) {
@@ -92,6 +101,7 @@ std::unique_ptr<NearestNeighbor> generate_classifier( int argc, char ** argv ) {
     return std::make_unique<NearestNeighbor>(
         std::move(dataset),
         std::move(calculator),
-        neighbors
+        neighbors,
+        normalize
     );
 }
