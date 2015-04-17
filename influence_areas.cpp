@@ -62,6 +62,8 @@ namespace command_line {
             {"hamming", no_argument, 0, 'm'},
             {"euclidean", no_argument, 0, 'c'},
             {"neighbors", required_argument, 0, 'n'},
+            {"normalize", no_argument, 0, 's'},
+            {"no-normalize", no_argument, 0, 'r'},
             {"normalize-tolerance", required_argument, 0, 't'},
 
             {"help", no_argument, 0, 'h'},
@@ -70,7 +72,7 @@ namespace command_line {
         int opt;
         int dummy_option_index;
         args.push_back( argv[0] );
-        while( (opt = getopt_long( argc, argv, "men:t:d:h",
+        while( (opt = getopt_long( argc, argv, "o:w:a:e:mcn:srt:h",
                     options, &dummy_option_index
                 )) != -1 ) {
             switch( opt ) {
@@ -113,6 +115,8 @@ namespace command_line {
 
                 case 'm':
                 case 'c':
+                case 's':
+                case 'r':
                     args.push_back( argv[optind-1] );
                     break;
                 case 'n':
