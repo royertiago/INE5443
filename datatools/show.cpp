@@ -19,11 +19,11 @@ namespace command_line {
 ;
 } // namespace command_line
 
-#include <getopt.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <cstdio>
 #include <cstring>
+#include "cmdline/args.h"
 #include "pr/data_set.h"
 #include "util/cv.h"
 
@@ -34,64 +34,33 @@ namespace command_line {
     int width = 300, height = 300;
     double radius = 6;
 
-    void parse( int argc, char ** argv ) {
-        static option options[] = {
-            {"width", required_argument, 0, 'w'},
-            {"height", required_argument, 0, 'e'},
-            {"radius", required_argument, 0, 'r'},
-            {"help", no_argument, 0, 'h'},
-            {0, 0, 0, 0},
-        };
-        int opt;
-        int dummy_option_index;
-        while( (opt = getopt_long( argc, argv, "w:e:r:h",
-                    options, &dummy_option_index
-                )) != -1 ) {
-            switch( opt ) {
-                case 'w':
-                    if( std::sscanf( optarg, "%u", &width ) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    if( width <= 0 ) {
-                        std::fprintf( stderr, "Width must be positive.\n" );
-                        std::exit(1);
-                    }
-                    break;
-                case 'e':
-                    if( std::sscanf( optarg, "%u", &height ) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    if( height <= 0 ) {
-                        std::fprintf( stderr, "Height must be positive.\n" );
-                        std::exit(1);
-                    }
-                    break;
-                case 'r':
-                    if( std::sscanf( optarg, "%lf", &radius ) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    if( radius <= 0 ) {
-                        std::fprintf( stderr, "Radius must be positive.\n" );
-                        std::exit(1);
-                    }
-                    break;
-                case 'h':
-                    std::printf( help_message, argv[0] );
-                    std::exit(0);
-                    break;
-                default:
-                    std::fprintf( stderr, "Unknown parameter %c\n", optopt );
-                    std::exit(1);
+    void parse( cmdline::args && args ) {
+        while( args.size() > 0 ) {
+            std::string arg = args.next();
+            if( arg == "--width" ) {
+                args.range( 1 ) >> width;
+                continue;
             }
+            if( arg == "--height" ) {
+                args.range( 1 ) >> height;
+                continue;
+            }
+            if( arg == "--radius" ) {
+                args.range( 1 ) >> radius;
+                continue;
+            }
+            if( arg == "--help" ) {
+                std::printf( help_message, args.program_name().c_str() );
+                std::exit(0);
+            }
+            std::fprintf( stderr, "Unknown parameter %s.\n", arg.c_str() );
+            std::exit(1);
         }
-    } // void parse(int, char**)
+    }
 } // namespace command_line
 
 int main( int argc, char ** argv ) {
-    command_line::parse( argc, argv );
+    command_line::parse( cmdline::args(argc, argv) );
     DataSet dataset = DataSet::parse( stdin );
 
     if( dataset.attribute_count() != 2 ) {
