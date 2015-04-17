@@ -22,6 +22,7 @@ public:
         std::size_t neighbors
     );
     NearestNeighbor() = default;
+    ~NearestNeighbor();
 
     /* The first function returns a const reference to the dataset.
      * The second returns a modifiable reference,

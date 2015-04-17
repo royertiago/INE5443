@@ -147,3 +147,9 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
 
     return categories;
 }
+
+/* The destructor must be here because std::unique_ptr's default destructor
+ * requires the full class specification.
+ * This would defeat the purpose of the forward-declarations
+ * in the beginning of the header file. */
+NearestNeighbor::~NearestNeighbor() {}
