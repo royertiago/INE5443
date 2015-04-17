@@ -2,23 +2,22 @@
 #define NEAREST_NEIGHBOR_H
 
 #include <string>
+#include <memory>
 #include <vector>
 
 class DataSet;
 struct DistanceCalculator;
 class DataEntry;
 
-class DistanceCalculator;
-
 class NearestNeighbor {
-    const DataSet & dataset;
-    DistanceCalculator& distance;
+    std::unique_ptr<DataSet> _dataset;
+    std::unique_ptr<DistanceCalculator> _distance;
     std::size_t neighbors; // Nearest Neighbor algorithm parameter
 
 public:
     NearestNeighbor(
-        const DataSet & dataset,
-        DistanceCalculator& distance,
+        std::unique_ptr<DataSet> && dataset,
+        std::unique_ptr<DistanceCalculator> && distance,
         std::size_t neighbors
     );
     NearestNeighbor() = default;

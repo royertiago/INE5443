@@ -6,25 +6,25 @@
 #include "pr/distance.h"
 
 NearestNeighbor::NearestNeighbor(
-    const DataSet & dataset,
-    DistanceCalculator& distance,
+    std::unique_ptr<DataSet> && dataset,
+    std::unique_ptr<DistanceCalculator> && distance,
     std::size_t neighbors
 ) :
-    dataset( dataset ),
-    distance( distance ),
+    _dataset( std::move(dataset) ),
+    _distance( std::move(distance) ),
     neighbors( neighbors )
 {
-    distance.calibrate(dataset);
+    _distance->calibrate(*_dataset);
 }
 
 std::vector< std::string > NearestNeighbor::classify( const DataEntry & target ) const {
     std::vector< std::pair<double, const DataEntry *> > nearest;
-    for( const DataEntry & entry : dataset )
-        nearest.emplace_back( distance( entry, target ), &entry );
+    for( const DataEntry & entry : *_dataset )
+        nearest.emplace_back( (*_distance)( entry, target ), &entry );
 
     std::sort( nearest.begin(), nearest.end() );
 
-    std::vector< std::map<std::string, unsigned> > votes( dataset.category_count() );
+    std::vector< std::map<std::string, unsigned> > votes( _dataset->category_count() );
     /* votes[i] represents the votes of the nearer neighbors
      * for the ith category that the target entry will be classified.
      * Thus, for instance, votes[0]["Iris-versicolor"] == 4
@@ -38,12 +38,12 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
     for( unsigned i = 0; i < neighbors; ++i, ++it ) {
         if( it == nearest.end() )
             throw "Too few entries in dataset to categorize target entry.";
-        for( unsigned j = 0; j < dataset.category_count(); j++ )
+        for( unsigned j = 0; j < _dataset->category_count(); j++ )
             votes[j][it->second->category(j)]++;
     }
 
-    std::vector< std::string > categories( dataset.category_count() );
-    std::vector< unsigned > max_votes( dataset.category_count() );
+    std::vector< std::string > categories( _dataset->category_count() );
+    std::vector< unsigned > max_votes( _dataset->category_count() );
     /* categories[i] is the category with the highest number of votes
      * for the ith category type,
      * or "" in the event of a draw.
@@ -52,7 +52,7 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
      * If there are draws, we will get more votes
      * from the nearest neighbors after the first `this->neighbors`. */
 
-    for( unsigned i = 0; i < dataset.category_count(); ++i ) {
+    for( unsigned i = 0; i < _dataset->category_count(); ++i ) {
         for( auto pair: votes[i] ) {
             if( pair.second > max_votes[i] ) {
                 categories[i] = pair.first;
@@ -113,7 +113,7 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
     bool draws = true;
     while( draws ) {
         draws = false;
-        for( unsigned i = 0; i < dataset.category_count(); ++i ) {
+        for( unsigned i = 0; i < _dataset->category_count(); ++i ) {
             if( categories[i] == "" ) {
                 // We need a new vote, but we might not have more voters.
                 if( it == nearest.end() )
