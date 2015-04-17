@@ -4,7 +4,7 @@
 #include "pr/data_set.h"
 
 int main( int argc, char ** argv ) {
-    auto ptr = generate_classifier(argc, argv);
+    auto ptr = generate_classifier(cmdline::args(argc, argv));
     NearestNeighbor & classifier = *ptr;
     std::size_t attribute_count = classifier.dataset().attribute_count();
     DataEntry entry;

@@ -5,10 +5,11 @@
  * from command line options.
  */
 
+#include "cmdline/args.h"
 #include "pr/nearest_neighbor.h"
 
 constexpr char classifier_help_message[] =
-"%s [options] --dataset <file>\n"
+" [options] --dataset <file>\n"
 "This program loads a dataset in the format specified by dadasets/format.md\n"
 "and try to classify the incoming entries into one of the categories\n"
 "defined in the dataset.\n"
@@ -55,6 +56,6 @@ constexpr char classifier_help_message[] =
 "    Display this help and quit.\n"
 ;
 
-std::unique_ptr<NearestNeighbor> generate_classifier( int argc, char ** argv );
+std::unique_ptr<NearestNeighbor> generate_classifier( cmdline::args&& );
 
 #endif // CLASSIFIER_H
