@@ -6,7 +6,6 @@ classify
 influence_areas
 datatools/canonicalize
 datatools/generate_spiral
-datatools/generate_svg
 datatools/show
 datatools/strip_entry_category
 mahalanobis/pixel_chooser
