@@ -6,9 +6,7 @@
 #include "pr/nearest_neighbor.h"
 #include "pr/p_norm.h"
 
-constexpr char Classifier::help_message[];
-
-Classifier::Classifier( int argc, char ** argv ) {
+std::unique_ptr<NearestNeighbor> generate_classifier( int argc, char ** argv ) {
     double tolerance = 0.1;
     bool euclidean = false;
     unsigned neighbors = 1;
@@ -66,7 +64,7 @@ Classifier::Classifier( int argc, char ** argv ) {
                 }
                 break;
             case 'h':
-                std::printf( help_message, argv[0] );
+                std::printf( classifier_help_message, argv[0] );
                 std::exit(0);
                 break;
             default:
@@ -75,12 +73,14 @@ Classifier::Classifier( int argc, char ** argv ) {
         }
     }
     // Command line options parsed, now we will initialize the variables.
+    std::unique_ptr<DataSet> dataset;
+    std::unique_ptr<DistanceCalculator> calculator;
 
     if( dataset_file == nullptr ) {
-        _dataset = std::make_unique<DataSet>(DataSet::parse( stdin ));
+        dataset = std::make_unique<DataSet>(DataSet::parse( stdin ));
     }
     else {
-        _dataset = std::make_unique<DataSet>(DataSet::parse( dataset_file ));
+        dataset = std::make_unique<DataSet>(DataSet::parse( dataset_file ));
         std::fclose(dataset_file);
     }
 
@@ -89,19 +89,9 @@ Classifier::Classifier( int argc, char ** argv ) {
     else
         calculator = std::make_unique<ManhattanDistance>( tolerance );
 
-    nn = std::make_unique<NearestNeighbor>( *_dataset, *calculator, neighbors );
+    return std::make_unique<NearestNeighbor>(
+        std::move(dataset),
+        std::move(calculator),
+        neighbors
+    );
 }
-
-std::vector< std::string > Classifier::classify( const DataEntry & data ) const {
-    return nn->classify( data );
-}
-
-const DataSet & Classifier::dataset() const {
-    return *_dataset;
-}
-
-/* The destructor must be here because the default destructor,
- * for std::unique_ptr, requires the full class specification.
- * This would defeat the purpose of the forward-declarations
- * in the beginning of the header file. */
-Classifier::~Classifier() {}

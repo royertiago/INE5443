@@ -1,27 +1,13 @@
 #ifndef CLASSIFIER_H
 #define CLASSIFIER_H
 
-/* Class that encapsulates the classification process.
- * The constructor is based on argc and argv;
- * see the classifier_help_message for details.
+/* Helper function that constructs a NearestNeighbor object
+ * from command line options.
  */
 
-#include <memory>
-#include <string>
-#include <vector>
+#include "pr/nearest_neighbor.h"
 
-#include "pr/data_entry.h"
-
-class DataSet;
-struct DistanceCalculator;
-class NearestNeighbor;
-
-class Classifier {
-    std::unique_ptr<DataSet> _dataset;
-    std::unique_ptr<DistanceCalculator> calculator;
-    std::unique_ptr<NearestNeighbor> nn;
-
-    static constexpr char help_message[] =
+constexpr char classifier_help_message[] =
 "%s [options] --dataset <file>\n"
 "This program loads a dataset in the format specified by dadasets/format.md\n"
 "and try to classify the incoming entries into one of the categories\n"
@@ -62,13 +48,6 @@ class Classifier {
 "    Display this help and quit.\n"
 ;
 
-public:
-    Classifier( int argc, char ** argv );
-    ~Classifier();
-
-    const DataSet & dataset() const;
-
-    std::vector< std::string > classify( const DataEntry & ) const;
-};
+std::unique_ptr<NearestNeighbor> generate_classifier( int argc, char ** argv );
 
 #endif // CLASSIFIER_H
