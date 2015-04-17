@@ -49,7 +49,11 @@ namespace util {
      * border is the percentage of the data set extremum points
      * that will be used to create a border.
      */
-     void influence_areas( cv::Mat & output, const Classifier & input, double border );
+    void influence_areas(
+        cv::Mat & output,
+        const NearestNeighbor & input,
+        double border
+    );
 } // namespace util
 
 #endif // UTIL_CV_H

@@ -25,8 +25,9 @@ std::vector<std::string> category_B = {"B"};
 std::vector<std::string> category_C = {"C"};
 
 TEST_CASE( "Euclidean Nearest Neighbor, NN=1, one category", "[nn][trivial]" ) {
-    EuclideanDistance distance(0);
-    NearestNeighbor nn(xy_data, distance, 1);
+    std::unique_ptr<DistanceCalculator> distance(new EuclideanDistance(0));
+    std::unique_ptr<DataSet> dataset(new DataSet(xy_data));
+    NearestNeighbor nn(std::move(dataset), std::move(distance), 1);
 
     CHECK( nn.classify(DataEntry({0,0},{})) == category_A );
     CHECK( nn.classify(DataEntry({3,0},{})) == category_B );
@@ -40,8 +41,9 @@ TEST_CASE( "Euclidean Nearest Neighbor, NN=1, one category", "[nn][trivial]" ) {
 }
 
 TEST_CASE( "Manhattan Nearest Neighbor, NN=1, one category", "[nn][trivial]" ) {
-    ManhattanDistance distance(0);
-    NearestNeighbor nn(xy_data, distance, 1);
+    std::unique_ptr<DistanceCalculator> distance(new ManhattanDistance(0));
+    std::unique_ptr<DataSet> dataset(new DataSet(xy_data));
+    NearestNeighbor nn(std::move(dataset), std::move(distance), 1);
 
     CHECK( nn.classify(DataEntry({0,0},{})) == category_B );
     CHECK( nn.classify(DataEntry({3,0},{})) == category_B );
@@ -55,8 +57,9 @@ TEST_CASE( "Manhattan Nearest Neighbor, NN=1, one category", "[nn][trivial]" ) {
 }
 
 TEST_CASE( "Euclidean Nearest Neighbor, NN=2, one category", "[nn][two_neighbors]" ) {
-    EuclideanDistance distance(0);
-    NearestNeighbor nn(xy_data, distance, 2);
+    std::unique_ptr<DistanceCalculator> distance(new EuclideanDistance(0));
+    std::unique_ptr<DataSet> dataset(new DataSet(xy_data));
+    NearestNeighbor nn(std::move(dataset), std::move(distance), 2);
 
     CHECK( nn.classify(DataEntry({0,0},{})) == category_A );
     CHECK( nn.classify(DataEntry({3,0},{})) == category_A );
@@ -73,8 +76,9 @@ TEST_CASE( "Euclidean Nearest Neighbor, NN=2, one category", "[nn][two_neighbors
 }
 
 TEST_CASE( "Manhattan Nearest Neighbor, NN=2, one category", "[nn][two_neighbors]" ) {
-    ManhattanDistance distance(0);
-    NearestNeighbor nn(xy_data, distance, 2);
+    std::unique_ptr<DistanceCalculator> distance(new ManhattanDistance(0));
+    std::unique_ptr<DataSet> dataset(new DataSet(xy_data));
+    NearestNeighbor nn(std::move(dataset), std::move(distance), 2);
 
     CHECK( nn.classify(DataEntry({0,0},{})) == category_A );
     CHECK( nn.classify(DataEntry({3,0},{})) == category_A );

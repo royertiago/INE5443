@@ -138,7 +138,8 @@ int main( int argc, char ** argv ) {
 
     command_line::parse( argc, argv );
 
-    Classifier classifier( args.size() - 1, args.data() );
+    auto ptr = generate_classifier(argc, argv);
+    NearestNeighbor & classifier = *ptr;
 
     if( classifier.dataset().attribute_count() != 2 ) {
         std::fprintf( stderr, "The database must have exactly two atributes.\n" );
