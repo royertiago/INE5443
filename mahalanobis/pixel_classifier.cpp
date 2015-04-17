@@ -30,82 +30,69 @@ namespace command_line {
 ;
 } // namespace command_line
 
-#include <getopt.h>
 #include <cfloat>
 #include <cstdio>
 #include <cstdlib>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "cmdline/args.h"
 #include "util/csv.h"
+#include "util/cv.h"
 #include "pr/classifier.h"
 #include "pr/grid_generator.h"
 #include "pr/mahalanobis.h"
 #include "pr/p_norm.h"
-#include "util/cv.h"
 
 namespace command_line {
-    const char * output = nullptr;
-    const char * image = nullptr;
+    std::string output;
+    std::string image;
 
     bool hamming = false;
     bool euclidean = false;
 
-    void parse( int argc, char ** argv ) {
-        static option options[] = {
-            {"output", required_argument, 0, 'o'},
-            {"mahalanobis", no_argument, 0, 'm'},
-            {"manhattan", no_argument, 0, 'n'},
-            {"hamming", no_argument, 0, 'n'},
-            {"euclidean", no_argument, 0, 'e'},
-            {"help", no_argument, 0, 'h'},
-            {0, 0, 0, 0},
-        };
-        int opt;
-        int dummy_option_index;
-        while( (opt = getopt_long( argc, argv, "o:h",
-                    options, &dummy_option_index
-                )) != -1 ) {
-            switch( opt ) {
-                case 'o':
-                    output = optarg;
-                    break;
-                case 'm':
-                    hamming = euclidean = false;
-                    break;
-                case 'n':
-                    hamming = true;
-                    euclidean = false;
-                    break;
-                case 'e':
-                    hamming = false;
-                    euclidean = true;
-                    break;
-                case 'h':
-                    std::printf( help_message, argv[0] );
-                    std::exit(0);
-                    break;
-                default:
-                    std::fprintf( stderr, "Unknown parameter %c\n", optopt );
-                    std::exit(1);
+    void parse( cmdline::args&& args ) {
+        while( args.size() > 0 ) {
+            std::string arg = args.next();
+            if( arg == "--output" ) {
+                output = arg;
+                continue;
             }
+            if( arg == "--mahalanobis" ) {
+                hamming = false;
+                euclidean = false;
+                continue;
+            }
+            if( arg == "--manhattan" || arg == "--hamming" ) {
+                hamming = true;
+                euclidean = false;
+                continue;
+            }
+            if( arg == "--euclidean" ) {
+                hamming = false;
+                euclidean = true;
+                continue;
+            }
+            if( arg == "--help" ) {
+                std::printf( help_message, args.program_name().c_str() );
+                std::exit(0);
+            }
+            if( image != "" ) {
+                std::fprintf( stderr, "Image specified twice, as '%s' and '%s'\n",
+                    image.c_str(), arg.c_str()
+                );
+                std::exit(1);
+            }
+            image = arg;
         }
-
-        if( optind >= argc ) {
+        if( image == "" ) {
             std::fprintf( stderr, "Missing image source in command-line.\n" );
             std::exit(1);
         }
-
-        image = argv[optind++];
-
-        if( optind < argc ) {
-            std::fprintf( stderr, "Spurious command-line option %s\n", argv[optind] );
-            std::exit(1);
-        }
-    } // void parse(int, char**)
+    }
 } // namespace command_line
 
 int main( int argc, char ** argv ) {
-    command_line::parse( argc, argv );
+    command_line::parse( cmdline::args(argc, argv) );
 
     auto data = util::parse_csv( stdin );
     cv::Mat img = cv::imread( command_line::image );
@@ -145,9 +132,11 @@ int main( int argc, char ** argv ) {
         *it = cv::Vec3b(255 * sim, 255 * sim, 255 * sim);
     }
 
-    if( command_line::output != nullptr ) {
+    if( command_line::output != "" ) {
         if( !cv::imwrite( command_line::output, img ) )
-            std::fprintf( stderr, "Error writing image to %s\n", command_line::output );
+            std::fprintf( stderr, "Error writing image to %s\n",
+                command_line::output.c_str()
+            );
     }
 
     cv::namedWindow( "Mahalanobis", CV_WINDOW_AUTOSIZE );
