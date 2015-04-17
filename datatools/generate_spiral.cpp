@@ -50,7 +50,7 @@ namespace command_line {
 #include <cmath>
 #include <cstdio>
 #include <random>
-#include <getopt.h>
+#include "cmdline/args.h"
 #include "pr/data_entry.h"
 #include "pr/data_set.h"
 
@@ -69,101 +69,53 @@ namespace command_line {
     std::uint_fast32_t seed =
         std::chrono::system_clock::now().time_since_epoch().count();
 
-    void parse( int argc, char ** argv ) {
-        static option options[] = {
-            {"spirals", required_argument, 0, 'c'},
-            {"entries", required_argument, 0, 'e'},
-            {"radial-start", required_argument, 0, 'd'},
-            {"angular-start", required_argument, 0, 't'},
-            {"radial-step", required_argument, 0, 'r'},
-            {"angular-step", required_argument, 0, 'a'},
-            {"radial-noise", required_argument, 0, 'n'},
-            {"seed", required_argument, 0, 's'},
-            {"help", no_argument, 0, 'h'},
-            {0, 0, 0, 0},
-        };
-        int opt;
-        int dummy_option_index;
-        unsigned long long tmp;
-        while( (opt = getopt_long( argc, argv, "c:e:d:t:r:a:n:s:h",
-                    options, &dummy_option_index
-                )) != -1 ) {
-            switch( opt ) {
-                case 'c':
-                    if( std::sscanf(optarg, "%u", &spirals) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    if( spirals <= 0 ) {
-                        std::fprintf( stderr, "Number of spirals must be poistive.\n" );
-                        std::exit(1);
-                    }
-                    break;
-                case 'e':
-                    if( std::sscanf(optarg, "%u", &entries) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(0);
-                    }
-                    if( entries <= 0 ) {
-                        std::fprintf( stderr, "Number of entries must be poistive.\n" );
-                        std::exit(1);
-                    }
-                    break;
-                case 'd':
-                    if( std::sscanf(optarg, "%lf", &radial_start) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    break;
-                case 't':
-                    if( std::sscanf(optarg, "%lf", &angular_start) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    break;
-                case 'r':
-                    if( std::sscanf(optarg, "%lf", &radial_step) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    break;
-                case 'a':
-                    if( std::sscanf(optarg, "%lf", &angular_step) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    break;
-                case 'n':
-                    if( std::sscanf(optarg, "%lf", &radial_noise) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    if( radial_noise < 0 ) {
-                        std::fprintf( stderr, "Radial noise must not be negative.\n" );
-                        std::exit(1);
-                    }
-                    break;
-                case 's':
-                    if( std::sscanf(optarg, "%llu", &tmp) != 1 ) {
-                        std::fprintf( stderr, "Not a valid number: %s\n", optarg );
-                        std::exit(1);
-                    }
-                    seed = tmp;
-                    break;
-                case 'h':
-                    std::printf( help_message, argv[0] );
-                    std::exit(0);
-                    break;
-                default:
-                    std::fprintf( stderr, "Unknown parameter %c\n", optopt );
-                    std::exit(1);
+    void parse( cmdline::args && args ) {
+        while( args.size() > 0 ) {
+            std::string arg = args.next();
+            if( arg == "--spirals" ) {
+                args.range( 1 ) >> spirals;
+                continue;
             }
+            if( arg == "--entries" ) {
+                args.range( 1 ) >> entries;
+                continue;
+            }
+            if( arg == "--radial-start" ) {
+                args >> radial_start;
+                continue;
+            }
+            if( arg == "--angular-start" ) {
+                args >> angular_start;
+                continue;
+            }
+            if( arg == "--radial-step" ) {
+                args >> radial_step;
+                continue;
+            }
+            if( arg == "--angular-step" ) {
+                args >> angular_step;
+                continue;
+            }
+            if( arg == "--radial-noise" ) {
+                args.range(0) >> radial_noise;
+                continue;
+            }
+            if( arg == "--seed" ) {
+                args >> seed;
+                continue;
+            }
+            if( arg == "--help" ) {
+                std::printf( help_message, args.program_name().c_str() );
+                std::exit(0);
+            }
+            std::fprintf( stderr, "Unknown parameter %s.\n", arg.c_str() );
+            std::exit(1);
         }
-    } // void parse(int, char**)
+    }
 } // namespace command_line
 
 int main( int argc, char ** argv ) {
-    command_line::parse( argc, argv );
+    command_line::parse( cmdline::args(argc, argv) );
 
     std::mt19937 rng(command_line::seed);
     std::vector< DataEntry > data;
