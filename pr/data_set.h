@@ -42,6 +42,11 @@ public:
      */
     DataEntry mean() const;
 
+    /* Generate a copy of this dataset, but only with the header
+     * (attribute names and category names).
+     */
+    DataSet header() const;
+
     const DataEntry * begin() const;
     const DataEntry * end() const;
     std::size_t size() const;

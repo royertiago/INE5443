@@ -133,6 +133,14 @@ DataEntry DataSet::mean() const {
     return DataEntry( std::move(sum), std::vector<std::string>() );
 }
 
+DataSet DataSet::header() const {
+    return DataSet(
+        std::vector<std::string>(attribute_names),
+        std::vector<std::string>(category_names),
+        std::vector<DataEntry>()
+    );
+}
+
 const DataEntry * DataSet::begin() const {
     return &*entries.begin();
 }
