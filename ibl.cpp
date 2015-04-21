@@ -16,6 +16,14 @@ namespace command_line {
 "    Chooses the IBL algorithm.\n"
 "    Default: 1.\n"
 "\n"
+"--shuffle\n"
+"    Shuffle the input dataset before giving it to the IBL algorithm.\n"
+"    Default: no shuffle.\n"
+"\n"
+"--seed <N>\n"
+"    Choose <N> as the seed for the shuffling algorithm.\n"
+"    Default: Generate a seed and print to stdout.\n"
+"\n"
 "--help\n"
 "    Display this help and quit.\n"
 ;
@@ -31,6 +39,9 @@ namespace command_line {
     int width = 300;
     int height = 300;
     int ibl = 1;
+    bool shuffle = false;
+    bool seed_set = false;
+    long long unsigned seed;
 
     void parse( cmdline::args&& args ) {
         while( args.size() > 0 ) {
@@ -45,6 +56,15 @@ namespace command_line {
             }
             if( arg == "--ibl" || arg == "--IBL" ) {
                 args.range(1, 2) >> ibl;
+                continue;
+            }
+            if( arg == "--shuffle" ) {
+                shuffle = true;
+                continue;
+            }
+            if( arg == "--seed" ) {
+                args >> seed;
+                seed_set = true;
                 continue;
             }
             if( arg == "--help" ) {
@@ -86,6 +106,14 @@ int main( int argc, char ** argv ) {
     util::show_dataset( left, dataset );
     cv::imshow( "IBL", img );
 
+    if( command_line::shuffle ) {
+        if( command_line::seed_set )
+            dataset.shuffle( command_line::seed );
+        else {
+            auto seed = dataset.shuffle();
+            std::cout << "Seed: " << seed << std::endl;
+        }
+    }
     ibl.train( dataset );
     std::cout << "Hits: " << ibl.hit_count()
         << " - Misses: " << ibl.miss_count() << "\n";
