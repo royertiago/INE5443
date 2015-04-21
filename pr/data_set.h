@@ -38,6 +38,14 @@ public:
      */
     void push_back( DataEntry&& );
 
+    /* Shuffles the dataset.
+     * The first version receives a seed to be used in random number generation.
+     * The second version generates a seed, call the first version,
+     * and returns the generated seed.
+     */
+    void shuffle( long long unsigned seed );
+    long long unsigned shuffle();
+
     /* The average entry of this dataset.
      */
     DataEntry mean() const;

@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <chrono>
+#include <random>
 #include "pr/data_set.h"
 
 DataSet::DataSet(
@@ -119,6 +122,17 @@ void DataSet::push_back( DataEntry && entry ) {
         entries.push_back( std::move(entry) );
     else
         throw "Wrong number of attributes or categories.";
+}
+
+void DataSet::shuffle( long long unsigned seed ) {
+    std::mt19937 rng(seed);
+    std::shuffle( entries.begin(), entries.end(), rng );
+}
+
+long long unsigned DataSet::shuffle() {
+    long long unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    shuffle(seed);
+    return seed;
 }
 
 DataEntry DataSet::mean() const {
