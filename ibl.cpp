@@ -95,12 +95,15 @@ int main( int argc, char ** argv ) {
 
     using command_line::width;
     using command_line::height;
-    cv::Mat img( height, 3 * width, CV_8UC3 );
+    /* We add two pixels in the width so that the final image
+     * will have two black lines, of one pixel each, separating
+     * each of its "panels". */
+    cv::Mat img( height, 3 * width + 2, CV_8UC3, cv::Scalar(0, 0, 0) );
 
     cv::Mat left, middle, right;
     left = img(cv::Range::all(), cv::Range(0, width) );
-    middle = img(cv::Range::all(), cv::Range(width, 2*width) );
-    right = img(cv::Range::all(), cv::Range(2*width, 3*width) );
+    middle = img(cv::Range::all(), cv::Range(width + 1, 2*width + 1) );
+    right = img(cv::Range::all(), cv::Range(2*width + 2, 3*width + 2) );
     cv::namedWindow( "IBL", cv::WINDOW_AUTOSIZE );
 
     util::show_dataset( left, dataset );
