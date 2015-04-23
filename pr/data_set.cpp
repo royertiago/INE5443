@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cfloat>
 #include <chrono>
 #include <random>
 #include "pr/data_set.h"
@@ -133,6 +134,22 @@ long long unsigned DataSet::shuffle() {
     long long unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     shuffle(seed);
     return seed;
+}
+
+DataEntry DataSet::min() const {
+    auto minimum_value = std::vector<double>( attribute_count(), DBL_MAX );
+    for( const DataEntry & entry: *this )
+        for( int i = 0; i < attribute_count(); i++ )
+            minimum_value[i] = std::min(minimum_value[i], entry.attribute(i));
+    return DataEntry( std::move(minimum_value), std::vector<std::string>() );
+}
+
+DataEntry DataSet::max() const {
+    auto maximum_value = std::vector<double>( attribute_count(), -DBL_MAX );
+    for( const DataEntry & entry: *this )
+        for( int i = 0; i < attribute_count(); i++ )
+            maximum_value[i] = std::max(maximum_value[i], entry.attribute(i));
+    return DataEntry( std::move(maximum_value), std::vector<std::string>() );
 }
 
 DataEntry DataSet::mean() const {

@@ -46,8 +46,11 @@ public:
     void shuffle( long long unsigned seed );
     long long unsigned shuffle();
 
-    /* The average entry of this dataset.
+    /* Entries that represent the minimum, maximum, and average values
+     * for each attribute in the dataset.
      */
+    DataEntry min() const;
+    DataEntry max() const;
     DataEntry mean() const;
 
     /* Generate a copy of this dataset, but only with the header
