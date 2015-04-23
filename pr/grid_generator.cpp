@@ -1,7 +1,7 @@
 #include <algorithm>
-#include <cfloat>
 #include <cstdio>
 #include <cstdlib>
+#include <tuple>
 #include "grid_generator.h"
 
 constexpr unsigned GridGenerator::default_density;
@@ -33,24 +33,9 @@ void GridGenerator::calibrate( const DataSet & dataset ) {
         std::exit(2);
     }
 
-    std::vector<double> min( size, DBL_MAX );
-    std::vector<double> max( size, DBL_MIN );
-
-    for( const DataEntry & entry : dataset ) {
-        for( unsigned i = 0; i < size; i++ ) {
-            min[i] = std::min(min[i], entry.attribute(i));
-            max[i] = std::max(max[i], entry.attribute(i));
-        }
-    }
-
-    step.resize( size );
-    shift.resize( size );
-
+    std::tie( step, shift ) = dataset.normalizing_factor( _expand );
     for( unsigned i = 0; i < size; i++ )
-        step[i] = (max[i] - min[i]) * (1+2*_expand) / _density[i];
-
-    for( unsigned i = 0; i < size; i++ )
-        shift[i] = (max[i] - min[i]) * _expand - min[i];
+        step[i] = 1/ (step[i] * _density[i]);
 }
 
 DataEntry GridGenerator::operator()( const std::vector<unsigned> & index ) const {
@@ -60,7 +45,7 @@ DataEntry GridGenerator::operator()( const std::vector<unsigned> & index ) const
 
     std::vector< double > attributes( size );
     for( unsigned i = 0; i < size; i++ )
-        attributes[i] = index[i] * step[i] - shift[i];
+        attributes[i] = index[i] * step[i] + shift[i];
 
     return DataEntry( std::move(attributes), {} );
 }
