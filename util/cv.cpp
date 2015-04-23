@@ -72,25 +72,14 @@ void show_dataset(
 
     output = cv::Scalar( 255, 255, 255 );
 
-    double max_x = -DBL_MAX, max_y = -DBL_MAX;
-    double min_x = DBL_MAX, min_y = DBL_MAX;
-    for( const DataEntry & e : input ) {
-        max_x = std::max( max_x, e.attribute(0) );
-        min_x = std::min( min_x, e.attribute(0) );
-        max_y = std::max( max_y, e.attribute(1) );
-        min_y = std::min( min_y, e.attribute(1) );
-    }
-
-    double scale_x = output.cols / (max_x - min_x);
-    double scale_y = output.rows / (max_y - min_y);
-    double shift_x = output.cols * border;
-    double shift_y = output.rows * border;
-    scale_x /= (1 + 2*border);
-    scale_y /= (1 + 2*border);
+    auto pair = input.normalizing_factor( border );
+    double min_x = pair.second[0], min_y = pair.second[1];
+    double scale_x = pair.first[0] * output.cols;
+    double scale_y = pair.first[1] * output.rows;
 
     for( const DataEntry & e : input ) {
-        int x = (e.attribute(0) - min_x) * scale_x + shift_x;
-        int y = (e.attribute(1) - min_y) * scale_y + shift_y;
+        int x = (e.attribute(0) - min_x) * scale_x;
+        int y = (e.attribute(1) - min_y) * scale_y;
         auto color = category_color( e.category(0) );
         cv::circle( output, cv::Point(x, y), 0, cv::Scalar(color), radius);
     }
