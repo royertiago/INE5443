@@ -16,6 +16,13 @@
  * as well as the order of categories;
  * however, no information about the order between attributes or categories
  * is kept in the object.
+ *
+ * It is important to note that the DataEntry is used in two distinct forms
+ * throughout the program.
+ * There is the "intended" use, effectively as a dataset entry.
+ * But also there are some places in the program where we use DataEntries
+ * without categories, simply to carry data about data entries attributes.
+ * For instante, DataSet::min returns one such attribute-only DataEntry.
  */
 class DataEntry {
     std::vector< double > _attributes;
