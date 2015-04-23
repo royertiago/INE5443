@@ -53,6 +53,23 @@ public:
     DataEntry max() const;
     DataEntry mean() const;
 
+    /* Return a pair of normalizing vectors.
+     * It is a pair of vectors, with attribute_count() elements each.
+     * If an value v lies between min().attribute(i) and max().attribute(i),
+     * then (v - pair.second[i]) / pair.first[i] will lie between 0 and 1.
+     *
+     * Note that if w is the value produced by the code above,
+     * then v == w * pair.first[i] + pair.second[i].
+     *
+     * The expansion factor is used to virtually expand the dataset's extremum points.
+     * FOr instance, if expand = 1.0, the dataset dimensions will be expanded
+     * in 100% in every direction before mapping it to [0, 1].
+     * So, the dataset will be mapped to the interval [1/3, 2/3] instead.
+     * Choose expand == 0.0 to disable this feature.
+     */
+    std::pair<std::vector<double>, std::vector<double>>
+    normalizing_factor( double expand ) const;
+
     /* Generate a copy of this dataset, but only with the header
      * (attribute names and category names).
      */

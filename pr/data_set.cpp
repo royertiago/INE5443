@@ -164,6 +164,22 @@ DataEntry DataSet::mean() const {
     return DataEntry( std::move(sum), std::vector<std::string>() );
 }
 
+std::pair<std::vector<double>, std::vector<double>>
+DataSet::normalizing_factor( double expand ) const {
+    auto minimum_value = min().attributes();
+    auto maximum_value = max().attributes();
+    std::vector< double > multiplicative_factor(attribute_count());
+
+    for( std::size_t i = 0; i < attribute_count(); i++ ) {
+        double distance = maximum_value[i] - minimum_value[i];
+        double expansion_radius = expand * distance;
+        maximum_value[i] += expansion_radius;
+        minimum_value[i] -= expansion_radius;
+        multiplicative_factor[i] = 1/(maximum_value[i] - minimum_value[i]);
+    }
+    return std::make_pair(std::move(multiplicative_factor), std::move(minimum_value));
+}
+
 DataSet DataSet::header() const {
     return DataSet(
         std::vector<std::string>(attribute_names),
