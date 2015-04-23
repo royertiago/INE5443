@@ -1,7 +1,7 @@
 /* Implementation of p_norm.h.
  */
 #include <cmath>
-#include <cfloat>
+#include <tuple> // std::tie
 #include "p_norm.h"
 #include "pr/data_set.h"
 #include "pr/data_entry.h"
@@ -13,22 +13,8 @@ NormalizingDistanceCalculator::NormalizingDistanceCalculator( double tolerance )
 
 void NormalizingDistanceCalculator::calibrate( const DataSet & dataset ) {
     normalized = true;
-    minimum_value = std::vector<double>( dataset.attribute_count(), DBL_MAX );
-    auto maximum_value = std::vector<double>( dataset.attribute_count(), DBL_MIN );
-    for( const DataEntry & entry : dataset )
-        for( std::size_t i = 0; i < dataset.attribute_count(); i++ ) {
-            minimum_value[i] = std::min(minimum_value[i], entry.attribute(i));
-            maximum_value[i] = std::max(maximum_value[i], entry.attribute(i));
-        }
-
-    multiplicative_factor.resize( dataset.attribute_count() );
-    for( std::size_t i = 0; i < dataset.attribute_count(); i++ ) {
-        double distance = maximum_value[i] - minimum_value[i];
-        double tolerance_radius = tolerance * distance;
-        maximum_value[i] -= tolerance_radius;
-        minimum_value[i] += tolerance_radius;
-        multiplicative_factor[i] = 1/(maximum_value[i] - minimum_value[i]);
-    }
+    std::tie(multiplicative_factor, minimum_value)
+        = dataset.normalizing_factor( tolerance );
 }
 
 double NormalizingDistanceCalculator::normalize( double value, std::size_t index ) const {
