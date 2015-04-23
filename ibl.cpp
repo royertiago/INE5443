@@ -20,8 +20,9 @@ namespace command_line {
 "    Shuffle the input dataset before giving it to the IBL algorithm.\n"
 "    Default: no shuffle.\n"
 "\n"
-"--seed <N>\n"
+"--shuffle-seed <N>\n"
 "    Choose <N> as the seed for the shuffling algorithm.\n"
+"    Implies --shuffle.\n"
 "    Default: Generate a seed and print to stdout.\n"
 "\n"
 "--help\n"
@@ -62,8 +63,9 @@ namespace command_line {
                 shuffle = true;
                 continue;
             }
-            if( arg == "--seed" ) {
+            if( arg == "--shuffle-seed" ) {
                 args >> seed;
+                shuffle = true;
                 seed_set = true;
                 continue;
             }
