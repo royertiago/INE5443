@@ -5,10 +5,10 @@
 classify
 ibl
 influence_areas
+pixel_chooser
+pixel_classifier
 datatools/canonicalize
 datatools/generate_spiral
 datatools/show
 datatools/strip_entry_category
-mahalanobis/pixel_chooser
-mahalanobis/pixel_classifier
 test/test

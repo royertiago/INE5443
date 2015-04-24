@@ -74,14 +74,14 @@ done
 
 if [ -z "$pixel_set" ]; then
     pixel_set=$(mktemp --tmpdir)
-    mahalanobis/pixel_chooser "$image" > "$pixel_set"
+    ./pixel_chooser "$image" > "$pixel_set"
 fi
 
 if $print_set; then
     echo Pixel set: "$pixel_set"
 fi
 
-mahalanobis/pixel_classifier "$distance" "$image" < "$pixel_set"
+./pixel_classifier "$distance" "$image" < "$pixel_set"
 
 if $delete_set; then
     rm "$pixel_set"
