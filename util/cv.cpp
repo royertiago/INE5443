@@ -103,7 +103,9 @@ void influence_areas( cv::Mat & img, const NearestNeighbor & nn, double border )
         for( int j = 0; j < img.cols; j++ ) {
             DataEntry data = grid( {(unsigned)i, (unsigned)j} );
             std::string category = *nn.classify(data).begin();
-            img.at<cv::Scalar>(img.rows - j - 1, i) = util::category_color(category);
+            auto color = util::category_color(category);
+            img.at<cv::Vec3b>(img.rows - j - 1, i) =
+                cv::Vec3b( color[0], color[1], color[2] );
         }
 }
 
