@@ -7,6 +7,10 @@ namespace command_line {
 "Duplicated pixels are NOT written twice to stdout.\n"
 "\n"
 "Options:\n"
+"--blank <width> <height>\n"
+"   Instead of choosing pixels from an image, do so from a\n"
+"   blank background, with the specified dimensions.\n"
+"\n"
 "--dataset\n"
 "    Output a dataset instead of a list of pixels.\n"
 "    You can use different categories for each pixel by pressing spacebar.\n"
@@ -29,11 +33,20 @@ namespace command_line {
     bool generate_dataset = false;
     std::string image_name = "";
 
+    bool blank_background = false;
+    int blank_width, blank_height;
+
     void parse( cmdline::args && args ) {
         while( args.size() > 0 ) {
             std::string arg = args.next();
             if( arg == "--dataset" ) {
                 generate_dataset = true;
+                continue;
+            }
+            if( arg == "--blank" ) {
+                args.range( 1 ) >> blank_width;
+                args.range( 1 ) >> blank_height;
+                blank_background = true;
                 continue;
             }
             if( arg == "--help" ) {
@@ -64,10 +77,24 @@ int color_index = 0;
 int main( int argc, char ** argv ) {
     command_line::parse( cmdline::args(argc, argv) );
 
-    img = cv::imread( command_line::image_name, CV_LOAD_IMAGE_COLOR );
-    if( img.empty() ) {
-        std::fprintf( stderr, "Error opening image.\n" );
-        return 1;
+    if( !command_line::blank_background ) {
+        if( command_line::image_name == "" ) {
+            std::fprintf( stderr, "Image not supplied nor --blank option used.\n" );
+            return 1;
+        }
+        img = cv::imread( command_line::image_name, CV_LOAD_IMAGE_COLOR );
+        if( img.empty() ) {
+            std::fprintf( stderr, "Error opening image.\n" );
+            return 1;
+        }
+    }
+    else {
+        img = cv::Mat(
+            command_line::blank_width,
+            command_line::blank_height,
+            CV_8UC3,
+            cv::Scalar(255, 255, 255)
+        );
     }
 
     chosen = std::vector<std::vector<bool>>(
