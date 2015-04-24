@@ -213,3 +213,40 @@ TEST_CASE( "DataSet writing to file", "[DataSet][write]" ) {
         )
     );
 }
+
+TEST_CASE( "DataSet::category_satistics", "[DataSet]" ) {
+    DataSet dataset(
+        std::vector<std::string>(),
+        std::vector<std::string>{ "Color", "Material" },
+        std::vector<DataEntry>{
+            DataEntry({},{"Blue", "Wood"}),
+            DataEntry({},{"Red", "Steel"}),
+            DataEntry({},{"Green", "Plastic"}),
+            DataEntry({},{"Blue", "Plastic"}),
+            DataEntry({},{"Yellow", "Wood"}),
+            DataEntry({},{"Yellow", "Plastic"})
+        }
+    );
+    std::vector<std::vector<std::pair<std::string, std::size_t>>> stat;
+    REQUIRE_NOTHROW( stat = dataset.category_statistics() );
+    REQUIRE( stat.size() == 2 );
+    REQUIRE( stat[0].size() == 4 );
+    REQUIRE( stat[1].size() == 3 );
+    CHECK( stat[0][0].first == "Blue" );
+    CHECK( stat[0][0].second == 2 );
+    CHECK( stat[0][1].first == "Green" );
+    CHECK( stat[0][1].second == 1 );
+    CHECK( stat[0][2].first == "Red" );
+    CHECK( stat[0][2].second == 1 );
+    CHECK( stat[0][3].first == "Yellow" );
+    CHECK( stat[0][3].second == 2 );
+    CHECK( stat[1][0].first == "Plastic" );
+    CHECK( stat[1][0].second == 3 );
+    CHECK( stat[1][1].first == "Steel" );
+    CHECK( stat[1][1].second == 1 );
+    CHECK( stat[1][2].first == "Wood" );
+    CHECK( stat[1][2].second == 2 );
+
+    dataset.shuffle();
+    CHECK( stat == dataset.category_statistics() );
+}

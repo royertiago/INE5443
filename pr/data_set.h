@@ -70,6 +70,15 @@ public:
     std::pair<std::vector<double>, std::vector<double>>
     normalizing_factor( double expand ) const;
 
+    /* Return counting data about the categories of this dataset.
+     * If m is the returned value, then
+     * m[i][j].first is the jth category (in alphabetical order)
+     * if the ith category. There are m[i][j].second entries in the set
+     * that have the category m[i][j].first in the position i.
+     */
+    std::vector<std::vector<std::pair<std::string, std::size_t>>>
+    category_statistics() const;
+
     /* Generate a copy of this dataset, but only with the header
      * (attribute names and category names).
      */
