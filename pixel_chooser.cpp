@@ -16,6 +16,11 @@ namespace command_line {
 "    You can use different categories for each pixel by pressing spacebar.\n"
 "    Output is written to stdout.\n"
 "\n"
+"    Oserve that datasset output follows the standard mathematical convention\n"
+"    that moving the mouse up increases the y-coordinate, while non-dataset\n"
+"    output follows the image-processing libraries convention that\n"
+"    moving the mouse up decreases the y-coordinate.\n"
+"\n"
 "--normalize\n"
 "    Normalize the generated points to the interval [0, 1].\n"
 "    Note that, if used without --dataset, this will cause the generated points\n"
@@ -125,7 +130,10 @@ int main( int argc, char ** argv ) {
 
     static auto new_point = []( int x, int y ) {
         double xpos = command_line::normalize_dataset ? (double) x / fixed_img.cols : x;
-        double ypos = command_line::normalize_dataset ? (double) y / fixed_img.rows : y;
+        double ypos = command_line::normalize_dataset ?
+            (fixed_img.rows - y) / (double) fixed_img.rows :
+            fixed_img.rows - y;
+
         if( command_line::generate_dataset ) {
             std::string category = "A";
             category[0] += color_index;
@@ -133,7 +141,7 @@ int main( int argc, char ** argv ) {
         }
         else {
             if( command_line::normalize_dataset )
-                std::printf( "%lf,%lf\n", xpos, ypos );
+                std::printf( "%lf,%lf\n", xpos, 1 - ypos );
             else
                 std::printf( "%i,%i\n", x, y );
         }
