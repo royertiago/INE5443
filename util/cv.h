@@ -25,7 +25,11 @@ namespace util {
      * Each category will be assigned a different color.
      * The assignment is done on demand, and there is only seven avaliable colors.
      */
-    cv::Vec3b category_color( std::string category );
+    cv::Scalar category_color( std::string category );
+
+    /* List of colors avaliable through util::category_color.
+     */
+    extern const std::vector< cv::Scalar > color_list;
 
     /* "Prints" the dataset in the cv::Mat.
      * Each point of the dataset become a circle in the image, with the chosen radius.

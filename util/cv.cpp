@@ -29,30 +29,29 @@ cv::Mat_<double> matFromEntry( const DataEntry & entry ) {
     return r;
 }
 
-cv::Vec3b category_color( std::string category ) {
-    static std::map<std::string, const unsigned *> color_map;
+const std::vector< cv::Scalar > color_list{
+    cv::Scalar( 0, 0, 255 ),
+    cv::Scalar( 0, 255, 0 ),
+    cv::Scalar( 255, 0, 0 ),
+    cv::Scalar( 255, 0, 255 ),
+    cv::Scalar( 0, 255, 255 ),
+    cv::Scalar( 255, 255, 0 ),
+    cv::Scalar( 0, 0, 0 ),
+};
+
+cv::Scalar category_color( std::string category ) {
+    static std::map< std::string, unsigned > color_map;
     static int index = 0;
 
-    static const unsigned red[] = {255, 0, 0};
-    static const unsigned green[] = {0, 255, 0};
-    static const unsigned blue[] = {0, 0, 255};
-    static const unsigned yellow[] = {255, 0, 255};
-    static const unsigned magenta[] = {255, 255, 0};
-    static const unsigned cyan[] = {0, 255, 255};
-    static const unsigned black[] = {0, 0, 0};
-    static const unsigned * colors[] =
-    {red, green, blue, yellow, magenta, cyan, black};
-    static constexpr unsigned limit = sizeof(colors)/sizeof(colors[0]);
+    static const unsigned limit = color_list.size();
 
-    auto pair = color_map.insert( std::make_pair(category, colors[index]) );
+    auto pair = color_map.insert( std::make_pair(category, index) );
     if( pair.second ) {
         if( index == limit )
             throw "Too much different categories.";
         ++index;
     }
-
-    const unsigned * c = pair.first->second;
-    return cv::Vec3b( c[2], c[1], c[0] );
+    return color_list[pair.first->second];
 };
 
 void show_dataset(
@@ -81,7 +80,7 @@ void show_dataset(
         int x = (e.attribute(0) - min_x) * scale_x;
         int y = (e.attribute(1) - min_y) * scale_y;
         auto color = category_color( e.category(0) );
-        cv::circle( output, cv::Point(x, y), 0, cv::Scalar(color), radius);
+        cv::circle( output, cv::Point(x, y), 0, color, radius);
     }
 }
 
@@ -104,7 +103,7 @@ void influence_areas( cv::Mat & img, const NearestNeighbor & nn, double border )
         for( int j = 0; j < img.cols; j++ ) {
             DataEntry data = grid( {(unsigned)i, (unsigned)j} );
             std::string category = *nn.classify(data).begin();
-            img.at<cv::Vec3b>(img.rows - j - 1, i) = util::category_color(category);
+            img.at<cv::Scalar>(img.rows - j - 1, i) = util::category_color(category);
         }
 }
 
