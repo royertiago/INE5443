@@ -70,7 +70,17 @@ DataSet dataset(
     std::vector<std::string>{"Category"},
     std::vector<DataEntry>{}
 );
-cv::Mat img;
+/* hover_img is the same as fixed_img,
+ * but with a circle under the mouse,
+ * to provide some visual feedback.
+ */
+cv::Mat fixed_img;
+cv::Mat hover_img;
+/* The mouse coordinates, mouse_x and mouse_y, are updated by a lambda function
+ * called every time the mouse moves. This is used to update the screen
+ * when the user press space, even if the user does not move the mouse right after.
+ */
+int mouse_x = 0, mouse_y = 0;
 const char * window = "Choose the points";
 int color_index = 0;
 
@@ -82,14 +92,14 @@ int main( int argc, char ** argv ) {
             std::fprintf( stderr, "Image not supplied nor --blank option used.\n" );
             return 1;
         }
-        img = cv::imread( command_line::image_name, CV_LOAD_IMAGE_COLOR );
-        if( img.empty() ) {
+        fixed_img = cv::imread( command_line::image_name, CV_LOAD_IMAGE_COLOR );
+        if( fixed_img.empty() ) {
             std::fprintf( stderr, "Error opening image.\n" );
             return 1;
         }
     }
     else {
-        img = cv::Mat(
+        fixed_img = cv::Mat(
             command_line::blank_width,
             command_line::blank_height,
             CV_8UC3,
@@ -98,8 +108,8 @@ int main( int argc, char ** argv ) {
     }
 
     chosen = std::vector<std::vector<bool>>(
-        img.cols,
-        std::vector<bool>(img.rows, false)
+        fixed_img.cols,
+        std::vector<bool>(fixed_img.rows, false)
     );
 
     static auto new_point = []( int x, int y ) {
@@ -112,6 +122,13 @@ int main( int argc, char ** argv ) {
             std::printf( "%i,%i\n", x, y );
     };
 
+    static auto show_hover = [](){
+        hover_img = fixed_img.clone();
+        cv::circle( hover_img, cv::Point(mouse_x, mouse_y), 0,
+            util::color_list[color_index], 6 );
+        cv::imshow( window, hover_img );
+    };
+
     cv::namedWindow( window, cv::WINDOW_AUTOSIZE );
     cv::setMouseCallback( window,
         []( int event, int x, int y, int /*flags*/, void * /*user_data*/ ) {
@@ -119,19 +136,26 @@ int main( int argc, char ** argv ) {
                 if( !chosen[x][y] )
                     new_point( x, y );
                 chosen[x][y] = true;
-                cv::circle( img, cv::Point(x, y), 0, util::color_list[color_index], 6);
-                cv::imshow( window, img );
+                fixed_img = hover_img.clone();
+                cv::imshow( window, fixed_img );
+            }
+            if( event == cv::EVENT_MOUSEMOVE ) {
+                mouse_x = x;
+                mouse_y = y;
+                show_hover();
             }
         },
         nullptr
     );
-    cv::imshow( window, img );
+    cv::imshow( window, fixed_img );
 
     // No idea why I cannot use 'while( (char) cv::waitKey() != 0 )'...
     while( true ) {
         char c = cv::waitKey();
-        if( c == ' ' )
+        if( c == ' ' ) {
             color_index = (color_index + 1) % util::color_list.size();
+            show_hover();
+        }
         else if( c != 0 )
             break;
     }
