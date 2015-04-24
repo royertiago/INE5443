@@ -2,7 +2,7 @@ namespace command_line {
     const char help_message[] =
 " [options]\n"
 "Generates an image that contains the influence areas\n"
-"of each category sy the dataset.\n"
+"of each category of the dataset.\n"
 "Input is read on stdin.\n"
 "\n"
 "Options:\n"
@@ -18,6 +18,21 @@ namespace command_line {
 "--expand <F>\n"
 "    Percentage of the dataset extension that should be used as border.\n"
 "    Default value: 0.05.\n"
+"\n"
+"--noise <N>\n"
+"    Enable generation of some noise in the dataset.\n"
+"    This command generates N noise points.\n"
+"\n"
+"--noise-seed <N>\n"
+"    Choose N as the seed for the noise generation algorithm.\n"
+"    The noise is generated before shuffling.\n"
+"    Default: Generate a seed and print to stdout.\n"
+"\n"
+"--noise-expand <F>\n"
+"    Choose F as the expansion factor for the noise;\n"
+"    that is, how much the noisy poins may diverge\n"
+"    from the dataset's absolute borders.\n"
+"    Default: 0.1\n"
 "\n"
 "--help\n"
 "    Display this help and exit.\n"
@@ -49,6 +64,11 @@ namespace command_line {
     int width = 500;
     int height = 500;
     double expand = 0.05;
+
+    int noise = 0;
+    long long unsigned noise_seed;
+    bool noise_seed_set = false;
+    double noise_expand = 0.1;
 
     /* Arguments that will be passed to the classifier. */
     cmdline::args subargs;
@@ -86,6 +106,19 @@ namespace command_line {
                 subargs.push_back( args.next() );
                 continue;
             }
+            if( arg == "--noise" ) {
+                args.range( 1 ) >> noise;
+                continue;
+            }
+            if( arg == "--noise-seed" ) {
+                args >> noise_seed;
+                noise_seed_set = true;
+                continue;
+            }
+            if( arg == "--noise-expand" ) {
+                args >> noise_expand;
+                continue;
+            }
             if( arg == "--help" ) {
                 std::cout << args.program_name() << help_message;
                 std::exit(0);
@@ -112,6 +145,23 @@ int main( int argc, char ** argv ) {
     if( classifier.dataset().category_count() != 1 ) {
         std::cerr << "The database must have exactly one category.\n";
         std::exit( 2 );
+    }
+
+    if( command_line::noise != 0 ) {
+        if( command_line::noise_seed_set ) {
+            classifier.edit_dataset().noise(
+                command_line::noise,
+                command_line::noise_expand,
+                command_line::noise_seed
+            );
+        }
+        else {
+            long long unsigned seed = classifier.edit_dataset().noise(
+                command_line::noise,
+                command_line::noise_expand
+            );
+            std::printf( "Noise seed: %llu\n", seed );
+        }
     }
 
     cv::Mat img( height, width, CV_8UC3, cv::Scalar(255, 255, 255) );
