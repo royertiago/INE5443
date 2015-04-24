@@ -46,6 +46,26 @@ public:
     void shuffle( long long unsigned seed );
     long long unsigned shuffle();
 
+    /* Generates some points of noise in the dataset.
+     *
+     * The noise is first generated in an hypercube, with each point
+     * having the same probaility as any other point.
+     * Then, each point is added back to the dataset, but by means
+     * of the affine transformation DataSet::normalizing_factor.
+     *
+     * The categories are also generated randomly, but weighted
+     * by the current categories. No new category will be added.
+     *
+     * Akin to DataSet::shuffle, the first version accepts a random seed
+     * and the second generates one and returns it.
+     *
+     * Parameters:
+     *  number: The number of random points to be generated.
+     *  expand: The expansion value passed to DataSet::normalizing_factor.
+     */
+    void noise( std::size_t number, double expand, long long unsigned seed );
+    long long unsigned noise( std::size_t number, double expand );
+
     /* Entries that represent the minimum, maximum, and average values
      * for each attribute in the dataset.
      */

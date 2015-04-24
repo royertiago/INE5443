@@ -137,6 +137,56 @@ long long unsigned DataSet::shuffle() {
     return seed;
 }
 
+void DataSet::noise( std::size_t number, double expand, long long unsigned seed ) {
+    std::mt19937 rng(seed);
+
+    auto stat = category_statistics();
+    std::vector< std::discrete_distribution<> > discrete_distributions;
+    for( unsigned i = 0; i < stat.size(); i++ ) {
+        std::vector<int> weights(stat[i].size());
+        for( unsigned j = 0; j < stat[i].size(); j++ )
+            weights[j] = stat[i][j].second;
+        discrete_distributions.push_back(
+            std::discrete_distribution<>(weights.begin(), weights.end())
+        );
+    }
+    auto category = [&]( std::size_t index ) {
+        return stat[index][
+            discrete_distributions[index](rng)
+        ].first;
+    };
+
+    auto min = this->min();
+    auto max = this->max();
+    std::vector< std::uniform_real_distribution<> > real_distributions;
+    for( unsigned i = 0; i < min.attribute_count(); i++ ) {
+        double expand_factor = (max.attribute(i) - min.attribute(i)) * expand;
+        real_distributions.push_back( std::uniform_real_distribution<>(
+            min.attribute(i) - expand_factor,
+            max.attribute(i) + expand_factor
+        ) );
+    }
+    auto attribute = [&]( std::size_t index ) {
+        return real_distributions[index](rng);
+    };
+
+    for( std::size_t c = 0; c < number; c++ ) {
+        std::vector<double> attributes( attribute_count() );
+        std::vector<std::string> categories( category_count() );
+        for( unsigned i = 0; i < attribute_count(); i++ )
+            attributes[i] = attribute(i);
+        for( unsigned i = 0; i < category_count(); i++ )
+            categories[i] = category(i);
+        push_back( DataEntry(std::move(attributes), std::move(categories)) );
+    }
+}
+
+long long unsigned DataSet::noise( std::size_t number, double expand ) {
+    long long unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    noise( number, expand, seed );
+    return seed;
+}
+
 DataEntry DataSet::min() const {
     auto minimum_value = std::vector<double>( attribute_count(), DBL_MAX );
     for( const DataEntry & entry: *this )
