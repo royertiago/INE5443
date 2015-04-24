@@ -16,6 +16,11 @@ namespace command_line {
 "    You can use different categories for each pixel by pressing spacebar.\n"
 "    Output is written to stdout.\n"
 "\n"
+"--normalize\n"
+"    Normalize the generated points to the interval [0, 1].\n"
+"    Note that, if used without --dataset, this will cause the generated points\n"
+"    to have floating-point coordinates, not integer ones.\n"
+"\n"
 "--help\n"
 "    Display this help and exit.\n"
 ;
@@ -31,10 +36,12 @@ namespace command_line {
 
 namespace command_line {
     bool generate_dataset = false;
+    bool normalize_dataset = false;
     std::string image_name = "";
 
     bool blank_background = false;
     int blank_width, blank_height;
+
 
     void parse( cmdline::args && args ) {
         while( args.size() > 0 ) {
@@ -47,6 +54,10 @@ namespace command_line {
                 args.range( 1 ) >> blank_width;
                 args.range( 1 ) >> blank_height;
                 blank_background = true;
+                continue;
+            }
+            if( arg == "--normalize" ) {
+                normalize_dataset = true;
                 continue;
             }
             if( arg == "--help" ) {
@@ -113,13 +124,19 @@ int main( int argc, char ** argv ) {
     );
 
     static auto new_point = []( int x, int y ) {
+        double xpos = command_line::normalize_dataset ? (double) x / fixed_img.cols : x;
+        double ypos = command_line::normalize_dataset ? (double) y / fixed_img.rows : y;
         if( command_line::generate_dataset ) {
             std::string category = "A";
             category[0] += color_index;
-            dataset.push_back( DataEntry({(double)x, (double)y},{category}) );
+            dataset.push_back( DataEntry({xpos, ypos},{category}) );
         }
-        else
-            std::printf( "%i,%i\n", x, y );
+        else {
+            if( command_line::normalize_dataset )
+                std::printf( "%lf,%lf\n", xpos, ypos );
+            else
+                std::printf( "%i,%i\n", x, y );
+        }
     };
 
     static auto show_hover = [](){
