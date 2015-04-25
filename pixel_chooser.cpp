@@ -144,6 +144,7 @@ int main( int argc, char ** argv ) {
     );
 
     /* Adds a new point to the dataset.
+     * x and y correspond to the mouse location.
      * This function registers the point in the vector chosen,
      * updates fixed_img and either prints the coordinates
      * or add it to the dataset, according to the command line options.
@@ -218,8 +219,13 @@ int main( int argc, char ** argv ) {
             double ypos = entry.attribute(1);
             if( is_normalized ) {
                 xpos *= fixed_img.cols;
-                ypos *= fixed_img.rows;
+                ypos = (1 - ypos) * fixed_img.rows;
             }
+            else
+                ypos = fixed_img.rows - ypos;
+            /* The function new_point uses pixel coordinates,
+             * so we need to adjust the y-coordinate before calling the function.
+             */
             color_index = (entry.category(0)[0] - 'A') % util::color_list.size();
             new_point( xpos, ypos );
         }
