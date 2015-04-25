@@ -1,4 +1,6 @@
 /* Driver program for the classifier.
+ *
+ * The list of command line arguments is avaliable in pr/classifier.h.
  */
 #include "pr/classifier.h"
 #include "pr/data_set.h"
