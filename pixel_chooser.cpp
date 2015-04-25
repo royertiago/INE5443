@@ -223,6 +223,7 @@ int main( int argc, char ** argv ) {
             color_index = (entry.category(0)[0] - 'A') % util::color_list.size();
             new_point( xpos, ypos );
         }
+        color_index = 0;
     }
 
     cv::namedWindow( window, cv::WINDOW_AUTOSIZE );
