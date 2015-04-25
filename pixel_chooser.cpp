@@ -11,7 +11,7 @@ namespace command_line {
 "   Instead of choosing pixels from an image, do so from a\n"
 "   blank background, with the specified dimensions.\n"
 "\n"
-"--dataset\n"
+"--generate-dataset\n"
 "    Output a dataset instead of a list of pixels.\n"
 "    You can use different categories for each pixel by pressing spacebar.\n"
 "    Output is written to stdout.\n"
@@ -23,8 +23,8 @@ namespace command_line {
 "\n"
 "--normalize\n"
 "    Normalize the generated points to the interval [0, 1].\n"
-"    Note that, if used without --dataset, this will cause the generated points\n"
-"    to have floating-point coordinates, not integer ones.\n"
+"    Note that, if used without --generate-dataset, this will cause\n"
+"    the generated points to have floating-point coordinates, not integer ones.\n"
 "\n"
 "--help\n"
 "    Display this help and exit.\n"
@@ -51,7 +51,7 @@ namespace command_line {
     void parse( cmdline::args && args ) {
         while( args.size() > 0 ) {
             std::string arg = args.next();
-            if( arg == "--dataset" ) {
+            if( arg == "--generate-dataset" ) {
                 generate_dataset = true;
                 continue;
             }
