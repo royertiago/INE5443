@@ -26,6 +26,16 @@ namespace command_line {
 "    Note that, if used without --generate-dataset, this will cause\n"
 "    the generated points to have floating-point coordinates, not integer ones.\n"
 "\n"
+"--dataset <file>\n"
+"    Append data to the specified dataset.\n"
+"    If the dataset is normalized, the program correctly expand the dataset\n"
+"    to all of the picture.\n"
+"    Otherwise, we assume that the dimensions of the current image\n"
+"    matches the dimensions of the image the dataset was generated against.\n"
+"\n"
+"    Normalization is detected by the absence of attributes greater than 1.0.\n"
+"    This does not affect the option --normalize in the output.\n"
+"\n"
 "--help\n"
 "    Display this help and exit.\n"
 ;
@@ -43,6 +53,7 @@ namespace command_line {
     bool generate_dataset = false;
     bool normalize_dataset = false;
     std::string image_name = "";
+    std::string read_dataset = "";
 
     bool blank_background = false;
     int blank_width, blank_height;
@@ -63,6 +74,10 @@ namespace command_line {
             }
             if( arg == "--normalize" ) {
                 normalize_dataset = true;
+                continue;
+            }
+            if( arg == "--dataset" ) {
+                read_dataset = args.next();
                 continue;
             }
             if( arg == "--help" ) {
@@ -167,6 +182,48 @@ int main( int argc, char ** argv ) {
             util::color_list[color_index], 6 );
         cv::imshow( window, hover_img );
     };
+
+    if( command_line::read_dataset != "" ) {
+        /* We only update the dataset here because we need the function new_point
+         * to be functioning properly.
+         */
+        const char * filename = command_line::read_dataset.c_str();
+        std::FILE * file = std::fopen( command_line::read_dataset.c_str(), "r" );
+        DataSet dataset = DataSet::parse( file );
+        /* There is no harm overriding the global dataset
+         * because we will not edit that dataset directly;
+         * we will use the function new_point instead.
+         * Noe we also gain the benefit of supporting pixel-coordinate output,
+         * because new_point deals with this options.
+         */
+        std::fclose( file );
+        if( dataset.category_count() != 1 ) {
+            std::fprintf( stderr, "The dataset %s have more than one category.\n",
+                filename );
+            std::exit(1);
+        }
+        if( dataset.attribute_count() != 2 ) {
+            std::fprintf( stderr, "The dataset %s does not have exactly"
+                " two attributes\n", filename );
+            std::exit(1);
+        }
+
+        bool is_normalized = true;
+        for( double d : dataset.max().attributes() )
+            if( d > 1.0 )
+                is_normalized = false;
+
+        for( const DataEntry & entry : dataset ) {
+            double xpos = entry.attribute(0);
+            double ypos = entry.attribute(1);
+            if( is_normalized ) {
+                xpos *= fixed_img.cols;
+                ypos *= fixed_img.rows;
+            }
+            color_index = (entry.category(0)[0] - 'A') % util::color_list.size();
+            new_point( xpos, ypos );
+        }
+    }
 
     cv::namedWindow( window, cv::WINDOW_AUTOSIZE );
     cv::setMouseCallback( window,
