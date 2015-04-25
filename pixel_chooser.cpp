@@ -128,7 +128,17 @@ int main( int argc, char ** argv ) {
         std::vector<bool>(fixed_img.rows, false)
     );
 
+    /* Adds a new point to the dataset.
+     * This function registers the point in the vector chosen,
+     * updates fixed_img and either prints the coordinates
+     * or add it to the dataset, according to the command line options.
+     *
+     * This function does not assume hover_img to be correct.
+     */
     static auto new_point = []( int x, int y ) {
+        chosen[x][y] = true;
+        cv::circle( fixed_img, cv::Point(x, y), 0, util::color_list[color_index], 6 );
+
         double xpos = command_line::normalize_dataset ? (double) x / fixed_img.cols : x;
         double ypos = command_line::normalize_dataset ?
             (fixed_img.rows - y) / (double) fixed_img.rows :
@@ -147,6 +157,10 @@ int main( int argc, char ** argv ) {
         }
     };
 
+    /* Sets hover_img to a clone of fixed_img, but with an additional circle
+     * representing the coordinates mouse_x and mouse_y,
+     * with the color util::color_list[color_index].
+     */
     static auto show_hover = [](){
         hover_img = fixed_img.clone();
         cv::circle( hover_img, cv::Point(mouse_x, mouse_y), 0,
@@ -160,9 +174,6 @@ int main( int argc, char ** argv ) {
             if( event == cv::EVENT_LBUTTONDOWN ) {
                 if( !chosen[x][y] )
                     new_point( x, y );
-                chosen[x][y] = true;
-                fixed_img = hover_img.clone();
-                cv::imshow( window, fixed_img );
             }
             if( event == cv::EVENT_MOUSEMOVE ) {
                 mouse_x = x;
@@ -172,6 +183,7 @@ int main( int argc, char ** argv ) {
         },
         nullptr
     );
+
     cv::imshow( window, fixed_img );
 
     // No idea why I cannot use 'while( (char) cv::waitKey() != 0 )'...
