@@ -80,7 +80,7 @@ void show_dataset(
         int x = (e.attribute(0) - min_x) * scale_x;
         int y = (e.attribute(1) - min_y) * scale_y;
         auto color = category_color( e.category(0) );
-        cv::circle( output, cv::Point(x, y), 0, color, radius);
+        cv::circle( output, cv::Point(x, output.rows - y - 1), 0, color, radius);
     }
 }
 
