@@ -116,8 +116,8 @@ int main( int argc, char ** argv ) {
     }
     else {
         fixed_img = cv::Mat(
-            command_line::blank_width,
             command_line::blank_height,
+            command_line::blank_width,
             CV_8UC3,
             cv::Scalar(255, 255, 255)
         );
