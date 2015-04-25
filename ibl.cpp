@@ -117,6 +117,32 @@ int main( int argc, char ** argv ) {
 
     DataSet dataset = DataSet::parse( stdin );
 
+    if( command_line::noise != 0 ) {
+        if( command_line::noise_seed_set ) {
+            dataset.noise(
+                command_line::noise,
+                command_line::noise_expand,
+                command_line::noise_seed
+            );
+        }
+        else {
+            long long unsigned seed = dataset.noise(
+                command_line::noise,
+                command_line::noise_expand
+            );
+            std::printf( "Noise seed: %llu\n", seed );
+        }
+    }
+
+    if( command_line::shuffle ) {
+        if( command_line::shuffle_seed_set )
+            dataset.shuffle( command_line::shuffle_seed );
+        else {
+            auto seed = dataset.shuffle();
+            std::cout << "Shuffle seed: " << seed << std::endl;
+        }
+    }
+
     std::unique_ptr<ibl> ibl_ptr;
     switch( command_line::ibl ) {
         case 1:
@@ -144,31 +170,6 @@ int main( int argc, char ** argv ) {
     util::show_dataset( left, dataset );
     cv::imshow( "IBL", img );
 
-    if( command_line::noise != 0 ) {
-        if( command_line::noise_seed_set ) {
-            dataset.noise(
-                command_line::noise,
-                command_line::noise_expand,
-                command_line::noise_seed
-            );
-        }
-        else {
-            long long unsigned seed = dataset.noise(
-                command_line::noise,
-                command_line::noise_expand
-            );
-            std::printf( "Noise seed: %llu\n", seed );
-        }
-    }
-
-    if( command_line::shuffle ) {
-        if( command_line::shuffle_seed_set )
-            dataset.shuffle( command_line::shuffle_seed );
-        else {
-            auto seed = dataset.shuffle();
-            std::cout << "Shuffle seed: " << seed << std::endl;
-        }
-    }
     ibl.train( dataset );
     std::cout << "Hits: " << ibl.hit_count()
         << " - Misses: " << ibl.miss_count() << "\n";
