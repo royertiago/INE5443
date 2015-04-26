@@ -16,6 +16,8 @@ struct DistanceCalculator {
      * or it can compute the covariance matrix for the Mahalanobis distance.
      */
     virtual void calibrate( const DataSet& ) = 0;
+
+    virtual ~DistanceCalculator() = default;
 };
 
 #endif // DISTANCE_H
