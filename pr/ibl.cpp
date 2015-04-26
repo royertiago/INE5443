@@ -34,9 +34,6 @@ int ibl1::miss_count() const {
 const DataSet & ibl1::conceptual_descriptor() const {
     return nn->dataset();
 }
-const NearestNeighbor & ibl1::nearest_neighbor() const {
-    return *nn;
-}
 
 void ibl2::train( const DataSet & dataset ) {
     nn = std::make_unique<NearestNeighbor>(
@@ -70,7 +67,4 @@ int ibl2::miss_count() const {
 }
 const DataSet & ibl2::conceptual_descriptor() const {
     return nn->dataset();
-}
-const NearestNeighbor & ibl2::nearest_neighbor() const {
-    return *nn;
 }

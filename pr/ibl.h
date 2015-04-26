@@ -15,7 +15,6 @@ struct ibl {
     virtual int hit_count() const = 0;
     virtual int miss_count() const = 0;
     virtual const DataSet & conceptual_descriptor() const = 0;
-    virtual const NearestNeighbor & nearest_neighbor() const = 0;
 
     virtual ~ibl() = default;
 };
@@ -30,7 +29,6 @@ public:
     virtual int hit_count() const override;
     virtual int miss_count() const override;
     virtual const DataSet & conceptual_descriptor() const override;
-    virtual const NearestNeighbor & nearest_neighbor() const override;
 };
 
 class ibl2 : public ibl {
@@ -43,7 +41,6 @@ public:
     virtual int hit_count() const override;
     virtual int miss_count() const override;
     virtual const DataSet & conceptual_descriptor() const override;
-    virtual const NearestNeighbor & nearest_neighbor() const override;
 };
 
 #endif // IBL_H
