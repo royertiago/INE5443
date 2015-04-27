@@ -19,7 +19,7 @@ void ibl1::train( const DataSet & dataset ) {
 
     /* nn.edit_dataset() will be our conceptual descriptor. */
     nn->edit_dataset().push_back( DataEntry(*it) );
-    ++hit;
+    ++miss;
     while( ++it != dataset.end() ) {
         auto category = nn->classify( *it );
         if( category == it->categories() )
@@ -53,7 +53,7 @@ void ibl2::train( const DataSet & dataset ) {
 
     /* nn.edit_dataset() will be our conceptual descriptor. */
     nn->edit_dataset().push_back( DataEntry(*it) );
-    ++hit;
+    ++miss;
     while( ++it != dataset.end() ) {
         auto category = nn->classify( *it );
         if( category == it->categories() )
@@ -171,7 +171,7 @@ void ibl3::train( const DataSet & dataset ) {
 
     // The algoritm begins here.
     conceptual_descriptor.push_back( {*it, 0, 0} );
-    hit++;
+    miss++;
     category_appearance_count[it->category(0)]++;
     trained_instances_count++;
 
