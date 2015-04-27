@@ -79,7 +79,7 @@ namespace command_line {
                 continue;
             }
             if( arg == "--ibl" || arg == "--IBL" ) {
-                args.range(1, 2) >> ibl;
+                args.range(1, 3) >> ibl;
                 continue;
             }
             if( arg == "--shuffle" ) {
@@ -153,6 +153,9 @@ int main( int argc, char ** argv ) {
             break;
         case 2:
             ibl_ptr = std::make_unique<ibl2>();
+            break;
+        case 3:
+            ibl_ptr = std::make_unique<ibl3>();
             break;
     }
     ibl & ibl = *ibl_ptr;
