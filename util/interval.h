@@ -35,8 +35,10 @@ interval precision_interval( double p, int n, double z );
  *
  * Parameters:
  *  p: class frequency; the ratio between
- *     how many times the category appears in the current conceptual descriptor
- *     and the size of current conceptual descriptor.
+ *     how many times the category appeared in the "current training set"
+ *     and the size of the "current training set".
+ *     (By "current training set" I mean the set of instances
+ *     that were already processed.)
  *  n: Number of training instances; size of current conceptual descriptor.
  *  z: Acceptance threshold; the same as in precision_interval.
  */
