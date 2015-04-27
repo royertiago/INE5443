@@ -83,7 +83,7 @@ ibl3::ibl3( double accepting_threshold, double rejecting_threshold ):
 double ibl3::do_distance( const DataEntry & lhs, const DataEntry & rhs ) const {
     return EuclideanDistance(0)( lhs, rhs );
 }
-void ibl3::do_update_weights( const DataEntry &, const DataEntry & ) {
+void ibl3::do_update_weights( const DataEntry &, const DataEntry &, double ) {
     // no-op
 }
 
@@ -240,7 +240,14 @@ void ibl3::train( const DataSet & dataset ) {
                 ++jt;
 
         // And finnaly, update the metric.
-        do_update_weights( *it, closest_acceptable->entry );
+        double lambda =
+            std::max(
+                category_appearance_count[it->category(0)],
+                category_appearance_count[closest_acceptable->entry.category(0)]
+            )
+            / (double) trained_instances_count;
+
+        do_update_weights( *it, closest_acceptable->entry, lambda );
 
     } // while( it != dataset.end() )
 

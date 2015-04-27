@@ -60,12 +60,21 @@ protected:
     virtual double do_distance( const DataEntry &, const DataEntry & ) const;
 
     /* This function is called after every classification.
-     * The first parameter is the just-classified entry.
-     * The second parameter is the closest acceptable entry present in the dataset.
+     * Parameters:
+     *  current_entry: the just-classified entry.
+     *  best_match: the closest acceptable entry present in the dataset.
+     *  lambda: Maximum value between the class frequency of current_entry
+     *      and best_match. (Class frequency is the ratio between
+     *      the number of times such class appeared to be trained until now
+     *      and how many instances in total we already trained.)
      *
      * The default implementation is a no-op.
      */
-    virtual void do_update_weights( const DataEntry &, const DataEntry & );
+    virtual void do_update_weights(
+        const DataEntry & current_entry,
+        const DataEntry & best_match,
+        double lambda
+    );
 
 public:
     ibl3( double accepting_threshold = 0.9, double rejecting_threshold = 0.75 );
