@@ -80,6 +80,13 @@ ibl3::ibl3( double accepting_threshold, double rejecting_threshold ):
     rejecting_threshold( rejecting_threshold )
 {}
 
+double ibl3::do_distance( const DataEntry & lhs, const DataEntry & rhs ) const {
+    return EuclideanDistance(0)( lhs, rhs );
+}
+void ibl3::do_update_weights( const DataEntry &, const DataEntry & ) {
+    // no-op
+}
+
 void ibl3::train( const DataSet & dataset ) {
     std::mt19937 rng;
 
@@ -165,10 +172,6 @@ void ibl3::train( const DataSet & dataset ) {
         return pair.first.max <= pair.second.min;
     };
 
-    /* distance( e1, e2 ) returns the euclidean distance between e1 and e2.
-     */
-    EuclideanDistance distance(0.0);
-
     // The algoritm begins here.
     conceptual_descriptor.push_back( {*it, 0, 0} );
     miss++;
@@ -184,7 +187,7 @@ void ibl3::train( const DataSet & dataset ) {
             ++jt )
         {
             if( acceptable(*jt) )
-                if( distance(jt->entry, *it) < distance_to_closest )
+                if( do_distance(jt->entry, *it) < distance_to_closest )
                     closest_acceptable = jt;
         }
 
@@ -228,13 +231,17 @@ void ibl3::train( const DataSet & dataset ) {
         }
 
         // Now, remove from the conceptual descriptor every bad classifier.
-        double threshold = distance(closest_acceptable->entry, *it);
+        double threshold = do_distance(closest_acceptable->entry, *it);
         auto jt = conceptual_descriptor.begin();
         while( jt != conceptual_descriptor.end() )
-            if( distance(jt->entry, *it) <= threshold && rejectable(*jt) )
+            if( do_distance(jt->entry, *it) <= threshold && rejectable(*jt) )
                 jt = conceptual_descriptor.erase( jt );
             else
                 ++jt;
+
+        // And finnaly, update the metric.
+        do_update_weights( *it, closest_acceptable->entry );
+
     } // while( it != dataset.end() )
 
     // Now, we must store the data in the conceptual_descriptor
