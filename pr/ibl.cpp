@@ -160,6 +160,7 @@ void ibl3::train( const DataSet & dataset ) {
      * then we refuse to discard it.
      */
     auto rejectable = [&]( const instance & i ) {
+        if( i.use_count == 0 ) return false;
         auto pair = intervals( i, this->rejecting_threshold );
         return pair.first.max <= pair.second.min;
     };
@@ -171,7 +172,8 @@ void ibl3::train( const DataSet & dataset ) {
     // The algoritm begins here.
     conceptual_descriptor.push_back( {*it, 0, 0} );
     hit++;
-    category_appearance_count[it->category(0)];
+    category_appearance_count[it->category(0)]++;
+    trained_instances_count++;
 
     while( ++it != dataset.end() ) {
         // First, lets find a closest acceptable instance.
@@ -212,8 +214,10 @@ void ibl3::train( const DataSet & dataset ) {
          * as a possibly good classifier.
          */
 
-        closest_acceptable->use_count++;
+        trained_instances_count++;
+        category_appearance_count[it->category(0)]++;
 
+        closest_acceptable->use_count++;
         if( closest_acceptable->entry.categories() == it->categories() ) {
             hit++;
             closest_acceptable->correct_use_count++;
@@ -227,11 +231,8 @@ void ibl3::train( const DataSet & dataset ) {
         double threshold = distance(closest_acceptable->entry, *it);
         auto jt = conceptual_descriptor.begin();
         while( jt != conceptual_descriptor.end() )
-            if( distance(jt->entry, *it) <= threshold
-                && rejectable( *jt ) )
-            {
+            if( distance(jt->entry, *it) <= threshold && rejectable(*jt) )
                 jt = conceptual_descriptor.erase( jt );
-            }
             else
                 ++jt;
     } // while( it != dataset.end() )
