@@ -43,4 +43,19 @@ public:
     virtual const DataSet & conceptual_descriptor() const override;
 };
 
+class ibl3 : public ibl {
+    DataSet _conceptual_descriptor;
+    int hit = 0;
+    int miss = 0;
+    double accepting_threshold;
+    double rejecting_threshold;
+
+public:
+    ibl3( double accepting_threshold = 0.9, double rejecting_threshold = 0.75 );
+    virtual void train( const DataSet& ) override;
+    virtual int hit_count() const override;
+    virtual int miss_count() const override;
+    virtual const DataSet & conceptual_descriptor() const override;
+};
+
 #endif // IBL_H

@@ -1,3 +1,9 @@
+#include <algorithm>
+#include <cfloat>
+#include <list>
+#include <map>
+#include <random>
+#include "util/interval.h"
 #include "ibl.h"
 #include "pr/p_norm.h"
 
@@ -67,4 +73,184 @@ int ibl2::miss_count() const {
 }
 const DataSet & ibl2::conceptual_descriptor() const {
     return nn->dataset();
+}
+
+ibl3::ibl3( double accepting_threshold, double rejecting_threshold ):
+    accepting_threshold( accepting_threshold ),
+    rejecting_threshold( rejecting_threshold )
+{}
+
+void ibl3::train( const DataSet & dataset ) {
+    std::mt19937 rng;
+
+    if( dataset.category_count() >= 2 )
+        throw "Current IBL3 implementation has only support for one category type.";
+
+    auto it = dataset.begin();
+
+    struct instance {
+        DataEntry entry;
+
+        /* How many times this entry was used to classify an entry.
+         */
+        int use_count;
+
+        /* How many times the classification went right.
+         */
+        int correct_use_count;
+    };
+
+    /* The conceptual descriptor may grow and shrink during the execution
+     * of the training, so we will only write to _conceptual_descriptor
+     * an the end of the algorithm.
+     *
+     * Note we are using a std::list instead of a std::set.
+     * Three reasons:
+     * 1. 'instance' does not have operator<.
+     * 2. std::list has a nice O(1) element removal through iterators.
+     * 3. We do not need ordering anyway...
+     */
+    std::list< instance > conceptual_descriptor;
+
+    /* Number of already processed instances in this training.
+     */
+    std::size_t trained_instances_count = 0;
+
+    /* category_appearance_count[str] is how many times an entity of category str
+     * already appeared in the training set.
+     */
+    std::map< std::string, std::size_t > category_appearance_count;
+
+    /* Returns a std::pair with the the precision and frequency intervals
+     * for that instance, respectively, given the acceptance threshold.
+     */
+    auto intervals = [&]( const instance & i, double z ) {
+        double p; int n;
+        p = (double) i.correct_use_count / i.use_count;
+        n = i.use_count;
+        interval precision = precision_interval( p, n, z );
+
+        auto appearances = category_appearance_count[i.entry.category(0)];
+        p = (double) appearances / trained_instances_count;
+        n = trained_instances_count;
+        interval frequency = frequency_interval( p, n, z );
+
+        return std::make_pair( precision, frequency );
+    };
+
+    /* Returns true if the specified instance is acceptable;
+     * that is, this instance is a good classifier.
+     * Returns false otherwise.
+     *
+     * Project decision: if the instance was never used to classify something,
+     * give it a chance and consider it acceptable.
+     */
+    auto acceptable = [&]( const instance & i ) {
+        if( i.use_count == 0 ) return true;
+        auto pair = intervals( i, this->accepting_threshold );
+        return pair.second.max <= pair.first.min;
+    };
+
+    /* Returns true if the specified instance should be discarded;
+     * that is, the classification properties of this instance
+     * is below the desirable.
+     * Returns false otherwise.
+     *
+     * Project decision: if the instance was never used to classify something,
+     * then we refuse to discard it.
+     */
+    auto rejectable = [&]( const instance & i ) {
+        auto pair = intervals( i, this->rejecting_threshold );
+        return pair.first.max <= pair.second.min;
+    };
+
+    /* distance( e1, e2 ) returns the euclidean distance between e1 and e2.
+     */
+    EuclideanDistance distance(0.0);
+
+    // The algoritm begins here.
+    conceptual_descriptor.push_back( {*it, 0, 0} );
+    hit++;
+    category_appearance_count[it->category(0)];
+
+    while( ++it != dataset.end() ) {
+        // First, lets find a closest acceptable instance.
+        auto closest_acceptable = conceptual_descriptor.end();
+        double distance_to_closest = DBL_MAX;
+        for( auto jt = conceptual_descriptor.begin();
+            jt != conceptual_descriptor.end();
+            ++jt )
+        {
+            if( acceptable(*jt) )
+                if( distance(jt->entry, *it) < distance_to_closest )
+                    closest_acceptable = jt;
+        }
+
+        // If there is no acceptable instances in the conceptual descriptor,
+        // let's choose a random entry.
+        if( closest_acceptable == conceptual_descriptor.end() ) {
+            int random = rng() % conceptual_descriptor.size();
+            closest_acceptable = conceptual_descriptor.begin();
+            std::advance( closest_acceptable, random );
+            /* All the presentations of the algorithm I've seen
+             * actually tell to choose 'r' as a random number between
+             * 1 and the size of the conceptual descriptor,
+             * and to define closest_acceptable as the r-closest instance to *it.
+             * However, 'r' is never used again, so this is just a complicated way
+             * of choosing a random element in the conceptual descriptor.
+             */
+        }
+
+        /* Either there are acceptable instances in the conceptual descriptor
+         * and closest_acceptable points to the closest of them;
+         * or there is no acceptable instances and closest_acceptable
+         * points to a random instance.
+         * In the former case, we will put the acceptability
+         * of the closest instance under judgement.
+         * In the latter case, we may thought as if we were giving chance
+         * to a random element of the set to "prove their worth"
+         * as a possibly good classifier.
+         */
+
+        closest_acceptable->use_count++;
+
+        if( closest_acceptable->entry.categories() == it->categories() ) {
+            hit++;
+            closest_acceptable->correct_use_count++;
+        }
+        else {
+            miss++;
+            conceptual_descriptor.push_back( {*it, 0, 0} );
+        }
+
+        // Now, remove from the conceptual descriptor every bad classifier.
+        double threshold = distance(closest_acceptable->entry, *it);
+        auto jt = conceptual_descriptor.begin();
+        while( jt != conceptual_descriptor.end() )
+            if( distance(jt->entry, *it) <= threshold
+                && rejectable( *jt ) )
+            {
+                jt = conceptual_descriptor.erase( jt );
+            }
+            else
+                ++jt;
+    } // while( it != dataset.end() )
+
+    // Now, we must store the data in the conceptual_descriptor
+    // inside our instance dataset _conceptual_descriptor.
+    _conceptual_descriptor = dataset.header();
+
+    for( instance & i : conceptual_descriptor )
+        if( i.use_count > 0 )
+            _conceptual_descriptor.push_back( std::move(i.entry) );
+}
+
+int ibl3::hit_count() const {
+    return hit;
+}
+int ibl3::miss_count() const {
+    return miss;
+}
+const DataSet & ibl3::conceptual_descriptor() const {
+    return _conceptual_descriptor;
 }
