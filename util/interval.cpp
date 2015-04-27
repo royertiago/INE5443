@@ -9,7 +9,7 @@ interval precision_interval( double p, int n, double z ) {
     double root = z * std::sqrt( p * (1-p) / n + z*z /(4*n*n) );
     double lower = 1 + z*z / n;
 
-    return interval{ (upper_left + root)/lower, (upper_left - root)/lower};
+    return interval{ (upper_left - root)/lower, (upper_left + root)/lower};
 }
 
 interval frequency_interval( double p, int n, double z ) {
