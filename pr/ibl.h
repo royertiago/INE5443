@@ -67,6 +67,11 @@ protected:
      */
     virtual double do_distance( const DataEntry &, const DataEntry & ) const;
 
+    /* This method is called once per nearest_neighbor() call.
+     * Returns the intended distance calculator for the nearest neighbor.
+     */
+    virtual std::unique_ptr<DistanceCalculator> do_distance_calculator() const;
+
     /* This function is called after every classification.
      * Parameters:
      *  current_entry: the just-classified entry.
@@ -109,6 +114,7 @@ class ibl4 : public ibl3 {
 
 protected:
     virtual double do_distance( const DataEntry &, const DataEntry & ) const override;
+    virtual std::unique_ptr<DistanceCalculator> do_distance_calculator() const override;
     virtual void do_update_weights(
         const DataEntry & current_entry,
         const DataEntry & best_match,

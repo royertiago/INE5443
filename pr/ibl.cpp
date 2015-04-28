@@ -94,6 +94,9 @@ double ibl3::do_distance( const DataEntry & lhs, const DataEntry & rhs ) const {
 void ibl3::do_update_weights( const DataEntry &, const DataEntry &, double ) {
     // no-op
 }
+std::unique_ptr<DistanceCalculator> ibl3::do_distance_calculator() const {
+    return std::unique_ptr<DistanceCalculator>(new EuclideanDistance(0.0));
+}
 void ibl3::seed( long long unsigned seed ) {
     _seed = seed;
 }
@@ -292,7 +295,7 @@ const DataSet & ibl3::conceptual_descriptor() const {
 const NearestNeighbor & ibl3::nearest_neighbor() const {
     nn.reset( new NearestNeighbor(
         std::make_unique<DataSet>(_conceptual_descriptor),
-        std::unique_ptr<DistanceCalculator>(new EuclideanDistance(0)),
+        do_distance_calculator(),
         1,
         false
     ) );
@@ -300,16 +303,38 @@ const NearestNeighbor & ibl3::nearest_neighbor() const {
 }
 
 
+namespace {
+    /* Distance calculator used by IBL 4.
+     */
+    struct WeightedDistance : public DistanceCalculator {
+        std::vector<double> const * weights;
+        WeightedDistance( const std::vector<double> * vec ) :
+            weights( vec )
+        {}
+
+        virtual double operator()( const DataEntry& x, const DataEntry& y ) const {
+            auto sqr = []( double d ) { return d * d; };
+            double res = 0;
+            for( std::size_t i = 0; i < weights->size(); i++ )
+                res += sqr( (*weights)[i] * (x.attribute(i) - y.attribute(i)) );
+
+            return std::sqrt( res );
+        }
+
+        virtual void calibrate( const DataSet& ) {
+            // no-op
+        }
+    };
+} // anonymous namespace
+
 ibl4::ibl4( double accepting_threshold, double rejecting_threshold ):
     ibl3( accepting_threshold, rejecting_threshold )
 {}
 double ibl4::do_distance( const DataEntry & x, const DataEntry & y ) const {
-    auto sqr = []( double d ) { return d * d; };
-    double res = 0;
-    for( std::size_t i = 0; i < weights.size(); i++ )
-        res += sqr( weights[i] * (x.attribute(i) - y.attribute(i)) );
-
-    return std::sqrt( res );
+    return WeightedDistance{ & weights }( x, y );
+}
+std::unique_ptr<DistanceCalculator> ibl4::do_distance_calculator() const {
+    return std::unique_ptr<DistanceCalculator>(new WeightedDistance{& weights});
 }
 void ibl4::do_update_weights( const DataEntry & a, const DataEntry & b, double lambda ) {
     for( std::size_t i = 0; i < weights.size(); i++ ) {
