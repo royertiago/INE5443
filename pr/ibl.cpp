@@ -230,7 +230,13 @@ void ibl3::train( const DataSet & dataset ) {
             conceptual_descriptor.push_back( {*it, 0, 0} );
         }
 
-        // Now, remove from the conceptual descriptor every bad classifier.
+        /* Now, remove from the conceptual descriptor every bad classifier.
+         * First, we need to save the current closest entry,
+         * because the pointer closest_aceptable might get removed
+         * form the conceptual descriptor, but we need that entry
+         * to call do_update_weights.
+         */
+        DataEntry closest_entry = closest_acceptable->entry;
         double threshold = do_distance(closest_acceptable->entry, *it);
         auto jt = conceptual_descriptor.begin();
         while( jt != conceptual_descriptor.end() )
@@ -243,7 +249,7 @@ void ibl3::train( const DataSet & dataset ) {
         double lambda =
             std::max(
                 category_appearance_count[it->category(0)],
-                category_appearance_count[closest_acceptable->entry.category(0)]
+                category_appearance_count[closest_entry.category(0)]
             )
             / (double) trained_instances_count;
 
