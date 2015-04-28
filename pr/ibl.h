@@ -52,7 +52,7 @@ class ibl3 : public ibl {
     long long unsigned _seed;
 
 protected:
-    /* The purpose of these methods is to ease the implementation of IBL 4 and 5.
+    /* The purpose of these methods is to ease the implementation of IBL 4.
      * do_distance is called several times per classification and queries
      * the distance between two data entries.
      *
