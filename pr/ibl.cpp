@@ -41,6 +41,9 @@ int ibl1::miss_count() const {
 const DataSet & ibl1::conceptual_descriptor() const {
     return nn->dataset();
 }
+const NearestNeighbor & ibl1::nearest_neighbor() const {
+    return *nn;
+}
 
 void ibl2::train( const DataSet & dataset ) {
     nn = std::make_unique<NearestNeighbor>(
@@ -74,6 +77,9 @@ int ibl2::miss_count() const {
 }
 const DataSet & ibl2::conceptual_descriptor() const {
     return nn->dataset();
+}
+const NearestNeighbor & ibl2::nearest_neighbor() const {
+    return *nn;
 }
 
 ibl3::ibl3( double accepting_threshold, double rejecting_threshold ):
@@ -282,6 +288,15 @@ int ibl3::miss_count() const {
 }
 const DataSet & ibl3::conceptual_descriptor() const {
     return _conceptual_descriptor;
+}
+const NearestNeighbor & ibl3::nearest_neighbor() const {
+    nn.reset( new NearestNeighbor(
+        std::make_unique<DataSet>(_conceptual_descriptor),
+        std::unique_ptr<DistanceCalculator>(new EuclideanDistance(0)),
+        1,
+        false
+    ) );
+    return *nn;
 }
 
 

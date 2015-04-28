@@ -62,12 +62,9 @@ namespace command_line {
 } // namespace command_line
 
 #include <iostream>
-#include <memory>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "pr/ibl.h"
-#include "pr/nearest_neighbor.h"
-#include "pr/p_norm.h"
 #include "util/cv.h"
 
 namespace command_line {
@@ -235,13 +232,7 @@ int main( int argc, char ** argv ) {
     cv::imshow( "IBL", img );
     cv::waitKey(10);
 
-    NearestNeighbor nearest_neighbor(
-        std::make_unique<DataSet>(ibl.conceptual_descriptor()),
-        std::unique_ptr<DistanceCalculator>(new EuclideanDistance(0)),
-        1,
-        false
-    );
-    util::influence_areas( right, nearest_neighbor, 0.1 );
+    util::influence_areas( right, ibl.nearest_neighbor(), 0.1 );
     cv::imshow( "IBL", img );
     cv::waitKey();
 

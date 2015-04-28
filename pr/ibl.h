@@ -15,6 +15,7 @@ struct ibl {
     virtual int hit_count() const = 0;
     virtual int miss_count() const = 0;
     virtual const DataSet & conceptual_descriptor() const = 0;
+    virtual const NearestNeighbor & nearest_neighbor() const = 0;
 
     virtual ~ibl() = default;
 };
@@ -29,6 +30,7 @@ public:
     virtual int hit_count() const override;
     virtual int miss_count() const override;
     virtual const DataSet & conceptual_descriptor() const override;
+    virtual const NearestNeighbor & nearest_neighbor() const override;
 };
 
 class ibl2 : public ibl {
@@ -41,6 +43,7 @@ public:
     virtual int hit_count() const override;
     virtual int miss_count() const override;
     virtual const DataSet & conceptual_descriptor() const override;
+    virtual const NearestNeighbor & nearest_neighbor() const override;
 };
 
 class ibl3 : public ibl {
@@ -50,6 +53,10 @@ class ibl3 : public ibl {
     double accepting_threshold;
     double rejecting_threshold;
     long long unsigned _seed;
+
+    /* Dummy pointer used to handle the data to the method nearest_neighbor().
+     */
+    mutable std::unique_ptr<NearestNeighbor> nn;
 
 protected:
     /* The purpose of these methods is to ease the implementation of IBL 4.
@@ -92,6 +99,7 @@ public:
     virtual int hit_count() const override;
     virtual int miss_count() const override;
     virtual const DataSet & conceptual_descriptor() const override;
+    virtual const NearestNeighbor & nearest_neighbor() const override;
 };
 
 class ibl4 : public ibl3 {
