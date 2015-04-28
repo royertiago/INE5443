@@ -40,6 +40,16 @@ namespace command_line {
 "    from the dataset's absolute borders.\n"
 "    Default: 0.1\n"
 "\n"
+"--accept-threshold <F>\n"
+"    Choose the accepting threshold for IBL 3, 4 and 5.\n"
+"    Default: 0.9.\n"
+"    This option is ignored for IBL 1 and 2.\n"
+"\n"
+"--reject-threshold <F>\n"
+"    Choose the rejecting thershold for IBL 3, 4 and 5.\n"
+"    Default: 0.75.\n"
+"    This option is ignored for IBL 1 and 2.\n"
+"\n"
 "--help\n"
 "    Display this help and quit.\n"
 ;
@@ -66,6 +76,9 @@ namespace command_line {
     long long unsigned noise_seed;
     bool noise_seed_set = false;
     double noise_expand = 0.1;
+
+    double accept_threshold = 0.9;
+    double reject_threshold = 0.75;
 
     void parse( cmdline::args&& args ) {
         while( args.size() > 0 ) {
@@ -103,6 +116,14 @@ namespace command_line {
             }
             if( arg == "--noise-expand" ) {
                 args >> noise_expand;
+                continue;
+            }
+            if( arg == "--accept-threshold" ) {
+                args.range( 0 ) >> accept_threshold;
+                continue;
+            }
+            if( arg == "--reject-threshold" ) {
+                args.range( 0 ) >> reject_threshold;
                 continue;
             }
             if( arg == "--help" ) {
@@ -155,10 +176,16 @@ int main( int argc, char ** argv ) {
             ibl_ptr = std::make_unique<ibl2>();
             break;
         case 3:
-            ibl_ptr = std::make_unique<ibl3>();
+            ibl_ptr = std::make_unique<ibl3>(
+                command_line::accept_threshold,
+                command_line::reject_threshold
+            );
             break;
         case 4:
-            ibl_ptr = std::make_unique<ibl3>();
+            ibl_ptr = std::make_unique<ibl3>(
+                command_line::accept_threshold,
+                command_line::reject_threshold
+            );
             break;
     }
     ibl & ibl = *ibl_ptr;
