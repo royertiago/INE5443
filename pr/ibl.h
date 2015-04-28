@@ -49,6 +49,7 @@ class ibl3 : public ibl {
     int miss = 0;
     double accepting_threshold;
     double rejecting_threshold;
+    long long unsigned _seed;
 
 protected:
     /* The purpose of these methods is to ease the implementation of IBL 4 and 5.
@@ -78,6 +79,15 @@ protected:
 
 public:
     ibl3( double accepting_threshold = 0.9, double rejecting_threshold = 0.75 );
+
+    /* Sets/gets the seed to the random number generator.
+     *
+     * One seed is automatically created on construction;
+     * this function can be used both to alter and query that seed.
+     */
+    void seed( long long unsigned );
+    long long unsigned seed() const;
+
     virtual void train( const DataSet& ) override;
     virtual int hit_count() const override;
     virtual int miss_count() const override;

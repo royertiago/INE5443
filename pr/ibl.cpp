@@ -1,11 +1,12 @@
 #include <algorithm>
 #include <cfloat>
+#include <chrono>
 #include <list>
 #include <map>
 #include <random>
-#include "util/interval.h"
 #include "ibl.h"
 #include "pr/p_norm.h"
+#include "util/interval.h"
 
 void ibl1::train( const DataSet & dataset ) {
     nn = std::make_unique<NearestNeighbor>(
@@ -77,7 +78,8 @@ const DataSet & ibl2::conceptual_descriptor() const {
 
 ibl3::ibl3( double accepting_threshold, double rejecting_threshold ):
     accepting_threshold( accepting_threshold ),
-    rejecting_threshold( rejecting_threshold )
+    rejecting_threshold( rejecting_threshold ),
+    _seed( std::chrono::system_clock::now().time_since_epoch().count() )
 {}
 
 double ibl3::do_distance( const DataEntry & lhs, const DataEntry & rhs ) const {
@@ -86,9 +88,15 @@ double ibl3::do_distance( const DataEntry & lhs, const DataEntry & rhs ) const {
 void ibl3::do_update_weights( const DataEntry &, const DataEntry &, double ) {
     // no-op
 }
+void ibl3::seed( long long unsigned seed ) {
+    _seed = seed;
+}
+long long unsigned ibl3::seed() const {
+    return _seed;
+}
 
 void ibl3::train( const DataSet & dataset ) {
-    std::mt19937 rng;
+    std::mt19937 rng(_seed);
 
     if( dataset.category_count() >= 2 )
         throw "Current IBL3 implementation has only support for one category type.";
