@@ -40,6 +40,12 @@ namespace command_line {
 "    from the dataset's absolute borders.\n"
 "    Default: 0.1\n"
 "\n"
+"--ibl-seed <N>\n"
+"--IBL-seed <N>\n"
+"    Choose a seed to be used in IBL 3, 4 and 5.\n"
+"    Default: Generate a seed and print to stdout.\n"
+"    This option is ignored for IBL 1 and 2.\n"
+"\n"
 "--accept-threshold <F>\n"
 "    Choose the accepting threshold for IBL 3, 4 and 5.\n"
 "    Default: 0.9.\n"
@@ -79,6 +85,8 @@ namespace command_line {
 
     double accept_threshold = 0.9;
     double reject_threshold = 0.75;
+    long long unsigned ibl_seed;
+    bool ibl_seed_set = false;
 
     void parse( cmdline::args&& args ) {
         while( args.size() > 0 ) {
@@ -124,6 +132,11 @@ namespace command_line {
             }
             if( arg == "--reject-threshold" ) {
                 args.range( 0 ) >> reject_threshold;
+                continue;
+            }
+            if( arg == "--ibl-seed" || arg == "--IBL-seed" ) {
+                args >> ibl_seed;
+                ibl_seed_set = true;
                 continue;
             }
             if( arg == "--help" ) {
@@ -180,12 +193,20 @@ int main( int argc, char ** argv ) {
                 command_line::accept_threshold,
                 command_line::reject_threshold
             );
-            break;
+            if( false ) { // WARNING: entangled if and switch
         case 4:
-            ibl_ptr = std::make_unique<ibl3>(
-                command_line::accept_threshold,
-                command_line::reject_threshold
-            );
+                ibl_ptr = std::make_unique<ibl3>(
+                    command_line::accept_threshold,
+                    command_line::reject_threshold
+                );
+            }
+            { // begin common code
+                ibl3 * ibl3_ptr = (ibl3 *) ibl_ptr.get();
+                if( command_line::ibl_seed_set )
+                    ibl3_ptr->seed( command_line::ibl_seed );
+                else
+                    std::cout << "IBL seed: " << ibl3_ptr->seed() << std::endl;
+            } // end common code
             break;
     }
     ibl & ibl = *ibl_ptr;
