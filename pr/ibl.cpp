@@ -269,3 +269,36 @@ int ibl3::miss_count() const {
 const DataSet & ibl3::conceptual_descriptor() const {
     return _conceptual_descriptor;
 }
+
+
+ibl4::ibl4( double accepting_threshold, double rejecting_threshold ):
+    ibl3( accepting_threshold, rejecting_threshold )
+{}
+double ibl4::do_distance( const DataEntry & x, const DataEntry & y ) const {
+    auto sqr = []( double d ) { return d * d; };
+    double res = 0;
+    for( std::size_t i = 0; i < weights.size(); i++ )
+        res += sqr( weights[i] * (x.attribute(i) - y.attribute(i)) );
+
+    return std::sqrt( res );
+}
+void ibl4::do_update_weights( const DataEntry & a, const DataEntry & b, double lambda ) {
+    for( std::size_t i = 0; i < weights.size(); i++ ) {
+        double d = std::fabs(a.attribute(i) - b.attribute(i));
+
+        if( a.categories() == b.categories() )
+            accumulated_weights[i] += (1 - lambda) * (1 - d);
+        else
+            accumulated_weights[i] += (1 - lambda) * d;
+
+        normalized_weights[i] += (1 - lambda);
+
+        weights[i] = std::max( accumulated_weights[i] / normalized_weights[i] - .5, 0. );
+    }
+}
+void ibl4::train( const DataSet & dataset ) {
+    weights.resize( dataset.attribute_count(), 1.0 );
+    accumulated_weights.resize( dataset.attribute_count(), 1.0 );
+    normalized_weights.resize( dataset.attribute_count(), 1.0 );
+    ibl3::train( dataset );
+}

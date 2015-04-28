@@ -84,4 +84,22 @@ public:
     virtual const DataSet & conceptual_descriptor() const override;
 };
 
+class ibl4 : public ibl3 {
+    std::vector<double> weights;
+    std::vector<double> accumulated_weights;
+    std::vector<double> normalized_weights;
+
+protected:
+    virtual double do_distance( const DataEntry &, const DataEntry & ) const override;
+    virtual void do_update_weights(
+        const DataEntry & current_entry,
+        const DataEntry & best_match,
+        double
+    ) override;
+
+public:
+    ibl4( double accepting_threshold = 0.9, double rejecting_threshold = 0.75 );
+    virtual void train( const DataSet & ) override;
+};
+
 #endif // IBL_H
