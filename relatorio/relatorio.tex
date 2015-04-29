@@ -117,4 +117,62 @@ e exibir a imagem \ref{iblimg}.
     \caption{Execução de IBL 2 no conjunto de dados \texttt{enclave.data}.}
     \label{iblimg}
 \end{figure}
+
+\section{Algoritmos implementados --- IBL 1 e 2}
+
+Estes dois algoritmos são simples e não possuem parâmetros adicionais;
+basta escolher \texttt{--ibl 1} ou \texttt{--ibl 2} na linha de comando.
+
+Como o IBL 2 armazena apenas as instâncias para as quais a classificação for incorreta,
+o descritor conceitual gerado é significativamente menor do que o gerado pelo IBL 1.
+A etapa mais pesada de execução do programa \texttt{ibl},
+a geração das áreas de influência do descritor conceitual,
+nos permite perceber a diferença de tempo;
+com IBL 1, o tempo de execução do programa fica aproximadamente 5 vezes maior.
+
+Entretanto, o IBL 1 possui maior resistência a ruídos do que o IBL 2;
+executando o mesmo experimento do exemplo com IBL 1,
+podemos ver que a região verde gerada é mais regular do que a gerada com IBL 2.
+
+\section{Algoritmos implementados --- IBL 3 e 4}
+
+Estes dois algoritmos são mais complexos e possuem três parâmetros adicionais.
+
+Os parâmetros $z$ dos intervalos de precisão e intervalos de instância
+podem ser especificados separadamente para aceitação e rejeição.
+Para alterar a aceitação para \texttt{0.8}, por exemplo,
+use \texttt{--accept-threshold 0.8}.
+Para colorar a rejeição em \texttt{0.5},
+use \texttt{--reject-threshold 0.5}.
+
+Além disso, em alguns casos, IBL 3 e 4 tomam decisões aleatórias.
+A semente do gerador de números aleatórios usada pode ser configurada com
+\texttt{--ibl-seed <number>}.
+
+Por exemplo, podemos executar
+\begin{verbatim}
+$ ./ibl --ibl 3 --shuffle --noise 10 < datasets/enclave.data
+--shuffle-seed 3456 --noise-seed 13456 --ibl-seed 789
+\end{verbatim}
+
+Esta execução do algoritmo mostra que o IBL 3 figura como um intermediário
+entre IBL 1 e IBL 2. O descritor conceitual resultante teve o dobro do tamanho
+em relação à execução com IBL 2, mas ele se mostrou muito
+superior com relação ao ruído introduzido.
+De fato, ele superou até o IBL 1, que trabalha com a entrada inteira.
+
+Nos experimentos, notei que a variação dos parâmetros $z$
+teve pouca influência nos descritores conceituais,
+em relação à influência de trocar de IBL 1 para IBL 3 ou IBL 4.
+No exemplo anterior, baixando o \texttt{--reject-threshold} para 0.7
+eliminou um dos pontos que acumulava bastante ruído,
+mas baixá-lo para 0.5 introduziu outro ponto ruim no descritor conceitual.
+
+Como a maior parte dos conjuntos de dados que utilizei já eram normalizados,
+IBL 4 mostrou desempenho praticamente idêntico ao IBL 3.
+
+IBL 5 não foi implementado porquê o código que eu programei não suporta
+nem a inserção de novos atributos nem é capaz de representar atributos ausentes,
+e é justamente para esses casos que o IBL 5 foi pensado.
+
 \end{document}
