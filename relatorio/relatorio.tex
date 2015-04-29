@@ -33,15 +33,19 @@ Este repositório é um conjunto de ferramentas de linha de comando
 que trabalham com datasets. Há programas para visualização,
 geração, e classificação de dados a partir destes datasets.
 
+Todos os programas suportam a opção \verb|--help| na linha de comando.
+
 A maior parte dos programas precisa ser compilada.
 O makefile do repositório está configurado
 para respeitar a variável \texttt{CXXFLAGS},
-portanto os programas do repositório pode ser compilado com
+portanto os programas do repositório podem ser compilado com
 \begin{verbatim}
     $ CXXFLAGS=-O2 make
 \end{verbatim}
 
-Todos os programas suportam a opção \verb|--help| na linha de comando.
+O código foi escrito em C++ e utiliza recursos do novo padrão
+(C++14). A compilação foi testada com \texttt{gcc 4.9.2}
+e com \texttt{clang 3.6.0}.
 
 \subsection{Arquivos \texttt{.data}}
 
