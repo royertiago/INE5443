@@ -81,4 +81,40 @@ Apertando barra de espaço, a classe dos pontos é alterada;
 apertanto qualquer outra tecla encerra o programa e imprime o conjunto gerado.
 (Foi assim que foi construído o conjunto \texttt{enclave.data}.)
 
+\section{Programas para classificação de dados}
+
+Apenas dois programas no repositório lidam diretamente com IBL.
+O programa \texttt{ibl}, na raíz do repositório,
+exibe uma janela dividida em três telas.
+A primeira mostra o dataset de entrada;
+a segunda mostra o descritor conceitual restante após rodar o algoritmo IBL,
+e a última mostra as áreas de influência do descritor conceitual.
+
+O programa \texttt{ibl} permite apenas visualizar
+o resultado da execução dos algoritmos IBL.
+Entretanto, ele não permite classificar novos pontos
+usando o descritor conceitual gerado.
+O programa \texttt{classify} é o oposto disso:
+ele não possui nenhuma funcionalidade de visualização
+(ele funciona em modo \emph{batch}),
+mas permite que novas instâncias sejam classificadas
+contra o descritor conceitual resultante.
+
+Todas as opções da linha de comando do \texttt{ibl}
+são aplicáveis a \emph{classify}, portanto iremos descrevê-las apenas no primeiro.
+
+Para rodar um exemplo com IBL 2, podemos executar
+\begin{verbatim}
+    $ ./ibl --ibl 2 --shuffle --noise 10 < datasets/enclave.data
+    --shuffle-seed 3456 --noise-seed 13456
+\end{verbatim}
+O programa deve reportar, na saída padrão, 245 acertos e 65 erros,
+e exibir a imagem \ref{iblimg}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.3]{ibl.png}
+    \caption{Execução de IBL 2 no conjunto de dados \texttt{enclave.data}.}
+    \label{iblimg}
+\end{figure}
 \end{document}
