@@ -35,7 +35,7 @@ namespace command_line {
 #include <cstdlib>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "cmdline/args.h"
+#include "cmdline/args.hpp"
 #include "util/csv.h"
 #include "util/cv.h"
 #include "pr/classifier.h"

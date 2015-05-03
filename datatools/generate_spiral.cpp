@@ -50,7 +50,7 @@ namespace command_line {
 #include <cmath>
 #include <cstdio>
 #include <random>
-#include "cmdline/args.h"
+#include "cmdline/args.hpp"
 #include "pr/data_entry.h"
 #include "pr/data_set.h"
 

@@ -45,7 +45,7 @@ namespace command_line {
 #include <vector>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
-#include "cmdline/args.h"
+#include "cmdline/args.hpp"
 #include "pr/data_set.h"
 #include "util/cv.h"
 

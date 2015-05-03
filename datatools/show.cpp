@@ -37,7 +37,7 @@ namespace command_line {
 #include <opencv2/highgui/highgui.hpp>
 #include <cstdio>
 #include <cstring>
-#include "cmdline/args.h"
+#include "cmdline/args.hpp"
 #include "pr/data_set.h"
 #include "util/cv.h"
 

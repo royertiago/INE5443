@@ -2,7 +2,7 @@
 #include <memory>
 #include <iostream>
 #include "classifier.h"
-#include "cmdline/args.h"
+#include "cmdline/args.hpp"
 #include "pr/data_set.h"
 #include "pr/ibl.h"
 #include "pr/nearest_neighbor.h"

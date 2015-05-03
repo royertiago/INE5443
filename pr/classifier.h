@@ -5,7 +5,7 @@
  * from command line options.
  */
 
-#include "cmdline/args.h"
+#include "cmdline/args.hpp"
 #include "pr/nearest_neighbor.h"
 
 constexpr char classifier_help_message[] =
