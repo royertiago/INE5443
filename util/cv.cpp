@@ -6,10 +6,10 @@
 namespace util {
 
 DataEntry entryFromVec( const cv::Vec3b & vec ) {
-    /* As the paragraph 8.5.4/7 of the C++11 standard,
-     * conversions from integer types to floating point types are "narrowing",
-     * so the compiler is obligate to issue an error
+    /* Conversions from integer types to floating point types are "narrowing",
+     * so the compiler is required to issue an error
      * when such conversion is used within braces - such as initializer lists.
+     * (Working Draft for the C++ Standard, N3936, paragraph 8.5.4/7)
      *
      * Here, we silence this error.
      */
