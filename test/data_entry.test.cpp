@@ -22,7 +22,8 @@ TEST_CASE( "Trivial DataEntry member test", "[DataEntry][trivial]" ) {
         CHECK( data.attribute(2) == -3.5 );
         CHECK( data.attribute(3) == 4.0 );
         /* Latter three numbers are exactly representable in floating point,
-         * so the comparison should be exact. */
+         * so the comparison should be exact.
+         */
     }
 
     SECTION( "DataEntry with no attributes" ) {

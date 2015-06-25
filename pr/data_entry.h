@@ -34,17 +34,20 @@ public:
      * the second vector is the category vector.
      *
      * Note that there is only one constructor taking vectors,
-     * and they must be std::move'd to the object. */
+     * and they must be std::move'd to the object.
+     */
     DataEntry( std::vector< double > &&, std::vector< std::string >&& );
 
     /* Construcs a new DataEntry from the specified initializer lists.
      * This function is meant to ease unit testing.
      *
      * Note the second initializer list is a list of char pointers,
-     * not a list of strings. */
+     * not a list of strings.
+     */
     DataEntry( std::initializer_list<double>, std::initializer_list<const char*> );
 
-    /* Equivalent to DataEntry({},{}). */
+    /* Equivalent to DataEntry({},{}).
+     */
     DataEntry() = default;
 
     /* Return the attribute or category in the chosen index,
@@ -53,19 +56,22 @@ public:
      * The non-const version allows the attributes to be changed.
      *
      * No checking is done to assure that there is an attribute
-     * or category in the specified index. */
+     * or category in the specified index.
+     */
     const double & attribute( std::size_t index ) const;
     double & attribute( std::size_t index );
     const std::string& category( std::size_t index ) const;
     std::string& category( std::size_t index );
 
     /* Return the number of attributes or categories
-     * of this DataEntry, respectively. */
+     * of this DataEntry, respectively.
+     */
     std::size_t attribute_count() const;
     std::size_t category_count() const;
 
     /* Return the attributes or categories of this DataEntry.
-     * Note you cannot change them. */
+     * Note you cannot change them.
+     */
     const std::vector< double > & attributes() const;
     const std::vector< std::string > & categories() const;
 
@@ -80,7 +86,8 @@ public:
      * Note that order of characters in 'format' matters.
      *
      * A trailing newline character after the last attribute or category
-     * will be discarded. */
+     * will be discarded.
+     */
     static DataEntry parse( std::FILE * file, const char * format );
 
     /* Writes itself to 'file' and append a newline.
@@ -89,25 +96,29 @@ public:
      * If the variable 'format' is too short
      * (for instance, the empty string)
      * then all remaining attributes and then all remaining categories
-     * will be written to 'file'. */
+     * will be written to 'file'.
+     */
     void write( std::FILE * file, const char * format = "" ) const;
 
     /* Parses an entry with 'size' attributes
      * and no category.
      *
      * Equivalent to call parse( FILE*, const char * format )
-     * with a string of 'size' characters 'a' in 'format'. */
+     * with a string of 'size' characters 'a' in 'format'.
+     */
     static DataEntry parse( std::FILE * file, std::size_t size );
 
     /* Compare two DataEntries for equality.
      * The error tolerance for category_count is
-     * std::numeric_limits<double>::epsilon(). */
+     * std::numeric_limits<double>::epsilon().
+     */
     friend bool operator==( const DataEntry &, const DataEntry & );
     friend bool operator!=( const DataEntry &, const DataEntry & );
 
     /* Prints a DataEntry.
      * Format example:
-     * ({1.5,0.8},{"CategoryA"}) */
+     * ({1.5,0.8},{"CategoryA"})
+     */
     friend std::ostream& operator<<( std::ostream& os, const DataEntry& );
 };
 

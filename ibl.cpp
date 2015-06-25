@@ -212,7 +212,8 @@ int main( int argc, char ** argv ) {
     using command_line::height;
     /* We add two pixels in the width so that the final image
      * will have two black lines, of one pixel each, separating
-     * each of its "panels". */
+     * each of its "panels".
+     */
     cv::Mat img( height, 3 * width + 2, CV_8UC3, cv::Scalar(0, 0, 0) );
 
     cv::Mat left, middle, right;

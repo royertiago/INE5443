@@ -267,7 +267,8 @@ std::vector<std::vector<std::pair<std::string, std::size_t>>>
 DataSet::category_statistics() const {
     std::map< std::pair<std::size_t, std::string>, std::size_t > stat;
     /* stat[{i, str}] == j means there is j elements in the dataset
-     * with str as its ith category. */
+     * with str as its ith category.
+     */
     for( const auto & entry : *this )
         for( unsigned i = 0; i < entry.category_count(); i++ )
             stat[std::make_pair(i, entry.category(i))]++;

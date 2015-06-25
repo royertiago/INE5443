@@ -50,7 +50,8 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
      * to be "Iris-setosa".
      *
      * We begin by processing the first `this->neighbors`
-     * mandatory votes. */
+     * mandatory votes.
+     */
 
     auto it = nearest.begin();
     for( unsigned i = 0; i < neighbors; ++i, ++it ) {
@@ -68,7 +69,8 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
      *
      * First, we will process the current votes.
      * If there are draws, we will get more votes
-     * from the nearest neighbors after the first `this->neighbors`. */
+     * from the nearest neighbors after the first `this->neighbors`.
+     */
 
     for( unsigned i = 0; i < _dataset->category_count(); ++i ) {
         for( auto pair: votes[i] ) {
@@ -154,5 +156,6 @@ std::vector< std::string > NearestNeighbor::classify( const DataEntry & target )
 /* The destructor must be here because std::unique_ptr's default destructor
  * requires the full class specification.
  * This would defeat the purpose of the forward-declarations
- * in the beginning of the header file. */
+ * in the beginning of the header file.
+ */
 NearestNeighbor::~NearestNeighbor() {}
