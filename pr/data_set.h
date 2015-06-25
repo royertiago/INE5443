@@ -48,23 +48,29 @@ public:
 
     /* Generates some points of noise in the dataset.
      *
-     * The noise is first generated in an hypercube, with each point
-     * having the same probaility as any other point.
-     * Then, each point is added back to the dataset, but by means
-     * of the affine transformation DataSet::normalizing_factor.
+     * The noise is first generated in an hypercube,
+     * using an uniform random number generator,
+     * and then the cube is scaled to fit the database.
+     *
+     * (The scaling is done dimension-wise; the resulting shape
+     * most likely is not a cube anymore.)
+     *
+     * Additionaly, you can specify the value `expand`,
+     * which will expand the cube a bit after the fitting.
+     * This has the effect of generating noise
+     * outside the original dataset boundaries.
+     * For instance, with an `expand` value of 0.5,
+     * a dimension that ranges from 0 to 2 in the database
+     * might receive random values from -1 to 3 by this method.
      *
      * The categories are also generated randomly, but weighted
      * by the current categories. No new category will be added.
      *
      * Akin to DataSet::shuffle, the first version accepts a random seed
      * and the second generates one and returns it.
-     *
-     * Parameters:
-     *  number: The number of random points to be generated.
-     *  expand: The expansion value passed to DataSet::normalizing_factor.
      */
-    void noise( std::size_t number, double expand, long long unsigned seed );
-    long long unsigned noise( std::size_t number, double expand );
+    void noise( std::size_t number_of_points, double expand, long long unsigned seed );
+    long long unsigned noise( std::size_t number_of_points, double expand );
 
     /* Entries that represent the minimum, maximum, and average values
      * for each attribute in the dataset.
