@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cfloat>
 #include <chrono>
+#include <cmath>
 #include <map>
 #include <random>
 #include "pr/data_set.h"
@@ -229,6 +230,23 @@ DataSet::normalizing_factor( double expand ) const {
         multiplicative_factor[i] = 1/(maximum_value[i] - minimum_value[i]);
     }
     return std::make_pair(std::move(multiplicative_factor), std::move(minimum_value));
+}
+
+std::pair<std::vector<double>, std::vector<double>>
+DataSet::standardize_factor() const {
+    auto mean = this->mean().attributes();
+    std::vector< double > variance(attribute_count());
+
+    auto square = []( double d ){ return d * d; };
+
+    for( const DataEntry & e : entries )
+        for( std::size_t i = 0; i < attribute_count(); i++ )
+            variance[i] += square( mean[i] - e.attribute(i) );
+
+    for( double & d : variance )
+        d = std::sqrt( entries.size() / d );
+
+    return std::make_pair( std::move(variance), std::move(mean) );
 }
 
 std::vector<std::vector<std::pair<std::string, std::size_t>>>

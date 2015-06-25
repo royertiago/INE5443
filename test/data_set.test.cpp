@@ -250,3 +250,25 @@ TEST_CASE( "DataSet::category_satistics", "[DataSet]" ) {
     dataset.shuffle();
     CHECK( stat == dataset.category_statistics() );
 }
+
+TEST_CASE( "DataSet::standardize_factor", "[DataSet]" ) {
+    DataSet dataset(
+        std::vector<std::string>{"Value"},
+        std::vector<std::string>(),
+        std::vector<DataEntry>{
+            DataEntry({2},{}),
+            DataEntry({4},{}),
+            DataEntry({4},{}),
+            DataEntry({4},{}),
+            DataEntry({5},{}),
+            DataEntry({5},{}),
+            DataEntry({7},{}),
+            DataEntry({9},{}),
+        }
+    );
+    auto pair = dataset.standardize_factor();
+    CHECK( pair.first.size() == 1 );
+    CHECK( pair.second.size() == 1 );
+    CHECK( pair.first[0] == Approx(1/2.0) );
+    CHECK( pair.second[0] == Approx(5.0) );
+}

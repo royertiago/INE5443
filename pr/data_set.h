@@ -90,6 +90,19 @@ public:
     std::pair<std::vector<double>, std::vector<double>>
     normalizing_factor( double expand ) const;
 
+    /* Return a pair of standardizing vectors.
+     * These vectors are similar in spirit to the vectors returned by
+     * data_set::normalizing_factor,
+     * but instead of normalizing each attribute to the interval [0, 1],
+     * the output will be in terms of standard deviations.
+     * That is, an output of s for the input v of the attribute i
+     * means that v is s standard deviations distantant
+     * from the mean of the attribute i.
+     *
+     * We ignore Bessel's correction.
+     */
+    std::pair<std::vector<double>, std::vector<double>> standardize_factor() const;
+
     /* Return counting data about the categories of this dataset.
      * If m is the returned value, then
      * m[i][j].first is the jth category (in alphabetical order)
