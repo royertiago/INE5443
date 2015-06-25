@@ -15,11 +15,19 @@ DataEntry::DataEntry( std::initializer_list< double > attributes,
     _categories( categories.begin(), categories.end() )
 {}
 
-double DataEntry::attribute( std::size_t index ) const {
+const double & DataEntry::attribute( std::size_t index ) const {
+    return _attributes[index];
+}
+
+double & DataEntry::attribute( std::size_t index ) {
     return _attributes[index];
 }
 
 const std::string& DataEntry::category( std::size_t index ) const {
+    return _categories[index];
+}
+
+std::string& DataEntry::category( std::size_t index ) {
     return _categories[index];
 }
 

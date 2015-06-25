@@ -50,10 +50,14 @@ public:
     /* Return the attribute or category in the chosen index,
      * respectively.
      *
+     * The non-const version allows the attributes to be changed.
+     *
      * No checking is done to assure that there is an attribute
      * or category in the specified index. */
-    double attribute( std::size_t index ) const;
+    const double & attribute( std::size_t index ) const;
+    double & attribute( std::size_t index );
     const std::string& category( std::size_t index ) const;
+    std::string& category( std::size_t index );
 
     /* Return the number of attributes or categories
      * of this DataEntry, respectively. */
