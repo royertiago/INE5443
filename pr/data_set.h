@@ -96,6 +96,19 @@ public:
     std::pair<std::vector<double>, std::vector<double>>
     normalizing_factor( double expand ) const;
 
+    /* This method normalizes every coordinate to the interval [x, 1-x],
+     * where x = expand / (2 * expand + 1).
+     *
+     * Intervals for some example values of `expand`:
+     *  0.0: [0, 1]
+     *  0.5: [1/4, 3/4]
+     *  1.0: [1/3, 2/3]
+     *
+     * This function effectively applies the transformation
+     * returned by normalizing_factor.
+     */
+    void normalize( double expand );
+
     /* Return a pair of standardizing vectors.
      * These vectors are similar in spirit to the vectors returned by
      * data_set::normalizing_factor,
@@ -108,6 +121,14 @@ public:
      * We ignore Bessel's correction.
      */
     std::pair<std::vector<double>, std::vector<double>> standardize_factor() const;
+
+    /* Rewrite each point in the database
+     * in terms of standard deviations from the mean.
+     *
+     * This function effectively applies the transformation
+     * returned by standardize_factor.
+     */
+    void standardize();
 
     /* Return counting data about the categories of this dataset.
      * If m is the returned value, then

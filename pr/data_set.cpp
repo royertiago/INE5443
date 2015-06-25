@@ -232,6 +232,13 @@ DataSet::normalizing_factor( double expand ) const {
     return std::make_pair(std::move(multiplicative_factor), std::move(minimum_value));
 }
 
+void DataSet::normalize( double factor ) {
+    auto pair = normalizing_factor( factor );
+    for( auto & entry : entries )
+        for( std::size_t i = 0; i < category_count(); i++ )
+            entry.attribute(i) = ( entry.attribute(i) - pair.second[i] )*pair.first[i];
+}
+
 std::pair<std::vector<double>, std::vector<double>>
 DataSet::standardize_factor() const {
     auto mean = this->mean().attributes();
@@ -247,6 +254,13 @@ DataSet::standardize_factor() const {
         d = std::sqrt( entries.size() / d );
 
     return std::make_pair( std::move(variance), std::move(mean) );
+}
+
+void DataSet::standardize() {
+    auto pair = standardize_factor();
+    for( auto & entry : entries )
+        for( std::size_t i = 0; i < category_count(); i++ )
+            entry.attribute(i) = ( entry.attribute(i) - pair.second[i] )*pair.first[i];
 }
 
 std::vector<std::vector<std::pair<std::string, std::size_t>>>
