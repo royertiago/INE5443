@@ -4,15 +4,24 @@
 #include <utility>
 #include "data_entry.h"
 
-DataEntry::DataEntry( std::vector< double > && a, std::vector< std::string >&& c ) :
-    _attributes( a ),
-    _categories( c )
+DataEntry::DataEntry(
+    std::vector< double > && attributes,
+    std::vector< std::string >&& categories,
+    std::string name
+) :
+    _attributes( attributes ),
+    _categories( categories ),
+    _name( name )
 {}
 
-DataEntry::DataEntry( std::initializer_list< double > attributes,
-                      std::initializer_list< const char * > categories ) :
+DataEntry::DataEntry(
+    std::initializer_list< double > attributes,
+    std::initializer_list< const char * > categories,
+    std::string name
+) :
     _attributes( attributes.begin(), attributes.end() ),
-    _categories( categories.begin(), categories.end() )
+    _categories( categories.begin(), categories.end() ),
+    _name( name )
 {}
 
 const double & DataEntry::attribute( std::size_t index ) const {
@@ -29,6 +38,14 @@ const std::string& DataEntry::category( std::size_t index ) const {
 
 std::string& DataEntry::category( std::size_t index ) {
     return _categories[index];
+}
+
+const std::string& DataEntry::name() const {
+    return _name;
+}
+
+std::string& DataEntry::name() {
+    return _name;
 }
 
 std::size_t DataEntry::attribute_count() const {
@@ -54,6 +71,7 @@ DataEntry DataEntry::parse( std::FILE * file, std::size_t size ) {
 DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
     std::vector< double > attributes;
     std::vector< std::string > categories;
+    std::string entry_name;
     int c;
 
     while( *format != '\0' ) {
@@ -63,7 +81,7 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
                 goto end_of_file;
             attributes.push_back(current_attribute);
         }
-        else if( *format == 'c' ) {
+        else if( *format == 'c' || *format == 'i' ) {
             std::string name;
             c = std::fgetc( file );
             if( c == EOF ) goto end_of_file;
@@ -74,7 +92,11 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
             }
             if( c == ',' )
                 std::ungetc(',', file);
-            categories.push_back(name);
+
+            if( *format == 'c' )
+                categories.push_back(name);
+            else
+                entry_name = name;
         }
         else
             throw "Unknown format.";
@@ -94,12 +116,13 @@ DataEntry DataEntry::parse( std::FILE * file, const char * format ) {
         std::ungetc( c, file );
 
 end_of_file:
-    return DataEntry( std::move(attributes), std::move(categories) );
+    return DataEntry( std::move(attributes), std::move(categories), entry_name );
 }
 
 void DataEntry::write( std::FILE * file, const char * format ) const {
     auto attribute_it = _attributes.begin();
     auto category_it = _categories.begin();
+    bool name_printed = false;
     const char * separator = "";
     while( *format != '\0' ) {
         if( *format == 'a' ) {
@@ -116,9 +139,21 @@ void DataEntry::write( std::FILE * file, const char * format ) const {
             separator = ",";
             ++category_it;
         }
+        else if( *format == 'i' ) {
+            if( name_printed )
+                throw "Too much 'i' specifiers.";
+            name_printed = true;
+
+            std::fprintf( file, "%s%s", separator, _name.c_str() );
+            separator = ",";
+        }
         else
             throw "Unknown specifier.";
         ++format;
+    }
+    if( !name_printed && _name != "" ) {
+        std::fprintf( file, "%s%s", separator, _name.c_str() );
+        separator = ",";
     }
     while( attribute_it != _attributes.end() ) {
         std::fprintf( file, "%s%lf", separator, *attribute_it );
@@ -135,7 +170,7 @@ void DataEntry::write( std::FILE * file, const char * format ) const {
 
 // Public operators implementation
 bool operator==( const DataEntry & lhs, const DataEntry & rhs ) {
-    if( lhs.attribute_count() != rhs.attribute_count() )
+    if( lhs._name != rhs._name || lhs.attribute_count() != rhs.attribute_count() )
         return false;
 
     for( std::size_t i = 0; i < lhs.attribute_count(); i++ )
@@ -164,6 +199,9 @@ std::ostream & operator<<( std::ostream & os, const DataEntry & rhs ) {
         os << separator << c;
         separator = ",";
     }
-    os << "})";
+    os << "}";
+    if( rhs._name != "" )
+        os << ",\"" << rhs._name << '"';
+    os << ")";
     return os;
 }

@@ -24,6 +24,7 @@ TEST_CASE( "Trivial DataEntry member test", "[DataEntry][trivial]" ) {
         /* Latter three numbers are exactly representable in floating point,
          * so the comparison should be exact.
          */
+        CHECK( data.name() == "" );
     }
 
     SECTION( "DataEntry with no attributes" ) {
@@ -35,6 +36,7 @@ TEST_CASE( "Trivial DataEntry member test", "[DataEntry][trivial]" ) {
         CHECK( data.category(0) == "A" );
         CHECK( data.category(1) == "B" );
         CHECK( data.category(2) == "XYZ" );
+        CHECK( data.name() == "" );
     }
 
     SECTION( "DataEntry with both categories and attributes" ) {
@@ -47,6 +49,13 @@ TEST_CASE( "Trivial DataEntry member test", "[DataEntry][trivial]" ) {
         CHECK( data.attribute(1) == Approx(3.9) );
         CHECK( data.category(0) == "A" );
         CHECK( data.category(1) == "D" );
+        CHECK( data.name() == "" );
+    }
+    SECTION( "DataEntry with just a name" ) {
+        DataEntry data( {},{}, "Name" );
+        CHECK( data.attribute_count() == 0 );
+        CHECK( data.category_count() == 0 );
+        CHECK( data.name() == "Name" );
     }
 }
 
@@ -68,6 +77,14 @@ TEST_CASE( "DataEntry equality/inequality operators", "[DataEntry][operators]" )
                 );
     DataEntry e6( std::vector<double>{-1, 1.00000001},
                   std::vector<std::string>{"B"}
+                );
+    DataEntry e7( std::vector<double>{-1, 1},
+                  std::vector<std::string>{"A"},
+                  "Name"
+                );
+    DataEntry e8( std::vector<double>{-1, 1},
+                  std::vector<std::string>{"A"},
+                  "Name"
                 );
 
     SECTION( "Tests against e1" ) {
@@ -101,6 +118,13 @@ TEST_CASE( "DataEntry equality/inequality operators", "[DataEntry][operators]" )
         CHECK( e4 != e6 );
         CHECK( e5 == e6 );
         CHECK_FALSE( e5 != e6 );
+    }
+
+    SECTION( "Name sensitive checking" ) {
+        CHECK_FALSE( e7 == e2 );
+        CHECK( e7 != e2 );
+        CHECK( e7 == e8 );
+        CHECK_FALSE( e7 != e8 );
     }
 }
 
@@ -163,6 +187,13 @@ TEST_CASE( "DataEntry ostream operator", "[DataEntry][operators][ostream]" ) {
     os << DataEntry({0.5,-1},{"A", "B"});
     CHECK( os.str() == "({0.5,-1},{A,B})" );
     os.str("");
+
+    os << DataEntry({},{},"Name");
+    CHECK( os.str() == "({},{},\"Name\")" );
+    os.str("");
+
+    os << DataEntry({0.5,-1},{"A", "B"}, "Name");
+    CHECK( os.str() == "({0.5,-1},{A,B},\"Name\")" );
 }
 
 TEST_CASE( "DataEntry file input/output", "[DataEntry][parse]" ) {
@@ -173,6 +204,8 @@ TEST_CASE( "DataEntry file input/output", "[DataEntry][parse]" ) {
         "DifferentWordPosition,-0.98,1e-2\n"
         "Comma,separated,words\n"
         " white space ,before comma , after comma\n"
+        "Name,1,Cat\n"
+        "1,Name,Cat\n"
         ;
 
     std::FILE * file = fmemopen(str_file, sizeof(str_file)-1, "r");
@@ -199,6 +232,12 @@ TEST_CASE( "DataEntry file input/output", "[DataEntry][parse]" ) {
     DataEntry e6 = DataEntry::parse(file, "ccc");
     REQUIRE( e6 == DataEntry({}, {" white space ", "before comma ", " after comma"}) );
 
+    DataEntry e7 = DataEntry::parse(file, "iac");
+    REQUIRE( e7 == DataEntry({1}, {"Cat"}, "Name") );
+
+    DataEntry e8 = DataEntry::parse(file, "aic");
+    REQUIRE( e8 == DataEntry({1}, {"Cat"}, "Name") );
+
     // End of file scan
     DataEntry eof = DataEntry::parse(file, "a");
     REQUIRE( eof == DataEntry({},{}) );
@@ -214,6 +253,8 @@ TEST_CASE( "DataEntry file input/output", "[DataEntry][parse]" ) {
     e4.write( file, "ca" );
     e5.write( file, "ccc" );
     e6.write( file );
+    e7.write( file, "aic" );
+    e8.write( file );
 
     std::fclose( file );
 
@@ -224,6 +265,8 @@ TEST_CASE( "DataEntry file input/output", "[DataEntry][parse]" ) {
         "DifferentWordPosition,-0.980000,0.010000\n"
         "Comma,separated,words\n"
         " white space ,before comma , after comma\n"
+        "1.000000,Name,Cat\n"
+        "Name,1.000000,Cat\n"
         )
     );
 }

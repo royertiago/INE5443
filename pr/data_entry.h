@@ -10,7 +10,9 @@
 /* class DataEntry
  *
  * This class represents a line in a dataset.
- * It contains both attributes and categories.
+ * It contains attributes, categories and a name.
+ * None of these are technically required,
+ * though most applications require at least attributes.
  *
  * Order of attributes is preserved,
  * as well as the order of categories;
@@ -27,16 +29,21 @@
 class DataEntry {
     std::vector< double > _attributes;
     std::vector< std::string > _categories;
+    std::string _name;
 public:
 
     /* Constructs a new DataEntry from the specified vectors.
-     * The first vector is the attribute vector,
-     * the second vector is the category vector.
+     * Since most applications does not require a name to the entries,
+     * the name defaults to "".
      *
      * Note that there is only one constructor taking vectors,
      * and they must be std::move'd to the object.
      */
-    DataEntry( std::vector< double > &&, std::vector< std::string >&& );
+    DataEntry(
+        std::vector< double > && attributes,
+        std::vector< std::string >&& categories,
+        std::string name = ""
+    );
 
     /* Construcs a new DataEntry from the specified initializer lists.
      * This function is meant to ease unit testing.
@@ -44,14 +51,18 @@ public:
      * Note the second initializer list is a list of char pointers,
      * not a list of strings.
      */
-    DataEntry( std::initializer_list<double>, std::initializer_list<const char*> );
+    DataEntry(
+        std::initializer_list<double>,
+        std::initializer_list<const char*>,
+        std::string = ""
+    );
 
     /* Equivalent to DataEntry({},{}).
      */
     DataEntry() = default;
 
     /* Return the attribute or category in the chosen index,
-     * respectively.
+     * or the name.
      *
      * The non-const version allows the attributes to be changed.
      *
@@ -62,6 +73,8 @@ public:
     double & attribute( std::size_t index );
     const std::string& category( std::size_t index ) const;
     std::string& category( std::size_t index );
+    const std::string& name() const;
+    std::string& name();
 
     /* Return the number of attributes or categories
      * of this DataEntry, respectively.
@@ -77,9 +90,10 @@ public:
 
     /* Parses an entry according to the specified format.
      *
-     * "format" is a string consisting entirely of 'a' and 'c'.
+     * "format" is a string consisting entirely of 'a', 'c' and 'n'.
      * 'a' means to read an attribute;
-     * 'c' means to read a category.
+     * 'c' means to read a category;
+     * 'i' means to read the entry name.
      * If EOF is reached, a DataEntry
      * with less attributes or categories is returned.
      *
@@ -95,8 +109,8 @@ public:
      * 'format' uses the same code as in function 'parse'.
      * If the variable 'format' is too short
      * (for instance, the empty string)
-     * then all remaining attributes and then all remaining categories
-     * will be written to 'file'.
+     * then all remaining data will be written to 'file',
+     * in the order name,attributes,categories.
      */
     void write( std::FILE * file, const char * format = "" ) const;
 
@@ -117,7 +131,9 @@ public:
 
     /* Prints a DataEntry.
      * Format example:
-     * ({1.5,0.8},{"CategoryA"})
+     * ("SomeEntry",{1.5,0.8},{"CategoryA"})
+     *
+     * This is used mainly for testing.
      */
     friend std::ostream& operator<<( std::ostream& os, const DataEntry& );
 };
