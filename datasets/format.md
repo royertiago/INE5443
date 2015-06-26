@@ -23,7 +23,7 @@ and `information` is the parameter.
 
 -   `n`: Number of columns.
     Declares that the data entries contains exactly `information` lines.
-    Shall appear before any `c` or `f` directive.
+    Shall appear before any `c`, `f` or `i` directive.
 
 -   `a`: Attribute.
     Declares that the next column is an attribute
@@ -36,6 +36,11 @@ and `information` is the parameter.
     Declares that the next column will say
     in which category the respective dataset entry falls.
     `information` is again a caption.
+
+-   `i`: Name.
+    Declares that the next column contains the name of the entry
+    (its `i`dentifier).
+    `information` is ignored.
 
 Note that the order of the `a` and `c` directives is important.
 The number of these directives shall be the number given in the `d` directive.
