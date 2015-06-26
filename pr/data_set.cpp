@@ -57,6 +57,8 @@ DataSet DataSet::parse( std::FILE * source ) {
             attribute_names.push_back(name);
         else if( type == 'c' )
             category_names.push_back(name);
+        else if( type == 'i' )
+            ; // no-op
         else
             throw "Unknown field type.";
     }
@@ -88,6 +90,7 @@ void DataSet::write( std::FILE * file, const char * format ) const {
 
     auto attribute_it = attribute_names.begin();
     auto category_it = category_names.begin();
+    bool name_printed = false;
     while( *format != '\0' ) {
         if( *format == 'a' ) {
             if( attribute_it == attribute_names.end() )
@@ -101,10 +104,18 @@ void DataSet::write( std::FILE * file, const char * format ) const {
             std::fprintf( file, "c %s\n", category_it->c_str() );
             ++category_it;
         }
+        else if( *format == 'i' ) {
+            if( name_printed )
+                throw "Too much 'i' specifiers.";
+            std::fprintf( file, "i \n" );
+            name_printed = true;
+        }
         else
             throw "Unknown specifier.";
         ++format;
     }
+    if( !name_printed && !entries.empty() && entries.front().name() != "" )
+        std::fprintf( file, "i \n" );
     while( attribute_it != attribute_names.end() ) {
         std::fprintf( file, "a %s\n", attribute_it->c_str() );
         ++attribute_it;

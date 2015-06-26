@@ -77,6 +77,20 @@ char str_file[] =
     "4,0,Green\n"
     ;
 
+char str_nfile[] =
+    "# Commentary that should be ignored.\n"
+    "# Another commentary.\n"
+    "n 4\n"
+    "a X pos\n"
+    "i Name\n"
+    "a Y pos\n"
+    "c Color\n"
+    "\n"
+    "1,Alpha,1,Blue\n"
+    "2,Beta,4,Red\n"
+    "4,Gamma,0,Green\n"
+    ;
+
 TEST_CASE( "DataSet parsing from file", "[DataSet][parse]" ) {
     std::FILE * file = fmemopen(str_file, sizeof(str_file)-1, "r");
 
@@ -102,6 +116,36 @@ TEST_CASE( "DataSet parsing from file", "[DataSet][parse]" ) {
     ++it;
     REQUIRE( it != dataset.end() );
     CHECK( *it == DataEntry({4, 0},{"Green"}) );
+
+    ++it;
+    CHECK( it == dataset.end() );
+}
+
+TEST_CASE( "DataSet parsing from file with names", "[DataSet][parse]" ) {
+    std::FILE * file = fmemopen(str_nfile, sizeof(str_nfile)-1, "r");
+
+    DataSet dataset = DataSet::parse(file);
+
+    REQUIRE( dataset.size() == 3 );
+    REQUIRE( dataset.attribute_count() == 2 );
+    REQUIRE( dataset.category_count() == 1 );
+
+    CHECK( dataset.attribute_name(0) == "X pos" );
+    CHECK( dataset.attribute_name(1) == "Y pos" );
+    CHECK( dataset.category_name(0) == "Color" );
+    CHECK( dataset.mean() == DataEntry({7.0/3, 5.0/3},{}) );
+
+    auto it = dataset.begin();
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({1, 1},{"Blue"}, "Alpha") );
+
+    ++it;
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({2, 4},{"Red"}, "Beta") );
+
+    ++it;
+    REQUIRE( it != dataset.end() );
+    CHECK( *it == DataEntry({4, 0},{"Green"}, "Gamma") );
 
     ++it;
     CHECK( it == dataset.end() );
@@ -210,6 +254,28 @@ TEST_CASE( "DataSet writing to file", "[DataSet][write]" ) {
         "Blue,1.000000,1.000000\n"
         "Red,2.000000,4.000000\n"
         "Green,4.000000,0.000000\n"
+        )
+    );
+}
+TEST_CASE( "DataSet writing to file with names", "[DataSet][write]" ) {
+    std::FILE * file = fmemopen(str_nfile, sizeof(str_nfile)-1, "r");
+    DataSet dataset = DataSet::parse( file );
+    std::fclose( file );
+    char output_file[2*sizeof(str_nfile)];
+
+    file = fmemopen(output_file, 2*sizeof(str_nfile)-1, "w");
+    dataset.write( file );
+    std::fclose( file );
+    CHECK( output_file == std::string(
+        "n 3\n"
+        "i \n"
+        "a X pos\n"
+        "a Y pos\n"
+        "c Color\n"
+        "\n"
+        "Alpha,1.000000,1.000000,Blue\n"
+        "Beta,2.000000,4.000000,Red\n"
+        "Gamma,4.000000,0.000000,Green\n"
         )
     );
 }
