@@ -40,13 +40,19 @@ class DendogramNode {
     DendogramNode * _parent;
     const DataEntry * _data;
 
+    // Additional information
+    double _linkage_distance;
+    unsigned _size;
+    unsigned _depth;
+
 public:
     /* Constructs a structural dendogram node.
      * Each child will have its _parent attribute set to 'this'.
      */
     DendogramNode(
         std::unique_ptr<DendogramNode> && left_child,
-        std::unique_ptr<DendogramNode> && right_child
+        std::unique_ptr<DendogramNode> && right_child,
+        double linkage_distance
     );
 
     /* Constructs a leaf dendogram node.
@@ -79,6 +85,10 @@ public:
     // The iterator meets the requirements of an ForwardIterator.
     DendogramIterator begin() const;
     DendogramIterator end() const;
+
+    double linkage_distance() const;
+    unsigned size() const;
+    unsigned depth() const;
 };
 
 #endif // DENDOGRAM_NODE_H

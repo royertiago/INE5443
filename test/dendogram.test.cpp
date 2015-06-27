@@ -17,16 +17,35 @@ TEST_CASE( "DendogramIterator", "[dendogram]" ) {
     auto nt3 = std::make_unique<DendogramNode>( &d3 );
     auto nt4 = std::make_unique<DendogramNode>( &d4 );
     auto nt5 = std::make_unique<DendogramNode>( &d5 );
+    CHECK( nt1->size() == 1 );
+    CHECK( nt2->size() == 1 );
+    CHECK( nt3->size() == 1 );
+    CHECK( nt4->size() == 1 );
+    CHECK( nt5->size() == 1 );
+
+    CHECK( nt1->depth() == 0 );
+    CHECK( nt2->depth() == 0 );
+    CHECK( nt3->depth() == 0 );
+    CHECK( nt4->depth() == 0 );
+    CHECK( nt5->depth() == 0 );
 
     // Second level
-    auto ns1 = std::make_unique<DendogramNode>( std::move(nt1), std::move(nt2) );
-    auto ns2 = std::make_unique<DendogramNode>( std::move(nt4), std::move(nt5) );
+    auto ns1 = std::make_unique<DendogramNode>( std::move(nt1), std::move(nt2), 0.0 );
+    auto ns2 = std::make_unique<DendogramNode>( std::move(nt4), std::move(nt5), 0.0 );
+    CHECK( ns1->size() == 2 );
+    CHECK( ns2->size() == 2 );
+    CHECK( ns1->depth() == 1 );
+    CHECK( ns2->depth() == 1 );
 
     // Third level
-    auto nt = std::make_unique<DendogramNode>( std::move(ns1), std::move(nt3) );
+    auto nt = std::make_unique<DendogramNode>( std::move(ns1), std::move(nt3), 0.0 );
+    CHECK( nt->size() == 3 );
+    CHECK( nt->depth() == 2 );
 
     // Top-level
-    auto top = std::make_unique<DendogramNode>( std::move(nt), std::move(ns2) );
+    auto top = std::make_unique<DendogramNode>( std::move(nt), std::move(ns2), 0.0 );
+    CHECK( top->size() == 5 );
+    CHECK( top->depth() == 3 );
 
     auto it = top->begin();
     CHECK( *it == d1 );

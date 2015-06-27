@@ -40,7 +40,7 @@ std::unique_ptr<DendogramNode> generate_dendogram(
 
         // Merge
         nodes.push_back( std::make_unique<DendogramNode>(
-            std::move(*best_left), std::move(*best_right)
+            std::move(*best_left), std::move(*best_right), best
         ));
         nodes.erase( best_left );
         nodes.erase( best_right );

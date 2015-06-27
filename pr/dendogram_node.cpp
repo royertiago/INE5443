@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <utility>
 #include "dendogram_node.h"
 #include "pr/data_entry.h"
@@ -39,19 +40,26 @@ bool operator!=(const DendogramIterator & lhs, const DendogramIterator & rhs) {
 
 DendogramNode::DendogramNode(
     std::unique_ptr<DendogramNode> && left_child,
-    std::unique_ptr<DendogramNode> && right_child
+    std::unique_ptr<DendogramNode> && right_child,
+    double linkage_distance
 ) :
     _left( std::move(left_child) ),
     _right( std::move(right_child) ),
     _parent( nullptr ),
-    _data( nullptr )
+    _data( nullptr ),
+    _linkage_distance( linkage_distance ),
+    _size( _left->size() + _right->size() ),
+    _depth( std::max( _left->depth(), _right->depth() ) + 1 )
 {
     _left->_parent = _right->_parent = this;
 }
 
 DendogramNode::DendogramNode( const DataEntry * data ) :
     _parent( nullptr ),
-    _data( data )
+    _data( data ),
+    _linkage_distance( 0.0 ),
+    _size( 1 ),
+    _depth( 0 )
 {} // unique_ptr's default constructor is to be a nullptr
 
 bool DendogramNode::structural() const {
@@ -91,4 +99,16 @@ DendogramIterator DendogramNode::end() const {
     DendogramIterator it;
     it._node = nullptr;
     return it;
+}
+
+double DendogramNode::linkage_distance() const {
+    return _linkage_distance;
+}
+
+unsigned DendogramNode::size() const {
+    return _size;
+}
+
+unsigned DendogramNode::depth() const {
+    return _depth;
 }
