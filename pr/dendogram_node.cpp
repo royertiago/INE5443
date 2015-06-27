@@ -2,8 +2,12 @@
 #include "dendogram_node.h"
 #include "pr/data_entry.h"
 
-DendogramIterator::const_reference DendogramIterator::operator*() const {
+DendogramIterator::reference DendogramIterator::operator*() const {
     return _node->data();
+}
+
+DendogramIterator::pointer DendogramIterator::operator->() const {
+    return &**this;
 }
 
 DendogramIterator & DendogramIterator::operator++() {

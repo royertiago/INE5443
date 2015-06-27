@@ -18,11 +18,13 @@ class DendogramIterator {
     const DendogramNode * _node;
     friend class DendogramNode;
 public:
-    typedef DataEntry value_type;
-    typedef DataEntry & reference;
-    typedef const DataEntry & const_reference;
+    typedef const DataEntry value_type;
+    typedef const DataEntry & reference;
+    typedef const DataEntry * pointer;
+    typedef std::forward_iterator_tag iterator_category;
 
-    const_reference operator*() const;
+    reference operator*() const;
+    pointer operator->() const;
     DendogramIterator & operator++();
     DendogramIterator operator++(int) {
         auto tmp = *this;
