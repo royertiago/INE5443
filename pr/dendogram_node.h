@@ -36,7 +36,7 @@ public:
 class DendogramNode {
     std::unique_ptr<DendogramNode> _left, _right;
     DendogramNode * _parent;
-    DataEntry * _data;
+    const DataEntry * _data;
 
 public:
     /* Constructs a structural dendogram node.
@@ -50,7 +50,7 @@ public:
     /* Constructs a leaf dendogram node.
      * The given data entry will not be deleted upon destruction.
      */
-    DendogramNode( DataEntry * );
+    DendogramNode( const DataEntry * );
 
     /* Queries wether this node is structural or leaf.
      * It is guaranteed that structural() == !leaf().

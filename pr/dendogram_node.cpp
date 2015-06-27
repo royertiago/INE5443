@@ -45,7 +45,7 @@ DendogramNode::DendogramNode(
     _left->_parent = _right->_parent = this;
 }
 
-DendogramNode::DendogramNode( DataEntry * data ) :
+DendogramNode::DendogramNode( const DataEntry * data ) :
     _parent( nullptr ),
     _data( data )
 {} // unique_ptr's default constructor is to be a nullptr
