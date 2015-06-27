@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <cfloat>
 #include "cv.h"
+#include "pr/dendogram_node.h"
 #include "pr/grid_generator.h"
 
 namespace util {
@@ -107,6 +108,46 @@ void influence_areas( cv::Mat & img, const NearestNeighbor & nn, double border )
             img.at<cv::Vec3b>(img.rows - j - 1, i) =
                 cv::Vec3b( color[0], color[1], color[2] );
         }
+}
+
+void print_dendogram( cv::Mat & output, const DendogramNode & input ) {
+    if( input.leaf() )
+        return;
+
+    int width = output.size().width;
+    int height = output.size().height;
+
+    int middle = (double) input.left().size() / input.size() * height;
+    int upper_limit = (double) input.left().linkage_distance() /
+        input.linkage_distance() * width;
+    int lower_limit = (double) input.right().linkage_distance() /
+        input.linkage_distance() * width;
+
+    cv::Mat upper_img = output( cv::Range(0, middle-1), cv::Range(0, upper_limit) );
+    cv::Mat lower_img = output( cv::Range(middle, height-1), cv::Range(0, lower_limit) );
+    print_dendogram( upper_img, input.left() );
+    print_dendogram( lower_img, input.right() );
+
+    int upper_middle = middle/2;
+    int lower_middle = (middle + height)/2;
+    cv::line(
+        output,
+        cv::Point(upper_limit, upper_middle),
+        cv::Point(width, upper_middle),
+        cv::Scalar(0,0,0)
+    );
+    cv::line(
+        output,
+        cv::Point(lower_limit, lower_middle),
+        cv::Point(width, lower_middle),
+        cv::Scalar(0,0,0)
+    );
+    cv::line(
+        output,
+        cv::Point(width-1, upper_middle),
+        cv::Point(width-1, lower_middle),
+        cv::Scalar(0,0,0)
+    );
 }
 
 } // namespace util

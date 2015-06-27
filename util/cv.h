@@ -6,9 +6,10 @@
  */
 
 #include <opencv2/core/core.hpp>
+#include "pr/classifier.h"
 #include "pr/data_entry.h"
 #include "pr/data_set.h"
-#include "pr/classifier.h"
+#include "pr/dendogram.h"
 
 namespace util {
 
@@ -58,6 +59,19 @@ namespace util {
         cv::Mat & output,
         const NearestNeighbor & input,
         double border
+    );
+
+    /* Draws the dendogram in the image.
+     * The leaves will face left, and the root will face right.
+     *
+     * The leaves, from top to bottom, corresponds to
+     * passing from begin() to end() of the given dendogram.
+     *
+     * No text is appended.
+     */
+    void print_dendogram(
+        cv::Mat & output,
+        const DendogramNode & input
     );
 } // namespace util
 
