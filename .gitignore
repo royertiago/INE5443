@@ -38,3 +38,4 @@ datatools/generate_spiral
 datatools/show
 datatools/strip_entry_category
 test/test
+view_dendogram
