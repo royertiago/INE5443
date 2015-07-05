@@ -112,12 +112,15 @@ DataSet classify_dendogram(
         unsigned index_of_highest = 0;
 
         // First, find the correct index
-        for( int i = 0; i < classes.size(); i++ )
+        for( int i = 0; i < classes.size(); i++ ) {
             if( classes[i]->linkage_distance() > highest_linkage_distance ) {
                 second_highest_linkage_distance = highest_linkage_distance;
                 highest_linkage_distance = classes[i]->linkage_distance();
                 index_of_highest = i;
             }
+            if( classes[i]->linkage_distance() > second_highest_linkage_distance )
+                second_highest_linkage_distance = classes[i]->linkage_distance();
+        }
 
         // Now, split!
         const DendogramNode * old_class = classes[index_of_highest];
