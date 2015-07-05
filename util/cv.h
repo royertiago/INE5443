@@ -75,6 +75,14 @@ namespace util {
         cv::Mat & output,
         const DendogramNode & input
     );
+
+    /* Same as print_dendogram, but writes the names of each node
+     * in the left of the dendogram.
+     */
+    void print_named_dendogram(
+        cv::Mat & output,
+        const DendogramNode & input
+    );
 } // namespace util
 
 #endif // UTIL_CV_H

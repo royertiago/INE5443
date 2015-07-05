@@ -217,4 +217,45 @@ int print_dendogram( cv::Mat & output, const DendogramNode & input ) {
     return (upper_middle + lower_middle) / 2;
 }
 
+void print_named_dendogram( cv::Mat & output, const DendogramNode & input ) {
+    constexpr int fontFace = cv::FONT_HERSHEY_PLAIN;
+    constexpr int fontScale = 1;
+    constexpr int fontThickness = 1;
+    constexpr int border = 5; // Five pixels of border around the text.
+
+    int baseline; // We ignore this number.
+
+    int widest_text = 0;
+    // First, find widest text
+    for( const auto & entry : input ) {
+        cv::Size size = cv::getTextSize(
+            entry.name(), fontFace, fontScale, fontThickness, &baseline
+        );
+        widest_text = widest_text > size.width ? widest_text : size.width;
+    }
+
+    // Now, print all texts
+    int i = 0; // This will be used to define the text height
+    for( const auto & entry : input ) {
+        cv::Size size = cv::getTextSize(
+            entry.name(), fontFace, fontScale, fontThickness, &baseline
+        );
+        int center = (2.0 * i + 1)/(2*input.size()) * output.size().height;
+        int bottom = center + size.height/2;
+        int left = widest_text - size.width + border;
+        cv::putText(
+            output, entry.name(), cv::Point( left, bottom ),
+            fontFace, fontScale, cv::Scalar(0,0,0)
+        );
+        i++;
+    }
+
+    // And finnaly, print the dendogram
+    cv::Mat remaining_image = output(
+        cv::Range::all(),
+        cv::Range( widest_text + 2*border, output.size().width )
+    );
+    print_dendogram( remaining_image, input );
+}
+
 } // namespace util
