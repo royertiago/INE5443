@@ -37,5 +37,5 @@ datatools/canonicalize
 datatools/generate_spiral
 datatools/show
 datatools/strip_entry_category
+dendogram
 test/test
-view_dendogram
