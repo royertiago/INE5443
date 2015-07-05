@@ -110,7 +110,7 @@ public:
      * If the variable 'format' is too short
      * (for instance, the empty string)
      * then all remaining data will be written to 'file',
-     * in the order name,attributes,categories.
+     * in the order attributes,categories,name.
      */
     void write( std::FILE * file, const char * format = "" ) const;
 

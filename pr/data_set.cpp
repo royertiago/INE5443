@@ -85,7 +85,9 @@ DataSet DataSet::parse( std::FILE * source ) {
 }
 
 void DataSet::write( std::FILE * file, const char * format ) const {
-    std::fprintf( file, "n %zd\n", attribute_names.size() + category_names.size() );
+    bool has_name = entries.front().name() != "";
+    std::fprintf( file, "n %zd\n",
+            attribute_names.size() + category_names.size() + has_name );
     const char * original_format = format;
 
     auto attribute_it = attribute_names.begin();
@@ -114,8 +116,6 @@ void DataSet::write( std::FILE * file, const char * format ) const {
             throw "Unknown specifier.";
         ++format;
     }
-    if( !name_printed && !entries.empty() && entries.front().name() != "" )
-        std::fprintf( file, "i \n" );
     while( attribute_it != attribute_names.end() ) {
         std::fprintf( file, "a %s\n", attribute_it->c_str() );
         ++attribute_it;
@@ -124,6 +124,8 @@ void DataSet::write( std::FILE * file, const char * format ) const {
         std::fprintf( file, "c %s\n", category_it->c_str() );
         ++category_it;
     }
+    if( has_name && !name_printed && !entries.empty() )
+        std::fprintf( file, "i \n" );
     std::fprintf( file, "\n" );
     for( const auto & entry : entries )
         entry.write( file, original_format );

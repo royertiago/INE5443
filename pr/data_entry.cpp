@@ -151,10 +151,6 @@ void DataEntry::write( std::FILE * file, const char * format ) const {
             throw "Unknown specifier.";
         ++format;
     }
-    if( !name_printed && _name != "" ) {
-        std::fprintf( file, "%s%s", separator, _name.c_str() );
-        separator = ",";
-    }
     while( attribute_it != _attributes.end() ) {
         std::fprintf( file, "%s%lf", separator, *attribute_it );
         separator = ",";
@@ -164,6 +160,10 @@ void DataEntry::write( std::FILE * file, const char * format ) const {
         std::fprintf( file, "%s%s", separator, category_it->c_str() );
         separator = ",";
         ++category_it;
+    }
+    if( !name_printed && _name != "" ) {
+        std::fprintf( file, "%s%s", separator, _name.c_str() );
+        separator = ",";
     }
     std::fprintf( file, "\n" );
 }
