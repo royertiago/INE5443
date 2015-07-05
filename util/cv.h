@@ -68,8 +68,10 @@ namespace util {
      * passing from begin() to end() of the given dendogram.
      *
      * No text is appended.
+     *
+     * Returns the height of the middle of the root node.
      */
-    void print_dendogram(
+    int print_dendogram(
         cv::Mat & output,
         const DendogramNode & input
     );

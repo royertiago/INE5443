@@ -110,12 +110,12 @@ void influence_areas( cv::Mat & img, const NearestNeighbor & nn, double border )
         }
 }
 
-void print_dendogram( cv::Mat & output, const DendogramNode & input ) {
-    if( input.leaf() )
-        return;
-
+int print_dendogram( cv::Mat & output, const DendogramNode & input ) {
     int width = output.size().width;
     int height = output.size().height;
+
+    if( input.leaf() )
+        return height/2;
 
     if( input.linkage_distance() < DBL_EPSILON ) {
         /* This should only happen in the lower levels.
@@ -145,7 +145,7 @@ void print_dendogram( cv::Mat & output, const DendogramNode & input ) {
                 cv::Scalar(0,0,0)
             );
         }
-        return;
+        return height/2;
     }
 
     int middle = (double) input.left().size() / input.size() * height;
@@ -192,11 +192,9 @@ void print_dendogram( cv::Mat & output, const DendogramNode & input ) {
      * --- this way both subtrees will look connected.
      */
 
-    print_dendogram( upper_img, input.left() );
-    print_dendogram( lower_img, input.right() );
+    int upper_middle = print_dendogram( upper_img, input.left() );
+    int lower_middle = print_dendogram( lower_img, input.right() ) + middle;
 
-    int upper_middle = middle/2;
-    int lower_middle = (middle + height)/2;
     cv::line(
         output,
         cv::Point(upper_limit, upper_middle),
@@ -215,6 +213,8 @@ void print_dendogram( cv::Mat & output, const DendogramNode & input ) {
         cv::Point(width-1, lower_middle),
         cv::Scalar(0,0,0)
     );
+
+    return (upper_middle + lower_middle) / 2;
 }
 
 } // namespace util
