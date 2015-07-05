@@ -97,7 +97,21 @@ DendogramIterator DendogramNode::begin() const {
 
 DendogramIterator DendogramNode::end() const {
     DendogramIterator it;
-    it._node = nullptr;
+    if( _parent == nullptr ) {
+        it._node = nullptr;
+        return it;
+    }
+    /* If we have a parent,
+     * end() is not a nullptr, but begin() of the next node.
+     *
+     * We will simply descend recursively to the rightmost leaf,
+     * increment the iterator, and return.
+     */
+    if( !leaf() )
+        return right().end();
+
+    it._node = this;
+    ++it;
     return it;
 }
 

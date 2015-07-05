@@ -64,6 +64,19 @@ TEST_CASE( "DendogramIterator", "[dendogram]" ) {
     REQUIRE( it != top->end() );
     ++it;
     CHECK( it == top->end() );
+
+    // In itarating through the left node, we should pass through d1, d2 and d3.
+    auto subit = top->left().begin();
+    CHECK( *subit == d1 );
+    REQUIRE( subit != top->left().end() );
+    ++subit;
+    CHECK( *subit == d2 );
+    REQUIRE( subit != top->left().end() );
+    ++subit;
+    CHECK( *subit == d3 );
+    REQUIRE( subit != top->left().end() );
+    ++subit;
+    CHECK( subit == top->left().end() );
 }
 
 TEST_CASE( "Dendogram builder", "[dendogram]" ) {
