@@ -231,7 +231,7 @@ int print_dendogram( cv::Mat & output, const DendogramNode & input ) {
     return (upper_middle + lower_middle) / 2;
 }
 
-void print_named_dendogram( cv::Mat & output, const DendogramNode & input ) {
+int print_named_dendogram( cv::Mat & output, const DendogramNode & input ) {
     constexpr int fontFace = cv::FONT_HERSHEY_PLAIN;
     constexpr int fontScale = 1;
     constexpr int fontThickness = 1;
@@ -264,12 +264,14 @@ void print_named_dendogram( cv::Mat & output, const DendogramNode & input ) {
         i++;
     }
 
-    // And finnaly, print the dendogram
+    // And finally, print the dendogram
     cv::Mat remaining_image = output(
         cv::Range::all(),
         cv::Range( widest_text + 2*border, output.size().width )
     );
     print_dendogram( remaining_image, input );
+
+    return 2 * border + widest_text;
 }
 
 } // namespace util

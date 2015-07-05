@@ -76,10 +76,12 @@ namespace util {
         const DendogramNode & input
     );
 
-    /* Same as print_dendogram, but writes the names of each node
-     * in the left of the dendogram.
+    /* Same as print_dendogram,
+     * but writes the names of each node in the left of the dendogram.
+     *
+     * Returns the width of the area used for writing the node names.
      */
-    void print_named_dendogram(
+    int print_named_dendogram(
         cv::Mat & output,
         const DendogramNode & input
     );
