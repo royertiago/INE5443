@@ -4,7 +4,7 @@ set -e
 show_help() {
     cat << HELP_TEXT
 $0 [options]
-Produces a dadaset whose entries are subsets of the given dataset.
+Produces a dataset whose entries are subsets of the given dataset.
 The entries are chosen randomly.
 The dataset is read in stdin; output is written is stdout.
 Options:
