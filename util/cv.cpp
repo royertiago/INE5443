@@ -117,6 +117,37 @@ void print_dendogram( cv::Mat & output, const DendogramNode & input ) {
     int width = output.size().width;
     int height = output.size().height;
 
+    if( input.linkage_distance() < DBL_EPSILON ) {
+        /* This should only happen in the lower levels.
+         * In this situation, width is most likely 0,
+         * so we simply return.
+         *
+         * Width will only be nonzero if this is the "top" call,
+         * so we will just draw some lines to give the impression
+         * of all them joining in the same level.
+         */
+        if( width != 0 && height != 0 ) {
+            for( int i = 0; i < input.size(); i++ ) {
+                int draw_height = (2.0 * i + 1)/2 / input.size() * height;
+                cv::line(
+                    output,
+                    cv::Point(0, draw_height),
+                    cv::Point(width-1, draw_height),
+                    cv::Scalar(0,0,0)
+                );
+            }
+            int lowest_height = 0.5/input.size() * height;
+            int highest_height = (input.size() - 0.5)/input.size() * height;
+            cv::line(
+                output,
+                cv::Point(width-1, lowest_height),
+                cv::Point(width-1, highest_height),
+                cv::Scalar(0,0,0)
+            );
+        }
+        return;
+    }
+
     int middle = (double) input.left().size() / input.size() * height;
     int upper_limit = (double) input.left().linkage_distance() /
         input.linkage_distance() * width;
