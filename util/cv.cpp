@@ -4,6 +4,8 @@
 #include "pr/dendogram_node.h"
 #include "pr/grid_generator.h"
 
+#include <stdio.h>
+
 namespace util {
 
 DataEntry entryFromVec( const cv::Vec3b & vec ) {
@@ -194,6 +196,18 @@ int print_dendogram( cv::Mat & output, const DendogramNode & input ) {
 
     int upper_middle = print_dendogram( upper_img, input.left() );
     int lower_middle = print_dendogram( lower_img, input.right() ) + middle;
+
+    /* If an cv::Mat is created without width, but some height,
+     * image.size().height will nonetheless returns 0.
+     * (It makes sense; the height of a null image is really zero.)
+     *
+     * Thus, the return values of print_dendogram will be 0 -- wrong.
+     * We simply reset them to the half here.
+     */
+    if( upper_limit == 0 )
+        upper_middle = middle/2;
+    if( lower_limit == 0 )
+        lower_middle = (middle + height)/2;
 
     cv::line(
         output,
