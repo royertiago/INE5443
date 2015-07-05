@@ -156,6 +156,42 @@ void print_dendogram( cv::Mat & output, const DendogramNode & input ) {
 
     cv::Mat upper_img = output( cv::Range(0, middle-1), cv::Range(0, upper_limit) );
     cv::Mat lower_img = output( cv::Range(middle, height-1), cv::Range(0, lower_limit) );
+
+    /* Cartesian plane in ASCII art outlining the variables:
+     *
+     *                          (upper_limit, 0)
+     *     (0, 0) ________________________________________________(width, 0)
+     *     |                      |                               |
+     *     |                      |                               |
+     *     |                      |                               |
+     *     |                      |                               |
+     *     |     [upper_img]      |(upper_limit, upper_middle)    |
+     *     |                      |                               |
+     *     |                      |                               |
+     *     |                      |                               |
+     *     (0, middle)____________|_____________                  |
+     *     |                                    |                 |
+     *     |                                    |                 |
+     *     |                                    |                 |
+     *     |                                    |                 |
+     *     |                                    |                 |
+     *     |            [lower_img]             |(lower_limit, lower_middle)
+     *     |                                    |                 |
+     *     |                                    |                 |
+     *     |                                    |                 |
+     *     |                                    |                 |
+     *     (0, height)__________________________|_________________(width, height)
+     *                                          (lower_limit, height)
+     *
+     * Using the power of recursion,
+     * we will somehow draw the left and right childs
+     * in [upper_img] and [lower_img], respectively,
+     * and connect the points (upper_limit, upper_middle)
+     * and (lower_limit, lower_middle) to the right border,
+     * and draw a line between their connection points
+     * --- this way both subtrees will look connected.
+     */
+
     print_dendogram( upper_img, input.left() );
     print_dendogram( lower_img, input.right() );
 
