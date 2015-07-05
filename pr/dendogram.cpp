@@ -77,7 +77,7 @@ double MeanLinkage( const DendogramNode & a, const DendogramNode & b ) {
     return d / count;
 }
 
-DataSet classify_dendogram(
+dendogram_classification_data classify_dendogram(
     const DendogramNode & root,
     int minClass,
     int maxClass,
@@ -131,6 +131,7 @@ DataSet classify_dendogram(
             second_highest_linkage_distance = old_class->left().linkage_distance();
         if( old_class->right().linkage_distance() > second_highest_linkage_distance )
             second_highest_linkage_distance = old_class->right().linkage_distance();
+
         return second_highest_linkage_distance;
     };
 
@@ -144,6 +145,11 @@ DataSet classify_dendogram(
         previous_linkage_distance = current_linkage_distance;
         current_linkage_distance = split_classes();
     }
+
+    // dendogram_classification_data attributes.
+    const double linkage_min_class = current_linkage_distance;
+    double linkage_upper_limit = previous_linkage_distance;
+    double linkage_lower_limit = current_linkage_distance;
 
     /* Now, we will iterate for every k in the range [minClass, maxClass]
      * and choose the one that maximizes the linkage delta.
@@ -161,8 +167,13 @@ DataSet classify_dendogram(
         if( previous_linkage_distance - current_linkage_distance > best_linkage_delta ) {
             best_linkage_delta = previous_linkage_distance - current_linkage_distance;
             best_split = classes;
+            linkage_upper_limit = previous_linkage_distance;
+            linkage_lower_limit = current_linkage_distance;
         }
     }
+
+    // dendogram_classification_data attribute.
+    const double linkage_max_class = current_linkage_distance;
 
     // Finally, construct and return the dataset.
     std::vector< std::string > attribute_names;
@@ -184,9 +195,16 @@ DataSet classify_dendogram(
             );
     }
 
-    return DataSet(
-        std::move( attribute_names ),
-        std::move( category_names ),
-        std::move( entries )
-    );
+    return {
+        DataSet(
+            std::move( attribute_names ),
+            std::move( category_names ),
+            std::move( entries )
+        ),
+        (int) best_split.size(),
+        linkage_min_class,
+        linkage_upper_limit,
+        linkage_lower_limit,
+        linkage_max_class,
+    };
 }
