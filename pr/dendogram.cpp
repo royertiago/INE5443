@@ -265,7 +265,10 @@ dendogram_classification_data classify_dendogram(
 
     // dendogram_classification_data attributes.
     const double linkage_min_class = current_linkage_distance;
-    double linkage_upper_limit = previous_linkage_distance;
+
+    /* upper_limit and lower_limit are exactly these if minClass == maxClass.
+     */
+    double linkage_upper_limit = current_linkage_distance;
     double linkage_lower_limit = current_linkage_distance;
 
     /* Now, we will iterate for every k in the range [minClass, maxClass]
@@ -274,9 +277,11 @@ dendogram_classification_data classify_dendogram(
      * linkage delta is the difference between
      * the linkage distance of the class we just split
      * and the linkage distance of the class we will split next.
+     *
+     * It starts as zero since the current upper and lower limits are zero.
      */
     std::vector< const DendogramNode * > best_split = classes;
-    double best_linkage_delta = previous_linkage_distance - current_linkage_distance;
+    double best_linkage_delta = 0.0;
 
     for( int k = minClass; k < maxClass; k++ ) {
         previous_linkage_distance = current_linkage_distance;
