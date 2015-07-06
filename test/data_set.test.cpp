@@ -337,4 +337,24 @@ TEST_CASE( "DataSet::standardize_factor", "[DataSet]" ) {
     CHECK( pair.second.size() == 1 );
     CHECK( pair.first[0] == Approx(1/2.0) );
     CHECK( pair.second[0] == Approx(5.0) );
+
+    dataset.standardize();
+    auto it = dataset.begin();
+    CHECK( it->attribute(0) == Approx(-1.5) );
+    ++it;
+    CHECK( it->attribute(0) == Approx(-0.5) );
+    ++it;
+    CHECK( it->attribute(0) == Approx(-0.5) );
+    ++it;
+    CHECK( it->attribute(0) == Approx(-0.5) );
+    ++it;
+    CHECK( it->attribute(0) == Approx(0.0) );
+    ++it;
+    CHECK( it->attribute(0) == Approx(0.0) );
+    ++it;
+    CHECK( it->attribute(0) == Approx(1.0) );
+    ++it;
+    CHECK( it->attribute(0) == Approx(2.0) );
+    ++it;
+    CHECK( it == dataset.end() );
 }

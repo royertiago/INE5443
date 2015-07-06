@@ -248,7 +248,7 @@ DataSet::normalizing_factor( double expand ) const {
 void DataSet::normalize( double factor ) {
     auto pair = normalizing_factor( factor );
     for( auto & entry : entries )
-        for( std::size_t i = 0; i < category_count(); i++ )
+        for( std::size_t i = 0; i < attribute_count(); i++ )
             entry.attribute(i) = ( entry.attribute(i) - pair.second[i] )*pair.first[i];
 }
 
@@ -272,7 +272,7 @@ DataSet::standardize_factor() const {
 void DataSet::standardize() {
     auto pair = standardize_factor();
     for( auto & entry : entries )
-        for( std::size_t i = 0; i < category_count(); i++ )
+        for( std::size_t i = 0; i < attribute_count(); i++ )
             entry.attribute(i) = ( entry.attribute(i) - pair.second[i] )*pair.first[i];
 }
 
