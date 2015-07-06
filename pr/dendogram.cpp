@@ -290,6 +290,7 @@ dendogram_classification_data classify_dendogram(
     std::vector< const DendogramNode * > last_split = classes;
     double best_linkage_delta = 0.0;
 
+    int k; // number of classes
     for( int k = minClass; k < maxClass; k++ ) {
         previous_linkage_distance = current_linkage_distance;
         last_split = classes;
@@ -299,6 +300,19 @@ dendogram_classification_data classify_dendogram(
             best_split = last_split;
             linkage_upper_limit = previous_linkage_distance;
             linkage_lower_limit = current_linkage_distance;
+        }
+    }
+    /* Note that with this algorithm we will never have maxClass classes.
+     * So, if maxClass < root.size(), we should do another iteration,
+     * but taking care not to spoil the ordering contitions
+     * on the returned dendogram_classification_data.
+     */
+    if( maxClass < root.size() ) {
+        last_split = classes;
+        double last_linkage_distance = split_classes();
+        if( current_linkage_distance - last_linkage_distance > best_linkage_delta ) {
+            best_split = last_split;
+            linkage_lower_limit = linkage_upper_limit = current_linkage_distance;
         }
     }
 
