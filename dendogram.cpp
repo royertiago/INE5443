@@ -258,7 +258,7 @@ int main( int argc, char ** argv ) {
     } // if( command_line::analyse )
 
     if( command_line::show_image ) {
-        cv::imshow( "IBL", img );
+        cv::imshow( "Dendogram", img );
         cv::waitKey();
     }
 
