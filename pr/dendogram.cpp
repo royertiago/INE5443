@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <limits>
 #include <list>
 #include <sstream>
@@ -6,7 +7,8 @@
 
 std::unique_ptr<DendogramNode> generate_dendogram(
     const DataSet & dataset,
-    LinkageDistanceFunction distance
+    LinkageDistanceFunction distance,
+    LinkageDistanceUpdateFunction update
 )
 {
     std::list< std::unique_ptr<DendogramNode> > nodes;
@@ -81,6 +83,14 @@ double SimpleLinkage( const DendogramNode & a, const DendogramNode & b ) {
             d = std::min( d, dist(entry1, entry2) );
     return d;
 }
+double SimpleLinkageUpdate(
+    const DendogramNode & a,
+    const DendogramNode & b,
+    double d1,
+    double d2
+) {
+    return std::min( d1, d2 );
+}
 
 double FullLinkage( const DendogramNode & a, const DendogramNode & b ) {
     EuclideanDistance dist(0.0);
@@ -89,6 +99,14 @@ double FullLinkage( const DendogramNode & a, const DendogramNode & b ) {
         for( auto entry2 : b )
             d = std::max( d, dist(entry1, entry2) );
     return d;
+}
+double FullLinkageUpdate(
+    const DendogramNode & a,
+    const DendogramNode & b,
+    double d1,
+    double d2
+) {
+    return std::max( d1, d2 );
 }
 
 double MeanLinkage( const DendogramNode & a, const DendogramNode & b ) {
@@ -101,6 +119,14 @@ double MeanLinkage( const DendogramNode & a, const DendogramNode & b ) {
             d += dist(entry1, entry2);
         }
     return d / count;
+}
+double MeanLinkageUpdate(
+    const DendogramNode & a,
+    const DendogramNode & b,
+    double d1,
+    double d2
+) {
+    return (d1 * b.left().size() + d2 * b.right().size()) / b.size();
 }
 
 dendogram_classification_data classify_dendogram(

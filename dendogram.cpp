@@ -86,6 +86,7 @@ namespace command_line {
     std::string output_file_name;
 
     LinkageDistanceFunction * linkage = SimpleLinkage;
+    LinkageDistanceUpdateFunction * update = SimpleLinkageUpdate;
 
     void parse( cmdline::args&& args ) {
         while( args.size() > 0 ) {
@@ -96,10 +97,12 @@ namespace command_line {
             }
             if( arg == "--full" ) {
                 linkage = FullLinkage;
+                update = FullLinkageUpdate;
                 continue;
             }
             if( arg == "--mean" ) {
                 linkage = MeanLinkage;
+                update = FullLinkageUpdate;
                 continue;
             }
             if( arg == "--width" ) {
@@ -182,7 +185,11 @@ int main( int argc, char ** argv ) {
     command_line::parse( cmdline::args(argc, argv) );
 
     DataSet dataset = DataSet::parse( stdin );
-    auto dendogram = generate_dendogram( dataset, command_line::linkage );
+    auto dendogram = generate_dendogram(
+        dataset,
+        command_line::linkage,
+        command_line::update
+    );
 
     cv::Mat img(
         command_line::height, command_line::width,

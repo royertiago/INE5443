@@ -91,7 +91,7 @@ TEST_CASE( "Dendogram builder", "[dendogram]" ) {
             DataEntry({1, 4}, {}, "E"),
         }
     );
-    auto dendogram = generate_dendogram( dataset, SimpleLinkage );
+    auto dendogram = generate_dendogram( dataset, SimpleLinkage, SimpleLinkageUpdate );
     /* Structure:       dendogram
      *                  /       \
      *               left      right

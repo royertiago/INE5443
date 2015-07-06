@@ -15,24 +15,40 @@
 using LinkageDistanceFunction =
     double( const DendogramNode &, const DendogramNode & );
 
+/* Type of a function that is associated to some LinkageDistanceFunction d.
+ * If the parameters are (n1, n2, d1, d2),
+ * this function should return d(n1, n2);
+ * but it may assume that n2 has two children c1 and c2,
+ * such that d(n1, c1) == d1 and d(n1, c2) == d2.
+ *
+ * That is, this function should calculate the distance between two nodes,
+ * given the distances between one node and the children of the other.
+ */
+using LinkageDistanceUpdateFunction =
+    double( const DendogramNode &, const DendogramNode &, double, double );
+
 /* Builds a dendogram.
  * The nodes will point to the values inside the dataset.
  */
 std::unique_ptr<DendogramNode> generate_dendogram(
     const DataSet &,
-    LinkageDistanceFunction
+    LinkageDistanceFunction,
+    LinkageDistanceUpdateFunction
 );
 
 /* Simple linkage: the distance is the smallest distance
  * between an entry in the first dataset and an entry in the second dataset.
  */
 LinkageDistanceFunction SimpleLinkage;
+LinkageDistanceUpdateFunction SimpleLinkageUpdate;
 
 // Full linkage: uses the greatest distance instead of the smallest.
 LinkageDistanceFunction FullLinkage;
+LinkageDistanceUpdateFunction FullLinkageUpdate;
 
 // Mean linkage: uses the average distance instead of the smallest.
 LinkageDistanceFunction MeanLinkage;
+LinkageDistanceUpdateFunction MeanLinkageUpdate;
 
 /* Given two parameters minClass and maxClass,
  * this function will find the "optimum cut" k (minClass <= k <= maxClass)
