@@ -11,39 +11,65 @@ std::unique_ptr<DendogramNode> generate_dendogram(
 {
     std::list< std::unique_ptr<DendogramNode> > nodes;
     typedef std::list<std::unique_ptr<DendogramNode>>::iterator iterator;
-    /* Simple brute-force algorithm.
-     * Start with a list of leaf dendogram nodes,
-     * and merge them as the algorithm proceeds.
-     */
+
+    struct distance_data {
+        iterator left;
+        iterator right;
+        double distance;
+
+        bool has( iterator it ) {
+            return left == it || right == it;
+        }
+    };
+
+    std::list< distance_data > distances;
+    typedef std::list< distance_data >::iterator distance_iterator;
 
     for( const DataEntry & entry : dataset )
         nodes.push_back( std::make_unique<DendogramNode>( &entry ) );
 
+    for( iterator it = nodes.begin(); it != nodes.end(); ++it ) {
+        iterator jt = it;
+        for( ++jt; jt != nodes.end(); ++jt )
+            distances.push_back( {it, jt, distance(**it, **jt)} );
+    }
+
     while( nodes.size() != 1 ) {
-        iterator best_left;
-        iterator best_right;
-        double best = std::numeric_limits<double>::max();
+        distance_data best;
+        best.distance = std::numeric_limits<double>::max();
 
         // Find the closest pair
-        for( iterator it = nodes.begin(); it != nodes.end(); ++it ) {
-            iterator jt = it;
-            for( ++jt; jt != nodes.end(); ++jt ) {
-                double d = distance( **it, **jt );
-                if( d < best ) {
-                    best = d;
-                    best_left = jt;
-                    best_right = it;
-                }
-            }
-        }
+        for( const auto& dist : distances )
+            if( dist.distance < best.distance )
+                best = dist;
 
-        // Merge
+        // Merge the nodes
         nodes.push_back( std::make_unique<DendogramNode>(
-            std::move(*best_left), std::move(*best_right), best
+            std::move(*best.left), std::move(*best.right), best.distance
         ));
-        nodes.erase( best_left );
-        nodes.erase( best_right );
+
+        // Clean distance list and 'nodes'
+        distance_iterator it = distances.begin();
+        while( it != distances.end() )
+            if( it->has( best.left ) || it->has( best.right ) )
+                it = distances.erase( it );
+            else
+                ++it;
+
+        nodes.erase( best.left );
+        nodes.erase( best.right );
+
+        /* Store new distances
+         * We must take care to not measure the distance
+         * between the last node and itself.
+         */
+        iterator jt = nodes.begin();
+        iterator end = nodes.end();
+        iterator target = --end;
+        for( ; jt != end; ++jt )
+            distances.push_back( {jt, target, distance(**jt, **target)} );
     }
+
     return std::move( nodes.front() );
 }
 
