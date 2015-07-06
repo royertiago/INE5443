@@ -50,6 +50,15 @@ TEST_CASE( "Trivial DataEntry member test", "[DataEntry][trivial]" ) {
         CHECK( data.category(0) == "A" );
         CHECK( data.category(1) == "D" );
         CHECK( data.name() == "" );
+
+        SECTION( "Update members" ) {
+            data.attribute(0) = 2;
+            CHECK( data.attribute(0) == 2.0 );
+            data.category(0) = "C";
+            CHECK( data.category(0) == "C" );
+            data.name() = "Name";
+            CHECK( data.name() == "Name" );
+        }
     }
     SECTION( "DataEntry with just a name" ) {
         DataEntry data( {},{}, "Name" );
