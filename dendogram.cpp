@@ -27,6 +27,10 @@ namespace command_line {
 "    this option may be useful in this case.\n"
 "    Default: write the names.\n"
 "\n"
+"--output <file>\n"
+"    Write the generated image to <file>.\n"
+"    No writing is done by default.\n"
+"\n"
 "--min-class <N>\n"
 "--max-class <N>\n"
 "    Activates the analyzer with the specified limitations.\n"
@@ -74,6 +78,8 @@ namespace command_line {
     bool show_limits = false;
     bool write_classes = false;
 
+    std::string output_file_name;
+
     LinkageDistanceFunction * linkage = SimpleLinkage;
 
     void parse( cmdline::args&& args ) {
@@ -97,6 +103,14 @@ namespace command_line {
             }
             if( arg == "--height" ) {
                 args.range(1) >> height;
+                continue;
+            }
+            if( arg == "--nonames" ) {
+                print_names = false;
+                continue;
+            }
+            if( arg == "--output" ) {
+                output_file_name = args.next();
                 continue;
             }
             if( arg == "--min-class" ) {
@@ -173,6 +187,13 @@ int main( int argc, char ** argv ) {
     else {
         word_width = 0;
         util::print_dendogram( img, *dendogram );
+    }
+
+    if( command_line::output_file_name != "" ) {
+        if( !cv::imwrite( command_line::output_file_name, img ) )
+            std::fprintf( stderr, "Error writing image to %s\n",
+                command_line::output_file_name.c_str()
+            );
     }
 
     if( command_line::analyse ) {
