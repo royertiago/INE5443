@@ -27,6 +27,10 @@ namespace command_line {
 "    this option may be useful in this case.\n"
 "    Default: write the names.\n"
 "\n"
+"--noshow\n"
+"    Disable image generation altogether.\n"
+"    Default: show image.\n"
+"\n"
 "--output <file>\n"
 "    Write the generated image to <file>.\n"
 "    No writing is done by default.\n"
@@ -69,6 +73,7 @@ namespace command_line {
     int width = 800;
     int height = 600;
 
+    bool show_image = true;
     bool print_names = true;
 
     bool analyse = false;
@@ -107,6 +112,10 @@ namespace command_line {
             }
             if( arg == "--nonames" ) {
                 print_names = false;
+                continue;
+            }
+            if( arg == "--noshow" ) {
+                show_image = false;
                 continue;
             }
             if( arg == "--output" ) {
@@ -182,11 +191,13 @@ int main( int argc, char ** argv ) {
 
     int word_width;
 
-    if( command_line::print_names )
-        word_width = util::print_named_dendogram( img, *dendogram );
-    else {
-        word_width = 0;
-        util::print_dendogram( img, *dendogram );
+    if( command_line::show_image || command_line::output_file_name != "" ) {
+        if( command_line::print_names )
+            word_width = util::print_named_dendogram( img, *dendogram );
+        else {
+            word_width = 0;
+            util::print_dendogram( img, *dendogram );
+        }
     }
 
     if( command_line::output_file_name != "" ) {
@@ -239,8 +250,10 @@ int main( int argc, char ** argv ) {
         }
     } // if( command_line::analyse )
 
-    cv::imshow( "IBL", img );
-    cv::waitKey();
+    if( command_line::show_image ) {
+        cv::imshow( "IBL", img );
+        cv::waitKey();
+    }
 
     return 0;
 }
