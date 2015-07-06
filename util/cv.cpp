@@ -1,5 +1,5 @@
+#include <algorithm>
 #include <stdexcept>
-#include <cfloat>
 #include "cv.h"
 #include "pr/dendogram_node.h"
 #include "pr/grid_generator.h"
@@ -119,45 +119,18 @@ int print_dendogram( cv::Mat & output, const DendogramNode & input ) {
     if( input.leaf() )
         return height/2;
 
-    if( input.linkage_distance() < DBL_EPSILON ) {
-        /* This should only happen in the lower levels.
-         * In this situation, width is most likely 0,
-         * so we simply return.
-         *
-         * Width will only be nonzero if this is the "top" call,
-         * so we will just draw some lines to give the impression
-         * of all them joining in the same level.
-         */
-        if( width != 0 && height != 0 ) {
-            for( int i = 0; i < input.size(); i++ ) {
-                int draw_height = (2.0 * i + 1)/2 / input.size() * height;
-                cv::line(
-                    output,
-                    cv::Point(0, draw_height),
-                    cv::Point(width-1, draw_height),
-                    cv::Scalar(0,0,0)
-                );
-            }
-            int lowest_height = 0.5/input.size() * height;
-            int highest_height = (input.size() - 0.5)/input.size() * height;
-            cv::line(
-                output,
-                cv::Point(width-1, lowest_height),
-                cv::Point(width-1, highest_height),
-                cv::Scalar(0,0,0)
-            );
-        }
-        return height/2;
-    }
-
     int middle = (double) input.left().size() / input.size() * height;
     int upper_limit = (double) input.left().linkage_distance() /
         input.linkage_distance() * width;
     int lower_limit = (double) input.right().linkage_distance() /
         input.linkage_distance() * width;
 
-    cv::Mat upper_img = output( cv::Range(0, middle-1), cv::Range(0, upper_limit) );
-    cv::Mat lower_img = output( cv::Range(middle, height-1), cv::Range(0, lower_limit) );
+    // This guarantees each image will be at least one pixel wide.
+    upper_limit = std::max( upper_limit, 1 );
+    lower_limit = std::max( lower_limit, 1 );
+
+    cv::Mat upper_img = output( cv::Range(0, middle), cv::Range(0, upper_limit) );
+    cv::Mat lower_img = output( cv::Range(middle, height), cv::Range(0, lower_limit) );
 
     /* Cartesian plane in ASCII art outlining the variables:
      *
@@ -196,18 +169,6 @@ int print_dendogram( cv::Mat & output, const DendogramNode & input ) {
 
     int upper_middle = print_dendogram( upper_img, input.left() );
     int lower_middle = print_dendogram( lower_img, input.right() ) + middle;
-
-    /* If an cv::Mat is created without width, but some height,
-     * image.size().height will nonetheless returns 0.
-     * (It makes sense; the height of a null image is really zero.)
-     *
-     * Thus, the return values of print_dendogram will be 0 -- wrong.
-     * We simply reset them to the half here.
-     */
-    if( upper_limit == 0 )
-        upper_middle = middle/2;
-    if( lower_limit == 0 )
-        lower_middle = (middle + height)/2;
 
     cv::line(
         output,
