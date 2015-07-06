@@ -72,25 +72,53 @@ std::unique_ptr<DendogramNode> generate_dendogram(
             0.0
         } );
 
-        // Clean distance list and 'nodes'
+        /* Clean 'distance' list.
+         * This is where we do the annotation.
+         * We will eliminate every distance information that contains either
+         * best.left or best.right,
+         * since the DendogramNodes of these two were just merged.
+         *
+         * If the current iterator 'it' points to the distance_data
+         * that has both best.left and best.rigth,
+         * there is nothing to annotate.
+         *
+         * If 'it' points to a distance_data that contains just the best.left,
+         * it means the other iterator points to a node
+         * whose distance to the just-merged node will need to be calculated;
+         * hence, we need to annotate this information.
+         * Specifically, we need to annotate the node that is not best.left
+         * (that's why we create the iterator 'target'),
+         * and since the other node points to best.left,
+         * we need to annotate d_left.
+         *
+         * The situation for best.right is analogous.
+         *
+         * Note that every pair of nodes will appear exactly once in 'distances',
+         * so we will update all the needed information in all nodes.
+         */
         distance_iterator it = distances.begin();
         while( it != distances.end() ) {
             if( it->has( best.left ) && it->has( best.right ) )
                 it = distances.erase( it );
             else if( it->has( best.left ) ) {
                 iterator target = it->left != best.left ? it->left : it->right;
-                target->d_right = it->distance;
+                target->d_left = it->distance;
                 it = distances.erase( it );
             }
             else if( it->has( best.right ) ) {
                 iterator target = it->left != best.right ? it->left : it->right;
-                target->d_left = it->distance;
+                target->d_right = it->distance;
                 it = distances.erase( it );
             }
             else
                 ++it;
         }
 
+        /* Remove the old nodes.
+         * We must not erase best.left and best.right before cleaning 'distances'
+         * because we compare iterators for equality in that loop,
+         * so they must've had been valid until now.
+         */
         nodes.erase( best.left );
         nodes.erase( best.right );
 
