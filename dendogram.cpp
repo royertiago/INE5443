@@ -228,16 +228,6 @@ int main( int argc, char ** argv ) {
 
         int remaining_width = command_line::width - word_width;
 
-        if( command_line::show_split ) {
-            int pos = (data.linkage_lower_limit + data.linkage_upper_limit) /
-                (2 * dendogram->linkage_distance()) * remaining_width + word_width;
-            cv::line(
-                img,
-                cv::Point(pos, 0), cv::Point(pos, command_line::height),
-                cv::Scalar(0,0,255)
-            );
-        }
-
         if( command_line::show_limits ) {
             int pos = data.linkage_min_class / dendogram->linkage_distance() *
                 remaining_width + word_width;
@@ -253,6 +243,16 @@ int main( int argc, char ** argv ) {
                 img,
                 cv::Point(pos, 0), cv::Point(pos, command_line::height),
                 cv::Scalar(128,128,128)
+            );
+        }
+
+        if( command_line::show_split ) {
+            int pos = (data.linkage_lower_limit + data.linkage_upper_limit) /
+                (2 * dendogram->linkage_distance()) * remaining_width + word_width;
+            cv::line(
+                img,
+                cv::Point(pos, 0), cv::Point(pos, command_line::height),
+                cv::Scalar(0,0,255)
             );
         }
     } // if( command_line::analyse )
