@@ -102,7 +102,7 @@ namespace command_line {
             }
             if( arg == "--mean" ) {
                 linkage = MeanLinkage;
-                update = FullLinkageUpdate;
+                update = MeanLinkageUpdate;
                 continue;
             }
             if( arg == "--width" ) {
