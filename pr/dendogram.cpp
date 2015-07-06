@@ -279,16 +279,24 @@ dendogram_classification_data classify_dendogram(
      * and the linkage distance of the class we will split next.
      *
      * It starts as zero since the current upper and lower limits are zero.
+     *
+     * We must take care of one detail: the difference
+     * previous_linkage_distance - current_linkage_distance
+     * refers to the last split, not to the current split.
+     * Therefore, we must store the last_split
+     * and store it in best_split if it would increase the linkage_delta.
      */
     std::vector< const DendogramNode * > best_split = classes;
+    std::vector< const DendogramNode * > last_split = classes;
     double best_linkage_delta = 0.0;
 
     for( int k = minClass; k < maxClass; k++ ) {
         previous_linkage_distance = current_linkage_distance;
+        last_split = classes;
         current_linkage_distance = split_classes();
         if( previous_linkage_distance - current_linkage_distance > best_linkage_delta ) {
             best_linkage_delta = previous_linkage_distance - current_linkage_distance;
-            best_split = classes;
+            best_split = last_split;
             linkage_upper_limit = previous_linkage_distance;
             linkage_lower_limit = current_linkage_distance;
         }
