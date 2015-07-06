@@ -196,18 +196,18 @@ double MeanLinkageUpdate(
 
 dendogram_classification_data classify_dendogram(
     const DendogramNode & root,
-    int minClass,
-    int maxClass,
+    int min_class,
+    int max_class,
     const DataSet & base
 )
 {
-    if( maxClass > root.size() )
-        throw "maxClass is greater than the number of leaves in the dendogram.";
-    if( minClass > maxClass )
-        throw "minClass > maxClass.";
+    if( max_class > root.size() )
+        throw "max_class is greater than the number of leaves in the dendogram.";
+    if( min_class > max_class )
+        throw "min_class > max_class.";
 
     std::vector< const DendogramNode * > classes;
-    classes.reserve( maxClass );
+    classes.reserve( max_class );
     classes.push_back( &root );
 
     /* We will iterate through every possible splitting of the dendogram
@@ -257,8 +257,8 @@ dendogram_classification_data classify_dendogram(
     // Previous value of current_linkage_distance
     double previous_linkage_distance = root.linkage_distance();
 
-    // First, we will add minClass classes to 'classes'.
-    for( int i = 1; i < minClass; i++ ) {
+    // First, we will add min_class classes to 'classes'.
+    for( int i = 1; i < min_class; i++ ) {
         previous_linkage_distance = current_linkage_distance;
         current_linkage_distance = split_classes();
     }
@@ -266,12 +266,12 @@ dendogram_classification_data classify_dendogram(
     // dendogram_classification_data attributes.
     const double linkage_min_class = current_linkage_distance;
 
-    /* upper_limit and lower_limit are exactly these if minClass == maxClass.
+    /* upper_limit and lower_limit are exactly these if min_class == max_class.
      */
     double linkage_upper_limit = current_linkage_distance;
     double linkage_lower_limit = current_linkage_distance;
 
-    /* Now, we will iterate for every k in the range [minClass, maxClass]
+    /* Now, we will iterate for every k in the range [min_class, max_class]
      * and choose the one that maximizes the linkage delta.
      *
      * linkage delta is the difference between
@@ -291,7 +291,7 @@ dendogram_classification_data classify_dendogram(
     double best_linkage_delta = 0.0;
 
     int k; // number of classes
-    for( int k = minClass; k < maxClass; k++ ) {
+    for( int k = min_class; k < max_class; k++ ) {
         previous_linkage_distance = current_linkage_distance;
         last_split = classes;
         current_linkage_distance = split_classes();
@@ -302,12 +302,12 @@ dendogram_classification_data classify_dendogram(
             linkage_lower_limit = current_linkage_distance;
         }
     }
-    /* Note that with this algorithm we will never have maxClass classes.
-     * So, if maxClass < root.size(), we should do another iteration,
+    /* Note that with this algorithm we will never have max_class classes.
+     * So, if max_class < root.size(), we should do another iteration,
      * but taking care not to spoil the ordering contitions
      * on the returned dendogram_classification_data.
      */
-    if( maxClass < root.size() ) {
+    if( max_class < root.size() ) {
         last_split = classes;
         double last_linkage_distance = split_classes();
         if( current_linkage_distance - last_linkage_distance > best_linkage_delta ) {

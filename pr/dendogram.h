@@ -55,8 +55,8 @@ LinkageDistanceUpdateFunction FullLinkageUpdate;
 LinkageDistanceFunction MeanLinkage;
 LinkageDistanceUpdateFunction MeanLinkageUpdate;
 
-/* Given two parameters minClass and maxClass,
- * this function will find the "optimum cut" k (minClass <= k <= maxClass)
+/* Given two parameters min_class and max_class,
+ * this function will find the "optimum cut" k (min_class <= k <= max_class)
  * and divide the dendogram in k different classes.
  *
  * This function returns the following information:
@@ -70,10 +70,10 @@ LinkageDistanceUpdateFunction MeanLinkageUpdate;
  *      Selected number of classes (the value $k$ above).
  *
  *  linkage_min_class
- *      Maximum linkage distance of top nodes with 'minClass' classes.
+ *      Maximum linkage distance of top nodes with 'min_class' classes.
  *
  *  linkage_max_class
- *      Maximum linkage distance of top nodes with 'maxClass' classes.
+ *      Maximum linkage distance of top nodes with 'max_class' classes.
  *
  *  linkage_lower_limit
  *      Maximum linkage distance of top nodes with $k$ classes.
@@ -89,10 +89,10 @@ LinkageDistanceUpdateFunction MeanLinkageUpdate;
  * By "optimum cut" we mean a $k$ that maximizes
  * linkage_upper_limit - linkage_lower_limit.
  * That is, the next class merge will be the "costlier"
- * of all merges that happen between minClass and maxClass.
+ * of all merges that happen between min_class and max_class.
  *
  * (Note that we will never put everything in a single class
- * unless the maxClass parameter forces us to.)
+ * unless the max_class parameter forces us to.)
  */
 struct dendogram_classification_data {
     DataSet classified_dataset;
@@ -105,8 +105,8 @@ struct dendogram_classification_data {
 
 dendogram_classification_data classify_dendogram(
     const DendogramNode &,
-    int minClass,
-    int maxClass,
+    int min_class,
+    int max_class,
     const DataSet& base
 );
 
