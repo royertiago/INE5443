@@ -54,7 +54,7 @@ namespace command_line {
         while( args.size() > 0 ) {
             std::string arg = args.next();
             if( arg == "--output" ) {
-                output = arg;
+                output = args.next();
                 continue;
             }
             if( arg == "--mahalanobis" ) {
