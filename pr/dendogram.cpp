@@ -11,8 +11,24 @@ std::unique_ptr<DendogramNode> generate_dendogram(
     LinkageDistanceUpdateFunction update
 )
 {
-    std::list< std::unique_ptr<DendogramNode> > nodes;
-    typedef std::list<std::unique_ptr<DendogramNode>>::iterator iterator;
+    /* To guarantee the quadratic number of calls,
+     * we will need to annotate each node with the distances required by
+     * the LinkageDistanceUpdateFunction.
+     * This 'node' type will store these annotations.
+     *
+     * d_left and d_right will mean, respectively,
+     * the distance to the left and right children
+     * of the node that was just merged.
+     */
+    struct node {
+        std::unique_ptr<DendogramNode> node;
+        double d_left;
+        double d_right;
+        DendogramNode & operator*(){ return *node; }
+    };
+
+    std::list< node > nodes;
+    typedef std::list< node >::iterator iterator;
 
     struct distance_data {
         iterator left;
@@ -27,8 +43,9 @@ std::unique_ptr<DendogramNode> generate_dendogram(
     std::list< distance_data > distances;
     typedef std::list< distance_data >::iterator distance_iterator;
 
+    // Initialize nodes and distances
     for( const DataEntry & entry : dataset )
-        nodes.push_back( std::make_unique<DendogramNode>( &entry ) );
+        nodes.push_back( {std::make_unique<DendogramNode>( &entry ), 0.0, 0.0} );
 
     for( iterator it = nodes.begin(); it != nodes.end(); ++it ) {
         iterator jt = it;
@@ -36,6 +53,7 @@ std::unique_ptr<DendogramNode> generate_dendogram(
             distances.push_back( {it, jt, distance(**it, **jt)} );
     }
 
+    // Iterate until every node was merged
     while( nodes.size() != 1 ) {
         distance_data best;
         best.distance = std::numeric_limits<double>::max();
@@ -46,17 +64,32 @@ std::unique_ptr<DendogramNode> generate_dendogram(
                 best = dist;
 
         // Merge the nodes
-        nodes.push_back( std::make_unique<DendogramNode>(
-            std::move(*best.left), std::move(*best.right), best.distance
-        ));
+        nodes.push_back( {
+            std::make_unique<DendogramNode>(
+                std::move(best.left->node), std::move(best.right->node), best.distance
+            ),
+            0.0,
+            0.0
+        } );
 
         // Clean distance list and 'nodes'
         distance_iterator it = distances.begin();
-        while( it != distances.end() )
-            if( it->has( best.left ) || it->has( best.right ) )
+        while( it != distances.end() ) {
+            if( it->has( best.left ) && it->has( best.right ) )
                 it = distances.erase( it );
+            else if( it->has( best.left ) ) {
+                iterator target = it->left != best.left ? it->left : it->right;
+                target->d_right = it->distance;
+                it = distances.erase( it );
+            }
+            else if( it->has( best.right ) ) {
+                iterator target = it->left != best.right ? it->left : it->right;
+                target->d_left = it->distance;
+                it = distances.erase( it );
+            }
             else
                 ++it;
+        }
 
         nodes.erase( best.left );
         nodes.erase( best.right );
@@ -69,10 +102,14 @@ std::unique_ptr<DendogramNode> generate_dendogram(
         iterator end = nodes.end();
         iterator target = --end;
         for( ; jt != end; ++jt )
-            distances.push_back( {jt, target, distance(**jt, **target)} );
+            distances.push_back( {
+                jt,
+                target,
+                update(**jt, **target, jt->d_left, jt->d_right)
+            } );
     }
 
-    return std::move( nodes.front() );
+    return std::move( nodes.front().node );
 }
 
 double SimpleLinkage( const DendogramNode & a, const DendogramNode & b ) {

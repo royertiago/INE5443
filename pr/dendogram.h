@@ -29,6 +29,11 @@ using LinkageDistanceUpdateFunction =
 
 /* Builds a dendogram.
  * The nodes will point to the values inside the dataset.
+ *
+ * It will make a quadratic number of calls to the LinkageDistanceFunction,
+ * with trees with a single node,
+ * and a quadratic number of calls to LinkageDistanceUpdateFunction,
+ * with varied tree sizes.
  */
 std::unique_ptr<DendogramNode> generate_dendogram(
     const DataSet &,
