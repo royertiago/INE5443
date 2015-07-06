@@ -267,15 +267,15 @@ TEST_CASE( "DataSet writing to file with names", "[DataSet][write]" ) {
     dataset.write( file );
     std::fclose( file );
     CHECK( output_file == std::string(
-        "n 3\n"
-        "i \n"
+        "n 4\n"
         "a X pos\n"
         "a Y pos\n"
         "c Color\n"
+        "i \n"
         "\n"
-        "Alpha,1.000000,1.000000,Blue\n"
-        "Beta,2.000000,4.000000,Red\n"
-        "Gamma,4.000000,0.000000,Green\n"
+        "1.000000,1.000000,Blue,Alpha\n"
+        "2.000000,4.000000,Red,Beta\n"
+        "4.000000,0.000000,Green,Gamma\n"
         )
     );
 }

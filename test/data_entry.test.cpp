@@ -266,7 +266,7 @@ TEST_CASE( "DataEntry file input/output", "[DataEntry][parse]" ) {
         "Comma,separated,words\n"
         " white space ,before comma , after comma\n"
         "1.000000,Name,Cat\n"
-        "Name,1.000000,Cat\n"
+        "1.000000,Cat,Name\n"
         )
     );
 }
