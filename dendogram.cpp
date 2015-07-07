@@ -240,13 +240,6 @@ int main( int argc, char ** argv ) {
         }
     }
 
-    if( command_line::output_file_name != "" ) {
-        if( !cv::imwrite( command_line::output_file_name, img ) )
-            std::fprintf( stderr, "Error writing image to %s\n",
-                command_line::output_file_name.c_str()
-            );
-    }
-
     if( command_line::analyse ) {
         auto data = classify_dendogram(
             *dendogram,
@@ -289,6 +282,13 @@ int main( int argc, char ** argv ) {
             );
         }
     } // if( command_line::analyse )
+
+    if( command_line::output_file_name != "" ) {
+        if( !cv::imwrite( command_line::output_file_name, img ) )
+            std::fprintf( stderr, "Error writing image to %s\n",
+                command_line::output_file_name.c_str()
+            );
+    }
 
     if( command_line::show_image ) {
         cv::imshow( "Dendogram", img );
